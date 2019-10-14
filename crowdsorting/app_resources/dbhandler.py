@@ -1,13 +1,7 @@
-from crowdsorting import session, app, pairselector
+from crowdsorting import session, pairselector
 from crowdsorting import db
-from crowdsorting.db_models.models import Project, Doc, Judge, Judgment
+from crowdsorting.database.models import Project, Doc, Judge, Judgment
 from crowdsorting import models
-import os
-from os import listdir
-from .settings import APP_DOCS, ADMIN_PATH
-import itertools
-from random import shuffle
-from .docpair import DocPair
 from datetime import datetime
 from datetime import timedelta
 
@@ -48,7 +42,7 @@ class dbHandler():
                 print(f"pair timestamp set to {pair.getTimestamp()}")
                 print(f"serving stored pair {pair}")
                 return pair
-        allDocs = db.session.query(Doc).filter_by(project_name=project).all()
+        allDocs = db.session.query(Doc).filter_by(project_name=project, checked_out=False).all()
         allJudgments = db.session.query(Judgment).filter_by(project_name=project).all()
         print('allJudgments:', allJudgments)
         pair = pairselector.getPair(allDocs, allJudgments)
@@ -56,8 +50,8 @@ class dbHandler():
             print('no more pairs')
             return pair
         self.pairsBeingProcessed[project].append(pair)
-        doc1 = db.session.query(Doc).filter_by(name=pair.getFirst()).first()
-        doc2 = db.session.query(Doc).filter_by(name=pair.getSecond()).first()
+        doc1 = db.session.query(Doc).filter_by(name=pair.getFirst(), project_name=project).first()
+        doc2 = db.session.query(Doc).filter_by(name=pair.getSecond(), project_name=project).first()
         doc1.checked_out = True
         doc2.checked_out = True
         db.session.commit()
@@ -69,8 +63,8 @@ class dbHandler():
     def createJudgment(self, harder, easier, project):
         print(f"The winner is {harder}")
         print(f"The loser is {easier}")
-        harder_doc = db.session.query(Doc).filter_by(name=harder).first()
-        easier_doc = db.session.query(Doc).filter_by(name=easier).first()
+        harder_doc = db.session.query(Doc).filter_by(name=harder, project_name=project).first()
+        easier_doc = db.session.query(Doc).filter_by(name=easier, project_name=project).first()
         harder_doc.checked_out = False
         easier_doc.checked_out = False
         harder_doc.num_compares += 1
@@ -87,7 +81,13 @@ class dbHandler():
 
     # Function to delete Doc and Judgments from database
     def deleteFile(self, name, project):
-        for j in db.session.query(Judgment).all():
+        for j in db.session.query(Judgment).filter_by(project_name=project).all():
+            if j.doc_harder.name == name:
+                db.session.query(Judgment).filter_by(id=j.id).delete()
+                continue
+            if j.doc_easier.name == name:
+                db.session.query(Judgment).filter_by(id=j.id).delete()
+            '''
             doc1 = db.session.query(Doc).filter_by(id=j.doc_harder_id).first()
             print('Doc1', doc1)
             doc2 = db.session.query(Doc).filter_by(id=j.doc_easier_id).first()
@@ -95,7 +95,8 @@ class dbHandler():
             if (type(doc1) == type(Doc()) and doc1.name == name) or (type(doc2) == type(Doc()) and doc2.name == name):
                 print('deleting a judgment')
                 db.session.query(Judgment).filter_by(id=j.id).delete()
-        db.session.query(Doc).filter_by(name=name).delete()
+                '''
+        db.session.query(Doc).filter_by(name=name, project_name=project).delete()
         db.session.commit()
 
     def createDoc(self, filename, contents, project):

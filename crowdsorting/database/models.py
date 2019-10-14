@@ -20,11 +20,11 @@ class Project(db.Model):
     name = db.Column(db.String(120), nullable=False, primary_key=True)
     date_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     judges = db.relationship('Judge', secondary='judges', lazy='subquery', backref=db.backref('myprojects', lazy=True))
-    docs = db.relationship('Doc')
-    judgments = db.relationship('Judgment')
+    docs = db.relationship('Doc', cascade='all')
+    judgments = db.relationship('Judgment', cascade='all')
 
     def __repr__(self):
-        return f"Project name={self.name}, date_created={self.date_created}"
+        return f"{self.name}"
 
     def getName(self):
         return self.name
@@ -51,11 +51,11 @@ class Doc(db.Model, UserMixin):
     checked_out = db.Column(db.Boolean, default=False)
     contents = db.Column(db.String(100000), default="")
     project_name = db.Column(db.String(120), ForeignKey('project.name'))
-    judgments_harder = db.relationship('Judgment', foreign_keys='Judgment.doc_harder_id')
-    judgments_easier = db.relationship('Judgment', foreign_keys='Judgment.doc_easier_id')
+    judgments_harder = db.relationship('Judgment', foreign_keys='Judgment.doc_harder_id', cascade='all')
+    judgments_easier = db.relationship('Judgment', foreign_keys='Judgment.doc_easier_id', cascade='all')
 
     def __repr__(self):
-        return f"\nDoc id={self.id}, name={self.name}, date_added={self.date_added}, num_compares={self.num_compares}"
+        return f"\n{self.name}"
 
 
 class Judge(db.Model):

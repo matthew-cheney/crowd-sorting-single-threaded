@@ -3,11 +3,28 @@
   <component name="ChangeListManager">
     <list default="true" id="a9a6dbdc-9919-4bdd-a983-5d41e32f0ef4" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/crowdsorting/app_resources/dbcontroller.py" beforeDir="false" afterPath="$PROJECT_DIR$/crowdsorting/app_resources/dbhandler.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/crowdsorting/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/crowdsorting/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/crowdsorting/app_resources/AdminModelView.py" beforeDir="false" afterPath="$PROJECT_DIR$/crowdsorting/app_resources/AdminModelView.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/crowdsorting/app_resources/dbhandler.py" beforeDir="false" afterPath="$PROJECT_DIR$/crowdsorting/app_resources/dbhandler.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/crowdsorting/app_resources/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/crowdsorting/app_resources/forms.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/crowdsorting/app_resources/routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/crowdsorting/app_resources/routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/crowdsorting/database/crowdsorting.db" beforeDir="false" afterPath="$PROJECT_DIR$/crowdsorting/database/crowdsorting.db" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/flask_session/0b60f7c8b1815a4c7295f7c002362e57" beforeDir="false" afterPath="$PROJECT_DIR$/flask_session/0b60f7c8b1815a4c7295f7c002362e57" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/crowdsorting/app_resources/sorting_algorithms/pairall.py" beforeDir="false" afterPath="$PROJECT_DIR$/crowdsorting/app_resources/sorting_algorithms/pairall.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/crowdsorting/database/crowdsorting.db" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/crowdsorting/database_connector.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/crowdsorting/databases.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/crowdsorting/db_models/db_template.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/crowdsorting/db_models/english_models.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/crowdsorting/db_models/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/crowdsorting/database/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/crowdsorting/db_models/russian_models.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/crowdsorting/project_folders/english/admins.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/crowdsorting/project_folders/english/english.db" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/crowdsorting/project_folders/russian/admins.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/crowdsorting/project_folders/russian/russian.db" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/crowdsorting/site.db" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/crowdsorting/templates/admin/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/crowdsorting/templates/admin/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flask_session/0b60f7c8b1815a4c7295f7c002362e57" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/flask_session/2029240f6d1128be89ddc32729463129" beforeDir="false" afterPath="$PROJECT_DIR$/flask_session/2029240f6d1128be89ddc32729463129" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/initialize_databases.py" beforeDir="false" afterPath="$PROJECT_DIR$/initialize_databases.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/notes.txt" beforeDir="false" afterPath="$PROJECT_DIR$/notes.txt" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -31,6 +48,11 @@
   <component name="PropertiesComponent">
     <property name="last_opened_file_path" value="$USER_HOME$/Documents/DGHT360" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/crowdsorting/database" />
+    </key>
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">

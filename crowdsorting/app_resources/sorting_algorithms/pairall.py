@@ -6,7 +6,7 @@ class pairall(selection_algorithm):
         if len(allDocs) < 2:
             return "Not enough docs to compare"
         # Remove docs that are currently checked out from consideration
-        toRemove = []
+        '''toRemove = []
         for doc in allDocs:
             if doc.checked_out:
                 toRemove.append(doc)
@@ -14,7 +14,7 @@ class pairall(selection_algorithm):
             allDocs.remove(doc)
         if len(allDocs) < 2:
             return "All docs are checked out"
-
+'''
         allDocs.sort(key=lambda x: self.getNumCompares(x))
 
         while len(allDocs) > 1:

@@ -21,3 +21,25 @@ class MyAdminIndexView(admin.AdminIndexView):
         if 'user' not in session or not session['user'].get_is_admin():
             return redirect(url_for('home'))
         return super(MyAdminIndexView, self).index()
+
+
+class JudgeView(AdminModelView):
+    column_list = ('firstName', 'lastName', 'username', 'email', 'projects')
+    column_filters = ['projects.name']
+    column_labels = {'projects.name': 'Projects', 'firstName': 'First Name', 'lastName': 'Last Name'}
+
+
+class JudgmentView(AdminModelView):
+    column_list = ('id', 'doc_harder', 'doc_easier', 'judge', 'project_name')
+    page_size = 50
+    column_filters = ['project_name']
+
+
+class DocView(AdminModelView):
+    column_list = ('name', 'num_compares', 'checked_out', 'project_name')
+    column_searchable_list = ['name']
+    column_filters = ['project_name']
+
+
+class ProjectView(AdminModelView):
+    column_list = ('name', 'date_created', 'judges')

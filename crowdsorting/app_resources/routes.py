@@ -1,29 +1,17 @@
 from crowdsorting.app_resources.dbhandler import dbHandler
 from crowdsorting import app, cas, session
-# from crowdsorting.app_resources.settings import db
 from flask import flash
 from flask import render_template
 from flask import url_for
 from flask import redirect
 from flask import request
 from flask import make_response
-# from flask import session
 import os
-from os import listdir
 from .settings import ADMIN_PATH
 from .user import User
 
 from crowdsorting.app_resources.forms import NewUserForm, NewProjectForm
 from flask_cas import login, logout, login_required
-from werkzeug.utils import secure_filename
-
-
-dirFiles = []
-dirFiles.sort()
-fileCounter = 0
-if len(dirFiles) > 0:
-    pass
-    # fileCounter = int(dirFiles[-1]) + 1
 
 dbhandler = dbHandler()
 
@@ -48,8 +36,7 @@ def login():
     session['user'] = User(cas.username, True, adminBool, user_id)
 
     return redirect(url_for('projectsdashboard'))
-    # session['tempInfo'] = 'hello, world!'
-    # return redirect(url_for('temp'))
+
 
 @app.route('/newuser', methods=['GET', 'POST'])
 def newuser():

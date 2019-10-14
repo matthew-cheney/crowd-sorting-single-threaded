@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired, Length, Email, ValidationError
-from crowdsorting.db_models.models import *
+from crowdsorting.database.models import *
 
 
 class NewDocForm(FlaskForm):

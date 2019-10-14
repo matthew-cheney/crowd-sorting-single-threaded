@@ -11,6 +11,12 @@ Insertion Sort?
     Performance enhancement (at least for us) - use Rob's AI to sort, then use humans to confirm
 
 
+To Do:
+    Prettify back-end code
+    Fix bugs in selection algorithm (make new one - transitivepairs?)
+    Work on front-end
+    Add ability to delete project
+
 Algorithms:
 https://en.wikipedia.org/wiki/Bradley%E2%80%93Terry_model
 https://en.wikipedia.org/wiki/Ordinal_regression
