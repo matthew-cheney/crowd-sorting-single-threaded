@@ -1,0 +1,12 @@
+body {
+    padding-top: 65px;
+}
+
+.card-height {
+  height: 50vh;
+  overflow-y: scroll;
+}
+
+.hidden_div {
+  visibility: hidden;
+}

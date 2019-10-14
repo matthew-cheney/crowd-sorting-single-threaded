@@ -1,0 +1,11 @@
+---
+  APP_DOCS: 'docs'
+  SECRET_KEY: 'f5930081528345e45851bd57266c39f1'
+  SQLALCHEMY_DATABASE_URI: 'sqlite:///database/crowdsorting.db'
+  SQLALCHEMY_TRACK_MODIFICATIONS: False
+  MAX_CONTENT_LENGTH: 16777216
+  CAS_SERVER: "https://cas.byu.edu"
+  CAS_AFTER_LOGIN: 'login'
+  SESSION_TYPE: 'filesystem'
+  FLASK_ADMIN_SWATCH: 'cerulean'
+  SELECTION_ALGORITHM: pairall()

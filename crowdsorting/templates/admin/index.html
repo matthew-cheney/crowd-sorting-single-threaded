@@ -1,0 +1,24 @@
+{% extends 'admin/master.html' %}
+
+{% block body %}
+<a href="/">Return to home</a>
+<h1>Admin Page</h1>
+
+<h3>The docs directory contains the following files:</h3>
+{% for file in allFiles %}
+<form method="POST" action="/deleteFile">
+  {{ file }} <button type="submit">Delete File</button><br>
+<input type="hidden" name="id" value="{{ file }}">
+</form>
+
+{% endfor %}
+<br>
+<form method="POST" action="/detectFiles">
+  <button type="submit">Detect New Files</button><br>
+</form>
+
+<form method="POST" action="/upload" enctype="multipart/form-data">
+  <input type="file" name="file" autocomplete="off" multiple="" required>
+  <input type="submit" value="Submit">
+</form>
+{% endblock %}

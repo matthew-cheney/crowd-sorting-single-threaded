@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+
+{% block content %}
+{% if current_user.get_is_authenticated() %}
+  Welcome {{ current_user.get_username() }}!</br>
+  is_authenticated: {{ current_user.get_is_authenticated() }}</br>
+  is_admin: {{ current_user.get_is_admin() }}</br>
+  current_project: {{ current_project }}
+{% endif %}
+{% endblock content %}

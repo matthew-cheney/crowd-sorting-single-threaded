@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+Welcome new user!
+
+Please enter your information below:
+
+<form method="POST" action="">
+  {{ form.csrf_token }}
+  <fieldset>
+    first name: {{ form.firstName() }}<br>
+    last name:  {{ form.lastName() }}<br>
+    email       {{ form.email() }}<br>
+  </fieldset>
+  {{ form.submit() }}
+</form>
+
+{% endblock content %}

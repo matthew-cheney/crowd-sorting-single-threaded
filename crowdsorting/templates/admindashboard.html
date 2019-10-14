@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+
+{% block content %}
+Admin Dashboad
+
+<form method="POST" action="/selectproject">
+    {% for project in all_projects %}
+        <input type="radio" name="project" value="{{ project.name }}"> {{ project.name }}<br>
+    {% endfor %}
+    <button type="submit">Submit</button>
+</form>
+<br>
+<form method="POST" action="/addproject">
+    <input type="text" name="project_name" placeholder="project name">
+    <button type="submit">Create Project</button>
+</form>
+
+{% endblock content %}

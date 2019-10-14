@@ -1,0 +1,3 @@
+'base': 'sqlite:///base_db/base.db',
+'russian': 'sqlite:///project_folders/russian/russian.db',
+'english': 'sqlite:///project_folders/english/english.db'

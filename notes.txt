@@ -1,0 +1,23 @@
+Questions -
+  Do we need support for different sorting algorithms between projects?
+  Can we assume the implementer will have access to their own databases locally? (i.e. not include that in the admin page)
+  
+Bradley Terry model
+Elo Rating System
+
+Merge Sort?
+    Good if list is entirely unsorted
+Insertion Sort?
+    Performance enhancement (at least for us) - use Rob's AI to sort, then use humans to confirm
+
+
+Algorithms:
+https://en.wikipedia.org/wiki/Bradley%E2%80%93Terry_model
+https://en.wikipedia.org/wiki/Ordinal_regression
+https://en.wikipedia.org/wiki/Rasch_model
+https://en.wikipedia.org/wiki/Scale_(social_sciences)#Comparative_scaling_techniques
+https://en.wikipedia.org/wiki/Elo_rating_system
+https://en.wikipedia.org/wiki/Thurstonian_model
+https://en.wikipedia.org/wiki/Glicko_rating_system
+https://github.com/deepy/glicko2 Python Glicko-2 implementation.
+https://github.com/sublee/glicko2 Python Glicko-2 implementation.

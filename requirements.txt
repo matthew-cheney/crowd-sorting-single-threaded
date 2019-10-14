@@ -1,0 +1,11 @@
+sqlalchemy
+flask
+python-dotenv
+flask-wtf
+flask-sqlalchemy
+flask-login
+flask-migrate
+flask-session
+flask-admin
+flask-YAMLConfig
+flask-cas
