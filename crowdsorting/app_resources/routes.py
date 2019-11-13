@@ -136,6 +136,7 @@ def sorted():
         return render_template('nopairs.html', title='Check later', message='No docs in this project', current_user=session['user'])
     sortedFiles, confidence, *args = dbhandler.getSorted(request.cookies.get('project'))
     confidence = confidence * 100
+    confidence = round(confidence, 2)
     number_of_judgments = dbhandler.getNumberOfJudgments(request.cookies.get('project'))
     number_of_docs = dbhandler.getNumberOfDocs(request.cookies.get('project'))
     possible_judgments = number_of_docs * (number_of_docs - 1) * .5
