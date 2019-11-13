@@ -1,5 +1,5 @@
 from crowdsorting.app_resources.dbhandler import dbHandler
-from crowdsorting import app, cas, session
+from crowdsorting import app, cas, session, pairselector
 from flask import flash
 from flask import render_template
 from flask import url_for
@@ -135,7 +135,7 @@ def sorted():
     if dbhandler.getNumberOfDocs(request.cookies.get('project')) == 0:
         return render_template('nopairs.html', title='Check later', message='No docs in this project', current_user=session['user'])
     sortedFiles, confidence, *args = dbhandler.getSorted(request.cookies.get('project'))
-    confidence = int(confidence * 100)
+    confidence = confidence * 100
     number_of_judgments = dbhandler.getNumberOfJudgments(request.cookies.get('project'))
     number_of_docs = dbhandler.getNumberOfDocs(request.cookies.get('project'))
     possible_judgments = number_of_docs * (number_of_docs - 1) * .5
@@ -179,7 +179,8 @@ def submitanswer():
         easier = request.form.get("file_two_name")
     else:
         easier = request.form.get("file_one_name")
-    dbhandler.createJudgment(harder, easier, request.cookies.get('project'))
+    judge = current_user=session['user']
+    dbhandler.createJudgment(harder, easier, request.cookies.get('project'), judge)
     flash('Judgment submitted', 'success')
     return redirect(url_for('home'))
 
@@ -209,6 +210,8 @@ def uploadFile():
             else:
                 flash('Allowed file types are txt', 'danger')
         dbhandler.addDocs(validFiles, request.cookies.get('project'))
+        filenames = [x.filename for x in files]
+        pairselector.create_acj(filenames, 10)
         return redirect(url_for('myadmin'))
 
 

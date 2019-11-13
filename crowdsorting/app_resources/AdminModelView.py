@@ -36,10 +36,15 @@ class JudgmentView(AdminModelView):
 
 
 class DocView(AdminModelView):
-    column_list = ('name', 'num_compares', 'checked_out', 'project_name')
+    column_list = ('name', 'num_compares', 'checked_out', 'project_name', 'judgments_harder', 'judgments_easier')
     column_searchable_list = ['name']
     column_filters = ['project_name']
 
 
+
 class ProjectView(AdminModelView):
     column_list = ('name', 'date_created', 'judges')
+
+
+class VoteView(AdminModelView):
+    column_list = ('id', 'doc_one', 'doc_two', 'doc_one_votes', 'doc_two_votes', 'resolved', 'project_name', 'judges')

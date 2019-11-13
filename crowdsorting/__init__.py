@@ -19,11 +19,11 @@ Session(app)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
-from crowdsorting.database.models import Project, Doc, Judge, Judgment
+from crowdsorting.database.models import Project, Doc, Judge, Vote, Judgment
 from crowdsorting.app_resources.sorting_algorithms.selection_algorithm import selection_algorithm
-from crowdsorting.app_resources.sorting_algorithms.pairall import pairall
+from crowdsorting.app_resources.sorting_algorithms.ACJProxy import ACJProxy
 
-pairselector = pairall()
+pairselector = ACJProxy()
 
 from crowdsorting.app_resources.AdminModelView import *
 from crowdsorting.app_resources import routes
@@ -32,4 +32,5 @@ admin = Admin(app, name='sorter', template_mode='bootstrap3', index_view=MyAdmin
 admin.add_view(ProjectView(Project, db.session))
 admin.add_view(DocView(Doc, db.session))
 admin.add_view(JudgeView(Judge, db.session))
+admin.add_view(VoteView(Vote, db.session))
 admin.add_view(JudgmentView(Judgment, db.session))

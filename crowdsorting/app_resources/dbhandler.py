@@ -45,7 +45,8 @@ class dbHandler():
         allDocs = db.session.query(Doc).filter_by(project_name=project, checked_out=False).all()
         allJudgments = db.session.query(Judgment).filter_by(project_name=project).all()
         print('allJudgments:', allJudgments)
-        pair = pairselector.getPair(allDocs, allJudgments)
+        # pair = pairselector.getPair(allDocs, allJudgments)
+        pair = pairselector.getPair(len(allDocs), allDocs)
         if type(pair) == type(""):
             print('no more pairs')
             return pair
@@ -60,7 +61,7 @@ class dbHandler():
         return pair
 
     # Function to create new judgment
-    def createJudgment(self, harder, easier, project):
+    def createJudgment(self, harder, easier, project, judge):
         print(f"The winner is {harder}")
         print(f"The loser is {easier}")
         harder_doc = db.session.query(Doc).filter_by(name=harder, project_name=project).first()
@@ -72,6 +73,7 @@ class dbHandler():
         judge_id = session['user'].get_judge_id()
         db.session.add(Judgment(doc_harder_id=harder_doc.id, doc_easier_id=easier_doc.id, judge_id=judge_id, project_name=project))
         db.session.commit()
+        pairselector.makeJudgment(easier_doc, harder_doc, judge.username)
         if project not in self.pairsBeingProcessed:
             self.addPairsBeingProcessed(project)
         for pair in self.pairsBeingProcessed[project]:
