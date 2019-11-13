@@ -97,8 +97,8 @@ def sorter():
     docPair = dbhandler.getPair(request.cookies.get('project'))
     if type(docPair) == type(""):
         return render_template('nopairs.html', title='Check later', message=docPair, current_user=session['user'])
-    file_one = docPair.getFirstContents()
-    file_two = docPair.getSecondContents()
+    file_one = docPair.getFirstContents().decode("utf-8")
+    file_two = docPair.getSecondContents().decode("utf-8")
     return render_template('sorter.html', title='Sorter', file_one=file_one,
                             file_two=file_two, file_one_name=docPair.getFirst(),
                             file_two_name=docPair.getSecond(),
@@ -196,7 +196,7 @@ def allowed_file(filename):
 @login_required
 def uploadFile():
     if request.method == 'POST':
-        validFiles = [];
+        validFiles = []
         if 'file' not in request.files:
             return redirect(request.url)
         files = request.files.getlist("file")
@@ -206,9 +206,9 @@ def uploadFile():
                 return redirect(request.url)
             if file and allowed_file(file.filename):
                 validFiles.append(file)
-                flash('File(s) successfully uploaded', 'success')
             else:
                 flash('Allowed file types are txt', 'danger')
+        flash(f'{len(validFiles)} file(s) successfully uploaded', 'success')
         dbhandler.addDocs(validFiles, request.cookies.get('project'))
         filenames = [x.filename for x in files]
         pairselector.create_acj(filenames, 10)

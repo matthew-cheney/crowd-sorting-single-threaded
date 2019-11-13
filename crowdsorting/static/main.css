@@ -10,3 +10,7 @@ body {
 .hidden_div {
   visibility: hidden;
 }
+
+.text_window {
+    cursor: pointer;
+}

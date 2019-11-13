@@ -2,17 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a9a6dbdc-9919-4bdd-a983-5d41e32f0ef4" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/crowdsorting/app_resources/sorting_algorithms/PairallStructure/__init__.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/crowdsorting/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/crowdsorting/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/crowdsorting/app_resources/AdminModelView.py" beforeDir="false" afterPath="$PROJECT_DIR$/crowdsorting/app_resources/AdminModelView.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/crowdsorting/app_resources/dbhandler.py" beforeDir="false" afterPath="$PROJECT_DIR$/crowdsorting/app_resources/dbhandler.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/crowdsorting/ACJ_Log/acj.pkl" beforeDir="false" afterPath="$PROJECT_DIR$/crowdsorting/ACJ_Log/acj.pkl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/crowdsorting/app_resources/routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/crowdsorting/app_resources/routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/crowdsorting/app_resources/sorting_algorithms/pairall.py" beforeDir="false" afterPath="$PROJECT_DIR$/crowdsorting/app_resources/sorting_algorithms/pairall.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/crowdsorting/database/crowdsorting.db" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/crowdsorting/database/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/crowdsorting/database/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/flask_session/1989ce7b77475c2a5756be942cffc22c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/crowdsorting/database/crowdsorting.db" beforeDir="false" afterPath="$PROJECT_DIR$/crowdsorting/database/crowdsorting.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/crowdsorting/static/main.css" beforeDir="false" afterPath="$PROJECT_DIR$/crowdsorting/static/main.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/crowdsorting/templates/sorter.html" beforeDir="false" afterPath="$PROJECT_DIR$/crowdsorting/templates/sorter.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/flask_session/2029240f6d1128be89ddc32729463129" beforeDir="false" afterPath="$PROJECT_DIR$/flask_session/2029240f6d1128be89ddc32729463129" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flask_session/e3b85fe435971784ee482b4c929bbdd7" beforeDir="false" afterPath="$PROJECT_DIR$/flask_session/e3b85fe435971784ee482b4c929bbdd7" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
