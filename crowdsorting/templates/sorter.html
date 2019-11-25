@@ -3,38 +3,77 @@
 {% block content %}
 
 <form method="POST" action="/submitAnswer">
-<div class="row">
-  <div class="col-md-12">
-  Sorting page<br>
-  </div>
-</div>
-<div class="row">
-  <div class="col-md-6 text_window" onclick="a_harder()">
-    <div class="card border-secondary mb-3" id="doc_a_div">
-      <div class="card-header text-center" id="doc_a_header"><div class="hidden_div">Holding</div></div>
-        <textarea readonly class="card-body card-height text_window" style="resize: none">{{ file_one }}</textarea>
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <h3>Select the harder text</h3>
+            <input type="hidden" name="harder" id="harder_hidden" value="">
+        </div>
     </div>
-  </div>
-  <div class="col-md-6 text_window" onclick="b_harder()">
-    <div class="card border-secondary mb-3" id="doc_b_div">
-      <div class="card-header text-center" id="doc_b_header"><div class="hidden_div">Holding</div></div>
-        <textarea readonly class="card-body card-height text_window" style="resize: none">{{ file_two }}</textarea>
+    <div class="row">
+        <div class="col-md-6 text_window" onclick="a_harder()">
+            <div class="card border-secondary mb-3" id="doc_a_div">
+                <div class="card-header text-center" id="doc_a_header">
+                    <div class="hidden_div">Holding</div>
+                </div>
+                <textarea readonly class="card-body card-height text_window"
+                          style="resize: none">{{ file_one }}</textarea>
+            </div>
+        </div>
+        <div class="col-md-6 text_window" onclick="b_harder()">
+            <div class="card border-secondary mb-3" id="doc_b_div">
+                <div class="card-header text-center" id="doc_b_header">
+                    <div class="hidden_div">Holding</div>
+                </div>
+                <textarea readonly class="card-body card-height text_window"
+                          style="resize: none">{{ file_two }}</textarea>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
-<div class="row">
-  <div class="col-md-12 text-center">
-    <h3>Select the harder text</h3>
-    <input type="hidden" name="harder" id="harder_hidden" value="">
-  </div>
-</div>
-<div class="row">
-  <div class="col-md-12 text-center">
-  <button type="submit" class="btn btn-primary btn-lg">Submit Answer</button><br>
-  <input type="hidden" name="file_one_name" value="{{ file_one_name }}">
-  <input type="hidden" name="file_two_name" value="{{ file_two_name }}">
-  </div>
-</div>
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <h3>Indicate each text's difficulty</h3>
+        </div>
+    </div>
+    <div class="row" style="margin-bottom: 10pt;">
+        <div class="col-md-6 text-center">
+            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                <label class="btn btn-success btn-lg level_button">
+                    <input type="radio" name="level_a" id="easy_a"
+                           autocomplete="off">Really Easy</label>
+                <label class="btn btn-secondary btn-lg level_button">
+                    <input type="radio" name="level_a" id="neutral_a"
+                           autocomplete="off">At My Level</label>
+                <label class="btn btn-danger btn-lg">
+                    <input type="radio" name="level_a" id="hard_a"
+                           autocomplete="off">Really Hard</label>
+            </div>
+        </div>
+        <div class="col-md-6 text-center">
+            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                <label class="btn btn-success btn-lg level_button">
+                    <input type="radio" name="level_b" id="easy_b"
+                           autocomplete="off">Really Easy</label>
+                <label class="btn btn-secondary btn-lg level_button">
+                    <input type="radio" name="level_b" id="neutral_b"
+                           autocomplete="off">At My Level</label>
+                <label class="btn btn-danger btn-lg">
+                    <input type="radio" name="level_b" id="hard_b"
+                           autocomplete="off">Really Hard</label>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <button type="submit" class="btn btn-primary btn-lg">Submit
+                Answer
+            </button>
+            <br>
+            <input type="hidden" name="file_one_name"
+                   value="{{ file_one_name }}">
+            <input type="hidden" name="file_two_name"
+                   value="{{ file_two_name }}">
+        </div>
+    </div>
 </form>
 <script>
 
@@ -58,5 +97,7 @@
     document.getElementById("doc_a_div").className = "card border-success mb-3"
     document.getElementById("doc_a_header").className = "card-header bg-success text-center"
   }
+
+
 </script>
 {% endblock content %}

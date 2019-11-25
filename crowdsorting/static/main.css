@@ -14,3 +14,7 @@ body {
 .text_window {
     cursor: pointer;
 }
+
+.level_button {
+    margin-right: 10pt;
+}
