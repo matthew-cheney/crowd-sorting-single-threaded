@@ -56,7 +56,7 @@ def logout():
 @app.route("/")
 @app.route("/projectsdashboard")
 def projectsdashboard():
-    if 'user' in session and session['user'].get_is_admin():
+    if True or 'user' in session and session['user'].get_is_admin():
         return render_template('admindashboard.html', title='Home', current_user=session['user'], all_projects=dbhandler.allProjects())
     elif 'user' in session:
         return render_template('userdashboard.html', title='Home', current_user=session['user'], all_projects=dbhandler.getUserProjects(session['user'].get_username()))
@@ -120,8 +120,8 @@ def about():
 # Router to admin page
 @app.route("/myadmin", methods=['GET', 'POST'])
 def myadmin():
-    if 'user' not in session or not session['user'].get_is_admin():
-        return redirect(url_for('home'))
+    # if 'user' not in session or not session['user'].get_is_admin():
+    # return redirect(url_for('home'))
     # allFiles = [i for i in listdir(app.config['APP_DOCS'])]
     allFiles = []
     return render_template('myadmin.html', title='Admin',
