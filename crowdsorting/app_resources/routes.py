@@ -56,7 +56,7 @@ def logout():
 @app.route("/")
 @app.route("/projectsdashboard")
 def projectsdashboard():
-    if True or 'user' in session and session['user'].get_is_admin():
+    if True or 'user' in session and session['user'].get_is_admin():  # This is bad - fix it
         return render_template('admindashboard.html', title='Home', current_user=session['user'], all_projects=dbhandler.allProjects())
     elif 'user' in session:
         return render_template('userdashboard.html', title='Home', current_user=session['user'], all_projects=dbhandler.getUserProjects(session['user'].get_username()))
@@ -182,8 +182,11 @@ def submitanswer():
         easier = request.form.get("file_one_name")
     judge = current_user=session['user']
     dbhandler.createJudgment(harder, easier, request.cookies.get('project'), judge)
-    flash('Judgment submitted', 'success')
-    return redirect(url_for('home'))
+    if isinstance(request.form.get('another_pair_checkbox'), type(None)):
+        flash('Judgment submitted', 'success')
+        return redirect(url_for('home'))
+    else:
+        return redirect(url_for('sorter'))
 
 
 ALLOWED_EXTENSIONS = {'txt'}

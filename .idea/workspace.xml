@@ -4,11 +4,12 @@
     <list default="true" id="a9a6dbdc-9919-4bdd-a983-5d41e32f0ef4" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/crowdsorting/ACJ_Log/acj.pkl" beforeDir="false" afterPath="$PROJECT_DIR$/crowdsorting/ACJ_Log/acj.pkl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/crowdsorting/app_resources/routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/crowdsorting/app_resources/routes.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/crowdsorting/database/crowdsorting.db" beforeDir="false" afterPath="$PROJECT_DIR$/crowdsorting/database/crowdsorting.db" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/crowdsorting/static/main.css" beforeDir="false" afterPath="$PROJECT_DIR$/crowdsorting/static/main.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/crowdsorting/templates/sorter.html" beforeDir="false" afterPath="$PROJECT_DIR$/crowdsorting/templates/sorter.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/flask_session/2029240f6d1128be89ddc32729463129" beforeDir="false" afterPath="$PROJECT_DIR$/flask_session/2029240f6d1128be89ddc32729463129" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/flask_session/e3b85fe435971784ee482b4c929bbdd7" beforeDir="false" afterPath="$PROJECT_DIR$/flask_session/e3b85fe435971784ee482b4c929bbdd7" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -32,12 +33,16 @@
   </component>
   <component name="PropertiesComponent">
     <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
-    <property name="last_opened_file_path" value="$USER_HOME$/Documents/DGHT360" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/crowdsorting" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/crowdsorting" />
       <recent name="$PROJECT_DIR$/crowdsorting/database" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/crowdsorting" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -105,5 +110,16 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/crowdsorting/app_resources/routes.py</url>
+          <line>184</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

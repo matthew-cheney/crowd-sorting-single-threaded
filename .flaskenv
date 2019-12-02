@@ -1,0 +1,3 @@
+FLASK_APP=crowdsorting/crowdsorting.py
+FLASK_RUN_HOST=localhost
+FLASK_RUN_PORT=80
