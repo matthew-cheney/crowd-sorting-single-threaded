@@ -4,3 +4,4 @@ flask_session
 **.pyc
 .idea
 crowdsorting/ACJ_Log
+crowdsorting/database/crowdsorting.db
