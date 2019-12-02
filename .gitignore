@@ -5,3 +5,4 @@ flask_session
 .idea
 crowdsorting/ACJ_Log
 crowdsorting/database/crowdsorting.db
+crowdsorting/app_resources/admins.txt
