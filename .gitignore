@@ -1,0 +1,6 @@
+**__pycache__
+venv
+flask_session
+**.pyc
+.idea
+crowdsorting/ACJ_Log
