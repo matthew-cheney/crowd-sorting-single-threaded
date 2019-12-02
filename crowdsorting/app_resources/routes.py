@@ -53,7 +53,6 @@ def logout():
     session.clear()
     return redirect(url_for('cas.logout'))
 
-@app.route("/")
 @app.route("/projectsdashboard")
 def projectsdashboard():
     if True or 'user' in session and session['user'].get_is_admin():  # This is bad - fix it
@@ -77,6 +76,7 @@ def temp():
     return 'temp'
 
 # Router to home page
+@app.route("/")
 @app.route("/home")
 def home():
 #     if 'user' in Session:
