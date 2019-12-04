@@ -15,7 +15,7 @@ from flask_cas import login, logout, login_required
 
 dbhandler = dbHandler()
 
-dummyUser = User("", False, False, 0)
+dummyUser = User("", False, False, 0, "", "")
 
 @app.route("/login")
 def login():
@@ -33,8 +33,9 @@ def login():
         if admin == cas.username:
             adminBool = True
             break
-    session['user'] = User(cas.username, True, adminBool, user_id)
-
+    db_user_id = dbhandler.getUser(cas.username)
+    firstName, lastName = dbhandler.getUserNames(db_user_id)
+    session['user'] = User(cas.username, True, adminBool, user_id, firstName, lastName)
     return redirect(url_for('projectsdashboard'))
 
 
@@ -46,6 +47,8 @@ def newuser():
     if form.validate_on_submit():
         dbhandler.createUser(form.firstName.data, form.lastName.data, cas.username, form.email.data)
         return redirect(url_for('login'))
+    if request.method == 'POST':
+        flash('Failed to register user', 'danger')
     return render_template('newuser.html', form=form, current_user=dummyUser)
 
 @app.route('/logout')
@@ -55,7 +58,7 @@ def logout():
 
 @app.route("/projectsdashboard")
 def projectsdashboard():
-    if True or 'user' in session and session['user'].get_is_admin():  # This is bad - fix it
+    if 'user' in session and session['user'].get_is_admin():  # This is bad - fix it
         return render_template('admindashboard.html', title='Home', current_user=session['user'], all_projects=dbhandler.allProjects())
     elif 'user' in session:
         return render_template('userdashboard.html', title='Home', current_user=session['user'], all_projects=dbhandler.getUserProjects(session['user'].get_username()))
@@ -95,6 +98,9 @@ def sorter():
     if 'user' not in session:
         return redirect(url_for('home'))
     docPair = dbhandler.getPair(request.cookies.get('project'))
+    if not docPair:
+        flash('Project not ready', 'warning')
+        return redirect(url_for('home'))
     if type(docPair) == type(""):
         return render_template('nopairs.html', title='Check later', message=docPair, current_user=session['user'])
     file_one = docPair.getFirstContents().decode("utf-8")
@@ -139,7 +145,7 @@ def sorted():
     confidence = round(confidence, 2)
     number_of_judgments = dbhandler.getNumberOfJudgments(request.cookies.get('project'))
     number_of_docs = dbhandler.getNumberOfDocs(request.cookies.get('project'))
-    possible_judgments = number_of_docs * (number_of_docs - 1) * .5
+    possible_judgments = dbhandler.getPossibleJudgmentsCount()
     if type(sortedFiles) == type(""):
         success = False
     else:
@@ -215,8 +221,8 @@ def uploadFile():
         flash(f'{len(validFiles)} file(s) successfully uploaded', 'success')
         dbhandler.addDocs(validFiles, request.cookies.get('project'))
         filenames = [x.filename for x in files]
-        pairselector.create_acj(filenames, 10)
-        return redirect(url_for('myadmin'))
+        pairselector.create_acj(filenames, rounds=15, maxRounds=15)
+        return redirect('/admin')
 
 
 @app.route("/addproject", methods=['POST'])

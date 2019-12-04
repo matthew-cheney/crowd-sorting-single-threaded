@@ -1,12 +1,26 @@
 {% extends "layout.html" %}
 
 {% block content %}
-User Dashboad
+User Dashboard<br>
+{% if all_projects|length == 0 %}
+Looks like there are no current projects. Check back later!
+{% else %}
+Select a project to work on:<br>
 <form method="POST" action="/selectproject">
 {% for project in all_projects %}
-<input type="radio" name="project" value="{{ project }}"> {{ project }}<br>
+<input type="radio" name="project" value="{{ project.name }}" onclick="activate_user_project_submit()"> {{ project.name }}<br>
 {% endfor %}
-<button type="submit">Submit</button>
+<button type="submit" id="submit_button" disabled>Submit</button>
 </form>
+
+{% endif %}
+
+<script>
+
+    function activate_user_project_submit() {
+        document.getElementById("submit_button").disabled = false;
+    }
+
+</script>
 
 {% endblock content %}

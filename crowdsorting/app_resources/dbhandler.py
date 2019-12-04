@@ -47,6 +47,8 @@ class dbHandler():
         print('allJudgments:', allJudgments)
         # pair = pairselector.getPair(allDocs, allJudgments)
         pair = pairselector.getPair(len(allDocs), allDocs)
+        if not pair:
+            return pair
         if type(pair) == type(""):
             print('no more pairs')
             return pair
@@ -120,6 +122,13 @@ class dbHandler():
             return user.id
         return "User not found"
 
+    def getUserNames(self, user_id):
+        user = db.session.query(Judge).filter_by(
+            id=user_id).first()
+        if (user is not None):
+            return user.firstName, user.lastName
+        return "User not found"
+
     def createUser(self, firstName, lastName, judge_username, email):
         db.session.add(Judge(firstName=firstName, lastName=lastName, username=judge_username, email=email))
         db.session.commit()
@@ -142,6 +151,7 @@ class dbHandler():
         return pairselector.getSorted(allDocs, allJudgments)
 
     def getUserProjects(self, user):
+        return self.allProjects() # This is a temporary fix
         projects = db.session.query(Judge).filter_by(username='mchen95').first().projects
         projects = [p.name for p in projects]
         print("projects:", projects)
@@ -162,3 +172,6 @@ class dbHandler():
         except:
             message = "unable to create project"
         return message
+
+    def getPossibleJudgmentsCount(self):
+        return pairselector.getPossibleJudgmentsCount()

@@ -5,14 +5,29 @@ Admin Dashboad
 
 <form method="POST" action="/selectproject">
     {% for project in all_projects %}
-        <input type="radio" name="project" value="{{ project.name }}"> {{ project.name }}<br>
+        <input type="radio" name="project" value="{{ project.name }}" onclick="activate_admin_project_submit()"> {{ project.name }}<br>
     {% endfor %}
-    <button type="submit">Submit</button>
+    <button type="submit" id="select_project_submit" disabled>Submit</button>
 </form>
 <br>
 <form method="POST" action="/addproject">
-    <input type="text" name="project_name" placeholder="project name">
-    <button type="submit">Create Project</button>
+    <input type="text" name="project_name" placeholder="project name" id="project_name" onkeyup="activate_new_project_submit()">
+    <button type="submit" id="new_project_submit" disabled>Create Project</button>
 </form>
 
+<script>
+
+    function activate_admin_project_submit() {
+        document.getElementById("select_project_submit").disabled = false;
+    }
+
+    function activate_new_project_submit() {
+        if (document.getElementById("project_name").value == "") {
+            document.getElementById("new_project_submit").disabled = true;
+        } else {
+            document.getElementById("new_project_submit").disabled = false;
+        }
+    }
+
+</script>
 {% endblock content %}

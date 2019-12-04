@@ -2,9 +2,13 @@
 
 {% block content %}
 {% if current_user.get_is_authenticated() %}
-  Welcome {{ current_user.get_username() }}!</br>
+  Welcome {{ current_user.get_first_name() }}!</br>
   is_authenticated: {{ current_user.get_is_authenticated() }}</br>
   is_admin: {{ current_user.get_is_admin() }}</br>
   current_project: {{ current_project }}
+{% else %}
+Welcome to CrowdSorting!<br>
+To use this app, please log in in the upper right corner.
 {% endif %}
+
 {% endblock content %}

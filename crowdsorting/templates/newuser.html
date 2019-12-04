@@ -2,16 +2,14 @@
 
 {% block content %}
 
-Welcome new user!
-
-Please enter your information below:
-
+Welcome new user!<br>
+Please enter your information below:<br>
 <form method="POST" action="">
   {{ form.csrf_token }}
   <fieldset>
-    first name: {{ form.firstName() }}<br>
-    last name:  {{ form.lastName() }}<br>
-    email       {{ form.email() }}<br>
+    First Name: {{ form.firstName() }}<br>
+    Last Name:  {{ form.lastName() }}<br>
+    Email       {{ form.email() }}<br>
   </fieldset>
   {{ form.submit() }}
 </form>

@@ -10,10 +10,12 @@ class ACJProxy:
     def __init__(self):
         self.acj = None
         self.number_of_docs = 0
+        self.rounds = 0
 
-    def create_acj(self, data, maxRounds, noOfChoices=1, logPath="crowdsorting/ACJ_Log/", optionNames=["Choice"]):
+    def create_acj(self, data, rounds=15, maxRounds=10, noOfChoices=1, logPath="crowdsorting/ACJ_Log/", optionNames=["Choice"]):
         print("creating acj")
         self.number_of_docs = len(data)
+        self.rounds = rounds
         dat = np.asarray(data)
         np.random.shuffle(dat)
         self.acj = ACJ(dat, maxRounds, noOfChoices, logPath, optionNames)
@@ -34,8 +36,11 @@ class ACJProxy:
             pickle.dump(self.acj, f)
 
     def getPair(self, number_of_docs, allDocs):
-        if isinstance(self.acj, type(None)):
-            self.unpickle_acj(number_of_docs)
+        try:
+            if isinstance(self.acj, type(None)):
+                self.unpickle_acj(number_of_docs)
+        except FileNotFoundError:
+            return False
         acj_pair = self.acj.nextIDPair()
         if isinstance(acj_pair, type(None)):
             return "no pair available"
@@ -72,3 +77,8 @@ class ACJProxy:
         sortedFiles = [x[0] for x in self.acj.results()[0]]
         confidence = self.acj.reliability()[0]
         return sortedFiles, confidence
+
+    def getPossibleJudgmentsCount(self):
+        total = int(self.rounds * (self.number_of_docs / 2))
+        print(f'returning number of pairs: {total}')
+        return total
