@@ -1,5 +1,18 @@
 {% extends "layout.html" %}
 
 {% block content %}
-About
+<h1 class="text-center">About Crowd Sorting</h1>
+<p>CrowdSorting is an app designed to crowd source one of the fundamental tasks of computing - sorting. For years, students, professionals, and researches have worked on designing new and more efficient sorting algorithms. These algorithms focus on speed, memory management, and other measures.</p>
+<p>Computers are very good at sorting things with quantifiable and persistent qualities. Numbers are the prime example, each being easily quantifiable and persistent in its value. However, there remains a plethora of information that is not quantifiable, and which can still be sorted.</p>
+<p>Consider the following example.</p>
+<div class="block_text">
+    <p>An ESL teacher teaches many courses at different levels. A beginner level student approaches him and asks for a book recommendation. The teacher recommends the <em>Magic Tree House</em> by Mary Pope Osborne, a series of chapter books for children.</p>
+    <p>Later, an advanced learner comes to the teacher for a similar recommendation. This time, the teacher recommends <em>A Tale of Two Cities</em> by Charles Dickens, a 19th century novel set in France and England.</p>
+</div>
+<p>Why does the teacher recommend <em>A Tale of Two Cities</em> to one student and the <em>Magic Tree House</em> to another? Obviously the former is harder and more suited for an advanced learner, while the latter is a relatively easy book well-suited for beginners.</p>
+<p>This is just one example of items (books) that can be sorted (by reading level), but which cannot be quantitatively measured.</p>
+<p>Traditionally, these types of items are sorted by a professional making arbitrary decisions. In this example, <em>A Tale of Two Cities</em> is obviously more difficult that the <em>Magic Tree House</em>. But what about <em>Moby Dick</em> by Herman Melville, or <em>War and Peace</em> by Leo Tolstoy? In these cases, different teachers might rank the novels differently.</p>
+<p>A relatively new method of sorting, called Adaptive Comparative Judgment (ACJ), relies on pairwise comparisons between objects to sort them. Rather than requiring judges to make arbitrary decisions about an item's difficulty, they are simply asked which of two items is harder. With enough of these judgments, the algorithm can generate a complete ordering.</p>
+<p>CrowdSorting takes ACJ and crowd sources the judgments. Its web interface and dynamic pair serving allow users to log on and generate pairwise judgments at any time. This dramatically increases the number of potential judges, thus increasing the potential number of judgments and items to sort.</p>
+<p>CrowdSorting is completely free and open-source. To get started, download the source code at <a href="https://github.com/matthew-cheney/crowd-sorting">https://github.com/matthew-cheney/crowd-sorting.</a></p>
 {% endblock content %}

@@ -2,13 +2,17 @@
 
 {% block content %}
 {% if current_user.get_is_authenticated() %}
-  Welcome {{ current_user.get_first_name() }}!</br>
+
+<h1 class="text-center">Welcome {{ current_user.get_first_name() }}!</h1>
+
   is_authenticated: {{ current_user.get_is_authenticated() }}</br>
   is_admin: {{ current_user.get_is_admin() }}</br>
   current_project: {{ current_project }}
 {% else %}
-Welcome to CrowdSorting!<br>
-To use this app, please log in in the upper right corner.
+<div class="home_div">
+    <h1 class="text-center">Welcome to CrowdSorting!</h1>
+    <h2 class="text-center">To use this app, please log in at the upper right corner.</h2>
+</div>
 {% endif %}
 
 {% endblock content %}

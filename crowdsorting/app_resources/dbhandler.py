@@ -143,12 +143,15 @@ class dbHandler():
         return db.session.query(Judgment).count()
 
     def getNumberOfDocs(self, project):
-        return db.session.query(Doc).count()
+        allDocs = db.session.query(Doc).filter_by(project_name=project).all()
+        return len(allDocs)
 
     def getSorted(self, project):
         allDocs = db.session.query(Doc).filter_by(project_name=project).all()
         allJudgments = db.session.query(Judgment).filter_by(project_name=project).all()
-        return pairselector.getSorted(allDocs, allJudgments)
+        sortedFiles = pairselector.getSorted(allDocs, allJudgments)
+        confidence = pairselector.getConfidence()
+        return sortedFiles, confidence
 
     def getUserProjects(self, user):
         return self.allProjects() # This is a temporary fix

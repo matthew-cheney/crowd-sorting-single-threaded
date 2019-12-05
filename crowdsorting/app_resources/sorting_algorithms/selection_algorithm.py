@@ -11,3 +11,7 @@ class selection_algorithm():
     @staticmethod
     def getSorted(allFiles, allJudgments):
         pass
+
+    @staticmethod
+    def getConfidence():
+        pass

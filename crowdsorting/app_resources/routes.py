@@ -78,6 +78,14 @@ def selectproject():
 def temp():
     return 'temp'
 
+
+def check_project(request):
+    if isinstance(request.cookies.get('project'), type(None)):
+        flash("Please select a project", "warning")
+        return False
+    else:
+        return True
+
 # Router to home page
 @app.route("/")
 @app.route("/home")
@@ -85,6 +93,8 @@ def home():
 #     if 'user' in Session:
     current_project = request.cookies.get('project')
     if 'user' in session:
+        if not check_project(request):
+            return redirect(url_for('projectsdashboard'))
         return render_template('home.html', title='Home', current_user=session['user'], current_project=current_project)
     else:
         return render_template('home.html', title='Home', current_user=dummyUser, current_project=current_project)
@@ -95,8 +105,13 @@ def home():
 # Router to sorting page
 @app.route("/sorter")
 def sorter():
+    if not check_project(request):
+        return redirect(url_for('projectsdashboard'))
     if 'user' not in session:
         return redirect(url_for('home'))
+    if isinstance(request.cookies.get('project'), type(None)):
+        return render_template('nopairs.html', title='Check later',
+                               message="No project selected", current_user=session['user'])
     docPair = dbhandler.getPair(request.cookies.get('project'))
     if not docPair:
         flash('Project not ready', 'warning')
@@ -119,6 +134,8 @@ def demo():
 @app.route("/about", methods=['GET'])
 def about():
     if 'user' in session:
+        if not check_project(request):
+            return redirect(url_for('projectsdashboard'))
         return render_template('about.html', current_user=session['user'])
     else:
         return render_template('about.html', current_user=dummyUser)
@@ -136,8 +153,12 @@ def myadmin():
 # Router for sorted page
 @app.route("/sorted")
 def sorted():
+    if not check_project(request):
+        return redirect(url_for('projectsdashboard'))
     if 'user' not in session:
         return redirect(url_for('home'))
+    if isinstance(request.cookies.get('project'), type(None)):
+        return render_template('nopairs.html', title='Check later', message='No project selected', current_user=session['user'])
     if dbhandler.getNumberOfDocs(request.cookies.get('project')) == 0:
         return render_template('nopairs.html', title='Check later', message='No docs in this project', current_user=session['user'])
     sortedFiles, confidence, *args = dbhandler.getSorted(request.cookies.get('project'))
@@ -159,7 +180,7 @@ def sorted():
                             possible_judgments=possible_judgments,
                             success=success)
 
-# Delete file route
+# Delete file route   - This route is obselete?
 @app.route("/deleteFile", methods=['POST'])
 @login_required
 def deleteFile():
@@ -170,7 +191,7 @@ def deleteFile():
 
 @app.route("/detectFiles", methods=['POST'])
 @login_required
-def detectFiles():
+def detectFiles():  # This route is obselete?
     print("in detectFiles route")
     dbhandler.detectFiles(request.cookies.get('project'))
     return redirect(url_for('myadmin'))
@@ -205,7 +226,13 @@ def allowed_file(filename):
 @app.route("/upload", methods=['POST'])
 @login_required
 def uploadFile():
+    if not check_project(request):
+        return redirect(url_for('projectsdashboard'))
     if request.method == 'POST':
+        if isinstance(request.cookies.get('project'), type(None)):
+            return render_template('nopairs.html', title='Check later',
+                                   message="No project selected",
+                                   current_user=session['user'])
         validFiles = []
         if 'file' not in request.files:
             return redirect(request.url)

@@ -1,6 +1,7 @@
 import _pickle as pickle
 
 import numpy as np
+from datetime import datetime
 
 from crowdsorting.app_resources.docpair import DocPair
 from crowdsorting.app_resources.sorting_algorithms.ACJ import ACJ
@@ -11,6 +12,7 @@ class ACJProxy:
         self.acj = None
         self.number_of_docs = 0
         self.rounds = 0
+        self.no_more_pairs = False
 
     def create_acj(self, data, rounds=15, maxRounds=10, noOfChoices=1, logPath="crowdsorting/ACJ_Log/", optionNames=["Choice"]):
         print("creating acj")
@@ -19,6 +21,7 @@ class ACJProxy:
         dat = np.asarray(data)
         np.random.shuffle(dat)
         self.acj = ACJ(dat, maxRounds, noOfChoices, logPath, optionNames)
+        self.no_more_pairs = False
         with open(r"crowdsorting/ACJ_Log/acj.pkl", "wb") as output_file:
             pickle.dump(self.acj, output_file)
         del (self.acj)
@@ -36,6 +39,8 @@ class ACJProxy:
             pickle.dump(self.acj, f)
 
     def getPair(self, number_of_docs, allDocs):
+        if self.no_more_pairs:
+            return "no good pair found"
         try:
             if isinstance(self.acj, type(None)):
                 self.unpickle_acj(number_of_docs)
@@ -43,6 +48,7 @@ class ACJProxy:
             return False
         acj_pair = self.acj.nextIDPair()
         if isinstance(acj_pair, type(None)):
+            self.no_more_pairs = True
             return "no pair available"
         doc_one_name = self.acj.getScript(acj_pair[0])
         doc_two_name = self.acj.getScript(acj_pair[1])
@@ -66,7 +72,7 @@ class ACJProxy:
         easier_doc_id = self.acj.getID(easier_doc_name.name)
         harder_doc_id = self.acj.getID(harder_doc_name.name)
         pair = (easier_doc_id, harder_doc_id)
-        self.acj.IDComp(pair, False, reviewer=judge_name)
+        self.acj.IDComp(pair, False, reviewer=judge_name, time=datetime.now())
         self.pickle_acj()
 
     def getSorted(self, allDocs, allJudgments):
@@ -75,10 +81,14 @@ class ACJProxy:
         if len(allDocs) < 1:
             return "No files in database"
         sortedFiles = [x[0] for x in self.acj.results()[0]]
-        confidence = self.acj.reliability()[0]
-        return sortedFiles, confidence
+        return sortedFiles
 
     def getPossibleJudgmentsCount(self):
         total = int(self.rounds * (self.number_of_docs / 2))
+        if total < 1:
+            total = 1
         print(f'returning number of pairs: {total}')
         return total
+
+    def getConfidence(self):
+        return self.acj.reliability()[0]

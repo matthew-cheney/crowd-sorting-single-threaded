@@ -1,5 +1,6 @@
 body {
     padding-top: 65px;
+    font-size: 14pt;
 }
 
 .card-height {
@@ -17,4 +18,14 @@ body {
 
 .level_button {
     margin-right: 10pt;
+}
+
+.home_div {
+    margin-top: 20px;
+}
+
+.block_text {
+    margin-left: 40px;
+    margin-right: 40px;
+    font-size: 12pt;
 }
