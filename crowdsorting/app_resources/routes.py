@@ -15,7 +15,7 @@ from flask_cas import login, logout, login_required
 
 dbhandler = dbHandler()
 
-dummyUser = User("", False, False, 0, "", "")
+dummyUser = User("", False, False, 0, "", "", "")
 
 @app.route("/login")
 def login():
@@ -35,7 +35,8 @@ def login():
             break
     db_user_id = dbhandler.getUser(cas.username)
     firstName, lastName = dbhandler.getUserNames(db_user_id)
-    session['user'] = User(cas.username, True, adminBool, user_id, firstName, lastName)
+    email = dbhandler.getEmail(db_user_id)
+    session['user'] = User(cas.username, True, adminBool, user_id, firstName, lastName, email)
     return redirect(url_for('projectsdashboard'))
 
 
@@ -180,6 +181,12 @@ def sorted():
                             possible_judgments=possible_judgments,
                             success=success)
 
+
+@app.route("/accountinfo", methods=['GET'])
+@login_required
+def accountinfo():
+    return render_template('accountinfo.html', current_user=session['user'])
+
 # Delete file route   - This route is obselete?
 @app.route("/deleteFile", methods=['POST'])
 @login_required
@@ -258,3 +265,4 @@ def add_project():
     message = dbhandler.createProject(request.form.get('project_name'))
     print(message)
     return redirect(url_for('projectsdashboard'))
+

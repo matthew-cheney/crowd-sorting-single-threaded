@@ -194,6 +194,7 @@ class UniACJ(object):
         self.returned = []
         self.logPath = logPath
         self.decisions = []
+        self.comparisonsMade = 0
 
     def nextRound(self, extRoundList = None):
         '''Returns next round of pairs'''
@@ -451,6 +452,7 @@ class UniACJ(object):
     def addDecision(self, pair, result, reviewer, time = 0):
         '''Adds an SSR to the SSR array'''
         self.decisions.append(Decision(pair, result,reviewer, time))
+        self.comparisonsMade += 1
 
     def revID(self, reviewer):
         return self.reviewers.index(reviewer)
@@ -585,3 +587,6 @@ class UniACJ(object):
         r = self.rankings()
         rank = list(zip(r[0], (r[1]-r[1].min())*100/(r[1].max()-r[1].min())))
         return [rank]
+
+    def getComparisonsMade(self):
+        return self.comparisonsMade

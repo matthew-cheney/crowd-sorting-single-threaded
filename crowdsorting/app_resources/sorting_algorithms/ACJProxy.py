@@ -46,6 +46,7 @@ class ACJProxy:
                 self.unpickle_acj(number_of_docs)
         except FileNotFoundError:
             return False
+
         acj_pair = self.acj.nextIDPair()
         if isinstance(acj_pair, type(None)):
             self.no_more_pairs = True
@@ -92,3 +93,6 @@ class ACJProxy:
 
     def getConfidence(self):
         return self.acj.reliability()[0]
+
+    def getNumberComparisonsMade(self):
+        return self.acj.getComparisonsMade()

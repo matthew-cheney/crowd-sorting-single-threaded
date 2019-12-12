@@ -29,3 +29,13 @@ body {
     margin-right: 40px;
     font-size: 12pt;
 }
+
+.table-nonfluid {
+    width: auto !important;
+    margin: auto;
+    font-size: 20pt;
+}
+
+.table-holder {
+    width: 100%;
+}

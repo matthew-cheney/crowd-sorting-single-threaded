@@ -178,3 +178,10 @@ class dbHandler():
 
     def getPossibleJudgmentsCount(self):
         return pairselector.getPossibleJudgmentsCount()
+
+    def getEmail(self, userID):
+        user = db.session.query(Judge).filter_by(
+            id=userID).first()
+        if (user is not None):
+            return user.email
+        return "User not found"

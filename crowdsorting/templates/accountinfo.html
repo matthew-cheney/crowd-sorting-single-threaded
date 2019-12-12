@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div id="accountinfo_content">
+    <h1 class="text-center">Account Info</h1>
+    <div id="table-holder" class="mx-auto">
+        <table class="table table-nonfluid">
+            <tr>
+                <td>
+                    Name:
+                </td>
+                <td>
+                    {{ current_user.get_first_name() }} {{ current_user.get_last_name() }}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Username:
+                </td>
+                <td>
+                    {{ current_user.get_username() }}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Email:
+                </td>
+                <td>
+                    {{ current_user.get_email() }}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Is admin:
+                </td>
+                <td>
+                    {{ current_user.get_is_admin() }}
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+{% endblock content %}
