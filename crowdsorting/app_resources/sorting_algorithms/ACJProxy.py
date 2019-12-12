@@ -8,11 +8,12 @@ from crowdsorting.app_resources.sorting_algorithms.ACJ import ACJ
 
 
 class ACJProxy:
-    def __init__(self):
+    def __init__(self, project_name):
         self.acj = None
         self.number_of_docs = 0
         self.rounds = 0
         self.no_more_pairs = False
+        self.project_name = project_name
 
     def create_acj(self, data, rounds=15, maxRounds=10, noOfChoices=1, logPath="crowdsorting/ACJ_Log/", optionNames=["Choice"]):
         print("creating acj")
@@ -22,28 +23,29 @@ class ACJProxy:
         np.random.shuffle(dat)
         self.acj = ACJ(dat, maxRounds, noOfChoices, logPath, optionNames)
         self.no_more_pairs = False
-        with open(r"crowdsorting/ACJ_Log/acj.pkl", "wb") as output_file:
-            pickle.dump(self.acj, output_file)
-        del (self.acj)
-        with open(r"crowdsorting/ACJ_Log/acj.pkl", "rb") as input_file:
-            self.acj = pickle.load(input_file)
+        with open(f"crowdsorting/app_resources/sorter_instances/{self.project_name}.pkl", "wb") as output_file:
+            pickle.dump(self, output_file)
+        # del (self.acj)
+        # with open(f"crowdsorting/app_resources/sorter_instances/{self.project_name}.pkl", "rb") as input_file:
+        #     self.acj = pickle.load(input_file)
 
-    def unpickle_acj(self, length):
-        print("unpickling acj")
-        with open(r"crowdsorting/ACJ_Log/acj.pkl", "rb") as input_file:
-            self.acj = pickle.load(input_file)
+    # def unpickle_acj(self, length):
+    #     print("unpickling acj")
+    #     with open(f"crowdsorting/app_resources/sorter_instances/{self.project_name}.pkl", "rb") as input_file:
+    #         self.acj = pickle.load(input_file)
 
     def pickle_acj(self):
         print("pickling acj")
-        with open(f"crowdsorting/ACJ_Log/acj.pkl", "wb") as f:
-            pickle.dump(self.acj, f)
+        with open(f"crowdsorting/app_resources/sorter_instances/{self.project_name}.pkl", "wb") as f:
+            pickle.dump(self, f)
 
     def getPair(self, number_of_docs, allDocs):
         if self.no_more_pairs:
             return "no good pair found"
         try:
             if isinstance(self.acj, type(None)):
-                self.unpickle_acj(number_of_docs)
+                # self.unpickle_acj(number_of_docs)
+                return "no acj created yet"
         except FileNotFoundError:
             return False
 

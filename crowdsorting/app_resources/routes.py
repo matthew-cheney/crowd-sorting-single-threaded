@@ -1,5 +1,5 @@
 from crowdsorting.app_resources.dbhandler import dbHandler
-from crowdsorting import app, cas, session, pairselector
+from crowdsorting import app, cas, session, pairselector, pairselectors
 from flask import flash
 from flask import render_template
 from flask import url_for
@@ -167,7 +167,7 @@ def sorted():
     confidence = round(confidence, 2)
     number_of_judgments = dbhandler.getNumberOfJudgments(request.cookies.get('project'))
     number_of_docs = dbhandler.getNumberOfDocs(request.cookies.get('project'))
-    possible_judgments = dbhandler.getPossibleJudgmentsCount()
+    possible_judgments = dbhandler.getPossibleJudgmentsCount(request.cookies.get('project'))
     if type(sortedFiles) == type(""):
         success = False
     else:
@@ -255,7 +255,8 @@ def uploadFile():
         flash(f'{len(validFiles)} file(s) successfully uploaded', 'success')
         dbhandler.addDocs(validFiles, request.cookies.get('project'))
         filenames = [x.filename for x in files]
-        pairselector.create_acj(filenames, rounds=15, maxRounds=15)
+        pairselectors[request.cookies.get('project')].create_acj(filenames, rounds=15, maxRounds=15)
+        # pairselector.create_acj(filenames, rounds=15, maxRounds=15)
         return redirect('/admin')
 
 

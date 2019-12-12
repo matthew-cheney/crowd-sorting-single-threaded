@@ -1,9 +1,12 @@
-from crowdsorting import session, pairselector
+from crowdsorting import session, pairselectors
 from crowdsorting import db
 from crowdsorting.database.models import Project, Doc, Judge, Judgment
 from crowdsorting import models
 from datetime import datetime
 from datetime import timedelta
+
+from crowdsorting.app_resources.sorting_algorithms.ACJProxy import ACJProxy
+
 
 class dbHandler():
 
@@ -46,7 +49,7 @@ class dbHandler():
         allJudgments = db.session.query(Judgment).filter_by(project_name=project).all()
         print('allJudgments:', allJudgments)
         # pair = pairselector.getPair(allDocs, allJudgments)
-        pair = pairselector.getPair(len(allDocs), allDocs)
+        pair = pairselectors[project].getPair(len(allDocs), allDocs)
         if not pair:
             return pair
         if type(pair) == type(""):
@@ -75,7 +78,7 @@ class dbHandler():
         judge_id = session['user'].get_judge_id()
         db.session.add(Judgment(doc_harder_id=harder_doc.id, doc_easier_id=easier_doc.id, judge_id=judge_id, project_name=project))
         db.session.commit()
-        pairselector.makeJudgment(easier_doc, harder_doc, judge.username)
+        pairselectors[project].makeJudgment(easier_doc, harder_doc, judge.username)
         if project not in self.pairsBeingProcessed:
             self.addPairsBeingProcessed(project)
         for pair in self.pairsBeingProcessed[project]:
@@ -140,7 +143,7 @@ class dbHandler():
         return
 
     def getNumberOfJudgments(self, project):
-        return db.session.query(Judgment).count()
+        return pairselectors[project].getNumberComparisonsMade()
 
     def getNumberOfDocs(self, project):
         allDocs = db.session.query(Doc).filter_by(project_name=project).all()
@@ -149,8 +152,8 @@ class dbHandler():
     def getSorted(self, project):
         allDocs = db.session.query(Doc).filter_by(project_name=project).all()
         allJudgments = db.session.query(Judgment).filter_by(project_name=project).all()
-        sortedFiles = pairselector.getSorted(allDocs, allJudgments)
-        confidence = pairselector.getConfidence()
+        sortedFiles = pairselectors[project].getSorted(allDocs, allJudgments)
+        confidence = pairselectors[project].getConfidence()
         return sortedFiles, confidence
 
     def getUserProjects(self, user):
@@ -171,13 +174,14 @@ class dbHandler():
             project = Project(name=project_name)
             db.session.add(project)
             db.session.commit()
+            pairselectors[project_name] = ACJProxy(project_name)
             message = f"project {project_name} successfully created"
         except:
             message = "unable to create project"
         return message
 
-    def getPossibleJudgmentsCount(self):
-        return pairselector.getPossibleJudgmentsCount()
+    def getPossibleJudgmentsCount(self, project):
+        return pairselectors[project].getPossibleJudgmentsCount()
 
     def getEmail(self, userID):
         user = db.session.query(Judge).filter_by(
