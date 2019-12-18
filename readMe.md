@@ -2,7 +2,7 @@
 
 Crowd Sorting is an open-source web app for sorting items by holistic binary comparisons. It utilizes Adaptive Comparative Judgment to minimize judgments and maximize accuracy.
 
-Crowd Sorting is being developed by the Digital Humanities Department at Brigham Young University.
+Crowd Sorting is being developed by the Digital Humanities Department at Brigham Young University, funded by the BYU Center for Language Studies.
 
 ## Installing Crowd Sorting
 
