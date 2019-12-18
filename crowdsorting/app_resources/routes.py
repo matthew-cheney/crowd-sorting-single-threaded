@@ -9,16 +9,20 @@ from flask import make_response
 import os
 from .settings import ADMIN_PATH
 from .user import User
+import json
+import re
 
 from crowdsorting.app_resources.forms import NewUserForm, NewProjectForm
 from flask_cas import login, logout, login_required
+
+import datetime
 
 dbhandler = dbHandler()
 
 dummyUser = User("", False, False, 0, "", "", "")
 
 @app.route("/login")
-def login():
+def login(other_dest=""):
     print('In the login route!')
     user_id = dbhandler.getUser(cas.username)
     if type(user_id) == type(""):
@@ -37,7 +41,10 @@ def login():
     firstName, lastName = dbhandler.getUserNames(db_user_id)
     email = dbhandler.getEmail(db_user_id)
     session['user'] = User(cas.username, True, adminBool, user_id, firstName, lastName, email)
-    return redirect(url_for('projectsdashboard'))
+    if other_dest == "":
+        return redirect(url_for('projectsdashboard'))
+    else:
+        return redirect(url_for(other_dest))
 
 
 @app.route('/newuser', methods=['GET', 'POST'])
@@ -60,7 +67,7 @@ def logout():
 @app.route("/projectsdashboard")
 def projectsdashboard():
     if 'user' in session and session['user'].get_is_admin():  # This is bad - fix it
-        return render_template('admindashboard.html', title='Home', current_user=session['user'], all_projects=dbhandler.allProjects())
+        return render_template('admindashboard.html', title='Home', current_user=session['user'], all_projects=dbhandler.allProjects(), all_users=dbhandler.getAllUsers())
     elif 'user' in session:
         return render_template('userdashboard.html', title='Home', current_user=session['user'], all_projects=dbhandler.getUserProjects(session['user'].get_username()))
     else:
@@ -113,7 +120,11 @@ def sorter():
     if isinstance(request.cookies.get('project'), type(None)):
         return render_template('nopairs.html', title='Check later',
                                message="No project selected", current_user=session['user'])
-    docPair = dbhandler.getPair(request.cookies.get('project'))
+    try:
+        docPair = dbhandler.getPair(request.cookies.get('project'))
+    except KeyError:
+        flash('Looks like your selected project has been deleted!', 'warning')
+        return redirect(url_for('projectsdashboard'))
     if not docPair:
         flash('Project not ready', 'warning')
         return redirect(url_for('home'))
@@ -267,3 +278,53 @@ def add_project():
     print(message)
     return redirect(url_for('projectsdashboard'))
 
+
+@app.route("/addusertoproject", methods=['POST'])
+@login_required
+def add_user_to_project():
+    print(f"in add_user_to_project at {datetime.datetime.now()}")
+    req_body = request.json
+    if req_body['action'] == 'add':
+        print(f"adding {req_body['project']} to {req_body['user']}")
+        dbhandler.addUserToProject(req_body['user'], req_body['project'])
+    else:
+        print(f"remove {req_body['project']} from {req_body['user']}")
+        dbhandler.removeUserFromProject(req_body['user'], req_body['project'])
+    return ""
+
+
+@app.route("/updateUserInfo", methods=['POST'])
+@login_required
+def update_user_info():
+    newFirstName = request.form.get('firstName')
+    newLastName = request.form.get('lastName')
+    username = request.form.get('username')
+    newEmail = request.form.get('email')
+
+    if newFirstName == "":
+        flash("First Name cannot be empty", 'warning')
+        return redirect(url_for('accountinfo'))
+    if newLastName == "":
+        flash("Last Name cannot be empty", "warning")
+        return redirect(url_for('accountinfo'))
+    if newEmail == "":
+        flash("Email cannot be empty", "warning")
+        return redirect(url_for("accountinfo"))
+    if not check(newEmail):
+        flash("Please enter a valid email", "warning")
+        return redirect(url_for("accountinfo"))
+
+    dbhandler.updateUserInfo(newFirstName, newLastName, username, newEmail)
+    return login('accountinfo')
+
+
+def _json_string_to_dict(json_string):
+    return json.loads(json_string)
+
+
+def check(email):
+    regex = '^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$'
+    if (re.search(regex, email)):
+        return True
+    else:
+        return False

@@ -39,3 +39,12 @@ body {
 .table-holder {
     width: 100%;
 }
+
+.info_input {
+    border-width: 0px;
+    border: none;
+}
+
+.info_input:focus {
+    outline-width: 0px;
+}

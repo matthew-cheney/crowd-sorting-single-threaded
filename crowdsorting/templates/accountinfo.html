@@ -3,41 +3,63 @@
 {% block content %}
 <div id="accountinfo_content">
     <h1 class="text-center">Account Info</h1>
-    <div id="table-holder" class="mx-auto">
-        <table class="table table-nonfluid">
-            <tr>
-                <td>
-                    Name:
-                </td>
-                <td>
-                    {{ current_user.get_first_name() }} {{ current_user.get_last_name() }}
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    Username:
-                </td>
-                <td>
-                    {{ current_user.get_username() }}
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    Email:
-                </td>
-                <td>
-                    {{ current_user.get_email() }}
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    Is admin:
-                </td>
-                <td>
-                    {{ current_user.get_is_admin() }}
-                </td>
-            </tr>
-        </table>
-    </div>
+    <form method="POST" action="/updateUserInfo">
+        <div id="table-holder" class="mx-auto">
+            <table class="table table-nonfluid">
+                <tr>
+                    <td>
+                        First Name:
+                    </td>
+                    <td>
+                        <input type="text" name="firstName" class="info_input" value="{{ current_user.get_first_name() }}" onkeyup="editText()">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Last Name:
+                    </td>
+                    <td>
+                        <input type="text" name="lastName" class="info_input" value="{{ current_user.get_last_name() }}" onkeyup="editText()">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Username:
+                    </td>
+                    <td>
+                        <input type="text" name="username" class="info_input" value="{{ current_user.get_username() }}" readonly>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Email:
+                    </td>
+                    <td>
+                        <input type="text" name="email" class="info_input" value="{{ current_user.get_email() }}" onkeyup="editText()">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Is admin:
+                    </td>
+                    <td>
+                        {{ current_user.get_is_admin() }}
+                    </td>
+                </tr>
+            </table>
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary" id="submit_changes" disabled>Submit Changes</button>
+            </div>
+        </div>
+    </form>
 </div>
+
+<script>
+
+    function editText() {
+        document.getElementById("submit_changes").disabled = false;
+    }
+
+
+</script>
 {% endblock content %}

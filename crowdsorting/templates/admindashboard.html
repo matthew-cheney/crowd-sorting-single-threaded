@@ -30,4 +30,61 @@ Admin Dashboad
     }
 
 </script>
+
+<table class="table">
+    <tr>
+        <td>
+            Username
+        </td>
+        {% for project in all_projects %}
+            <td>
+                {{ project.name }}
+            </td>
+            {% endfor %}
+    </tr>
+    {% for user in all_users %}
+        <tr>
+            <td>
+                {{ user.username }}
+            </td>
+            {% for project in all_projects %}
+            <td>
+                {% if user in project.judges %}
+                <input type="checkbox", id="{{ user.id }}_{{ project.name }}" onclick="toggleProject('{{ user.id }}', '{{ project.name }}')" checked>
+                {% else %}
+                <input type="checkbox", id="{{ user.id }}_{{ project.name }}" onclick="toggleProject('{{ user.id }}', '{{ project.name }}')" >
+                {% endif %}
+            </td>
+            {% endfor %}
+        </tr>
+    {% endfor %}
+</table>
+
+<script>
+    function toggleProject(user, project) {
+
+        checkbox_id = user + "_" + project;
+
+        json_dict = {
+            user: user,
+            project: project,
+            action: "remove"
+            };
+
+        check_box = document.getElementById(checkbox_id)
+        if (check_box.checked == true) {
+            json_dict = { user: user, project: project, action: "add" };
+        }
+
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "/addusertoproject", true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send(JSON.stringify(json_dict));
+
+
+        }
+
+</script>
+
 {% endblock content %}

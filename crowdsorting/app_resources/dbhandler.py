@@ -157,9 +157,9 @@ class dbHandler():
         return sortedFiles, confidence
 
     def getUserProjects(self, user):
-        return self.allProjects() # This is a temporary fix
-        projects = db.session.query(Judge).filter_by(username='mchen95').first().projects
-        projects = [p.name for p in projects]
+        # return self.allProjects() # This is a temporary fix
+        projects = db.session.query(Judge).filter_by(username=user).first().projects
+        # projects = [p.name for p in projects]
         print("projects:", projects)
         return projects
 
@@ -189,3 +189,26 @@ class dbHandler():
         if (user is not None):
             return user.email
         return "User not found"
+
+    def getAllUsers(self):
+        users = db.session.query(Judge).all()
+        return users
+
+    def addUserToProject(self, userId, projectName):
+        project = db.session.query(Project).filter_by(name=projectName).first()
+        user = db.session.query(Judge).filter_by(id=userId).first()
+        project.judges.append(user)
+        db.session.commit()
+
+    def removeUserFromProject(self, userId, projectName):
+        project = db.session.query(Project).filter_by(name=projectName).first()
+        user = db.session.query(Judge).filter_by(id=userId).first()
+        project.judges.remove(user)
+        db.session.commit()
+
+    def updateUserInfo(self, newFirstName, newLastName, username, newEmail):
+        user = db.session.query(Judge).filter_by(username=username).first()
+        user.firstName = newFirstName
+        user.lastName = newLastName
+        user.email = newEmail
+        db.session.commit()
