@@ -6,8 +6,8 @@ Crowd Sorting is being developed by the Digital Humanities Department at Brigham
 
 ## Installing Crowd Sorting
 
-Clone this repository to your machine or server
-Add admin usernames to crowdsorting/app_resources/admins.txt
+Clone this repository to your machine or server</br>
+Add admin usernames to crowdsorting/app_resources/admins.txt</br>
 Run: python3 initialize_databases.py
 
 ## Running Crowd Sorting
