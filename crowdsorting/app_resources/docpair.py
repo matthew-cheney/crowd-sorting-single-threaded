@@ -1,7 +1,7 @@
 from datetime import datetime
 
-class DocPair():
 
+class DocPair:
     doc1 = ""
     doc2 = ""
     timestamp = ""
@@ -19,32 +19,32 @@ class DocPair():
         else:
             return False
 
-    def getFirst(self):
+    def get_first(self):
         return self.doc1.name
 
-    def getSecond(self):
+    def get_second(self):
         return self.doc2.name
 
-    def getDocOne(self):
+    def get_doc_one(self):
         return self.doc1
 
-    def getDocTwo(self):
+    def get_doc_two(self):
         return self.doc2
 
-    def getTimestamp(self):
+    def get_timestamp(self):
         return self.timestamp
 
     def __str__(self):
         return f"{self.doc1.name}, {self.doc2.name}, time:{self.timestamp}"
 
-    def getLifeSeconds(self):
+    def get_life_seconds(self):
         return self.lifeSeconds
 
-    def updateTimestamp(self):
+    def update_time_stamp(self):
         self.timestamp = datetime.now()
 
-    def getFirstContents(self):
+    def get_first_contents(self):
         return self.doc1.contents
 
-    def getSecondContents(self):
+    def get_second_contents(self):
         return self.doc2.contents

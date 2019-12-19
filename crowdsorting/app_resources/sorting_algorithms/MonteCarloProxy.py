@@ -4,12 +4,12 @@ import numpy as np
 from datetime import datetime
 
 from crowdsorting.app_resources.docpair import DocPair
-from crowdsorting.app_resources.sorting_algorithms.ACJ import ACJ
+from crowdsorting.app_resources.sorting_algorithms.MonteCarlo import MonteCarlo as MC
 
 
-class ACJProxy:
+class MonteCarloProxy:
     def __init__(self, project_name):
-        self.acj = None
+        self.mc = None
         self.number_of_docs = 0
         self.rounds = 0
         self.no_more_pairs = False
@@ -17,24 +17,24 @@ class ACJProxy:
 
     @staticmethod
     def get_algorithm_name():
-        return "Adaptive Comparative Judgment"
+        return "Monte Carlo Sorting"
 
-    def create_acj(self, data, rounds=15, maxRounds=10, noOfChoices=1,
-                   logPath="crowdsorting/ACJ_Log/", optionNames=None):
+    def create_mc(self, data, rounds=15, maxRounds=10, noOfChoices=1,
+                  logPath="crowdsorting/ACJ_Log/", optionNames=None):
         if optionNames is None:
             optionNames = ["Choice"]
-        print("creating acj")
+        print("creating mc")
         self.number_of_docs = len(data)
         self.rounds = rounds
         dat = np.asarray(data)
         np.random.shuffle(dat)
-        self.acj = ACJ(dat, maxRounds, noOfChoices, logPath, optionNames)
+        self.mc = MC(dat, epsilon=10)
         self.no_more_pairs = False
         with open(f"crowdsorting/app_resources/sorter_instances/{self.project_name}.pkl", "wb") as output_file:  # noqa: E501
             pickle.dump(self, output_file)
 
-    def pickle_acj(self):
-        print("pickling acj")
+    def pickle_mc(self):
+        print("pickling mc")
         with open(f"crowdsorting/app_resources/sorter_instances/{self.project_name}.pkl", "wb") as f:  # noqa: E501
             pickle.dump(self, f)
 
@@ -42,19 +42,19 @@ class ACJProxy:
         if self.no_more_pairs:
             return "no good pair found"
         try:
-            if isinstance(self.acj, type(None)):
-                # self.unpickle_acj(number_of_docs)
-                return "no acj created yet"
+            if isinstance(self.mc, type(None)):
+                # self.unpickle_mc(number_of_docs)
+                return "no mc created yet"
         except FileNotFoundError:
             return False
 
-        acj_pair = self.acj.nextIDPair()
-        if isinstance(acj_pair, type(None)):
+        mc_pair = self.mc.next_pair()
+        if isinstance(mc_pair, type(None)):
             self.no_more_pairs = True
             return "no pair available"
-        doc_one_name = self.acj.getScript(acj_pair[0])
-        doc_two_name = self.acj.getScript(acj_pair[1])
-        if acj_pair is None:
+        doc_one_name = self.mc.get_script(mc_pair[0])
+        doc_two_name = self.mc.get_script(mc_pair[1])
+        if mc_pair is None:
             return "no good pair found"
         doc_one = False
         doc_two = False
@@ -72,32 +72,29 @@ class ACJProxy:
 
     def make_judgment(self, easier_doc_name, harder_doc_name,
                       judge_name='Unknown'):
-        easier_doc_id = self.acj.getID(easier_doc_name.name)
-        harder_doc_id = self.acj.getID(harder_doc_name.name)
+        easier_doc_id = self.mc.get_ID(easier_doc_name.name)
+        harder_doc_id = self.mc.get_ID(harder_doc_name.name)
         pair = (easier_doc_id, harder_doc_id)
-        self.acj.IDComp(pair, False, reviewer=judge_name, time=datetime.now())
-        self.pickle_acj()
+        self.mc.compare(pair, False)  #, reviewer=judge_name, time=datetime.now())
+        self.pickle_mc()
 
     def get_sorted(self, allDocs, allJudgments):
-        if isinstance(self.acj, type(None)):
-            self.unpickle_acj(len(allDocs))
+        if isinstance(self.mc, type(None)):
+            self.unpickle_mc(len(allDocs))
         if len(allDocs) < 1:
             return "No files in database"
-        sortedFiles = [x[0] for x in self.acj.results()[0]]
+        sortedFiles = self.mc.get_sorted()
         return sortedFiles
 
     def get_possible_judgments_count(self):
-        total = int(self.rounds * (self.number_of_docs / 2))
-        if total < 1:
-            total = 1
-        print(f'returning number of pairs: {total}')
-        return total
+        print(f'returning number of pairs: 9001')
+        return "9001"
 
     def get_confidence(self):
-        return self.acj.reliability()[0]
+        return self.mc.get_confidence()
 
     def get_number_comparisons_made(self):
-        return self.acj.getComparisonsMade()
+        return self.mc.get_comparisons_made()
 
-    def unpickle_acj(self, param):
+    def unpickle_mc(self, param):
         pass

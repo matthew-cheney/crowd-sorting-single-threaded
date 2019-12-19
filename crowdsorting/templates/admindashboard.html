@@ -1,90 +1,126 @@
 {% extends "layout.html" %}
 
 {% block content %}
-Admin Dashboad
 
-<form method="POST" action="/selectproject">
-    {% for project in all_projects %}
-        <input type="radio" name="project" value="{{ project.name }}" onclick="activate_admin_project_submit()"> {{ project.name }}<br>
-    {% endfor %}
-    <button type="submit" id="select_project_submit" disabled>Submit</button>
-</form>
-<br>
-<form method="POST" action="/addproject">
-    <input type="text" name="project_name" placeholder="project name" id="project_name" onkeyup="activate_new_project_submit()">
-    <button type="submit" id="new_project_submit" disabled>Create Project</button>
-</form>
+<div class="text-center">
+    <div class="text-center">
+        <h1>Admin Dashboard</h1>
+    </div>
 
-<script>
+    <hr/>
 
-    function activate_admin_project_submit() {
-        document.getElementById("select_project_submit").disabled = false;
-    }
-
-    function activate_new_project_submit() {
-        if (document.getElementById("project_name").value == "") {
-            document.getElementById("new_project_submit").disabled = true;
-        } else {
-            document.getElementById("new_project_submit").disabled = false;
-        }
-    }
-
-</script>
-
-<table class="table">
-    <tr>
-        <td>
-            Username
-        </td>
-        {% for project in all_projects %}
-            <td>
-                {{ project.name }}
-            </td>
-            {% endfor %}
-    </tr>
-    {% for user in all_users %}
-        <tr>
-            <td>
-                {{ user.username }}
-            </td>
+    <div>
+        <h3>Current Projects</h3>
+        <p>Select a project to work on and hit "Submit"</p>
+        <form method="POST" action="/selectproject">
             {% for project in all_projects %}
-            <td>
-                {% if user in project.judges %}
-                <input type="checkbox", id="{{ user.id }}_{{ project.name }}" onclick="toggleProject('{{ user.id }}', '{{ project.name }}')" checked>
-                {% else %}
-                <input type="checkbox", id="{{ user.id }}_{{ project.name }}" onclick="toggleProject('{{ user.id }}', '{{ project.name }}')" >
-                {% endif %}
-            </td>
+                <input type="radio" name="project" value="{{ project.name }}" onclick="activate_admin_project_submit()"> {{ project.name }}<br>
             {% endfor %}
-        </tr>
-    {% endfor %}
-</table>
+            <button type="submit" id="select_project_submit" disabled>Submit</button>
+        </form>
+    </div>
+    <script>
 
-<script>
-    function toggleProject(user, project) {
-
-        checkbox_id = user + "_" + project;
-
-        json_dict = {
-            user: user,
-            project: project,
-            action: "remove"
-            };
-
-        check_box = document.getElementById(checkbox_id)
-        if (check_box.checked == true) {
-            json_dict = { user: user, project: project, action: "add" };
+        function activate_admin_project_submit() {
+            document.getElementById("select_project_submit").disabled = false;
         }
 
-
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", "/addusertoproject", true);
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.send(JSON.stringify(json_dict));
-
-
+        function activate_new_project_submit() {
+            if (document.getElementById("project_name").value == "") {
+                document.getElementById("new_project_submit").disabled = true;
+            } else {
+                document.getElementById("new_project_submit").disabled = false;
+            }
         }
 
-</script>
+    </script>
 
+    <hr/>
+
+    <div>
+
+        <h3>Create New Project</h3>
+
+        <form method="POST" action="/addproject">
+        <table class="table borderless">
+            <tr>
+                <td>
+                    <h4>Enter a name for the project</h4>
+                    <input type="text" name="project_name" placeholder="project name" id="project_name" onkeyup="activate_new_project_submit()">
+                    <button type="submit" id="new_project_submit" disabled>Create Project</button>
+                </td>
+                <td>
+                    <h4>Choose a selection algorithm</h4>
+                    <div>
+                        {% for selector in selector_algorithms %}
+                        <input type="radio" name="selector_algorithm" value="{{ selector.get_algorithm_name() }}" onclick=""> {{ selector.get_algorithm_name() }}<br>
+                        {% endfor %}
+                    </div>
+                </td>
+            </tr>
+        </table>
+        </form>
+
+    </div>
+
+    <hr/>
+
+    <div>
+        <h3>Manage Users</h3>
+        <table class="table borderless">
+            <tr>
+                <td>
+                    Username
+                </td>
+                {% for project in all_projects %}
+                    <td>
+                        {{ project.name }}
+                    </td>
+                    {% endfor %}
+            </tr>
+            {% for user in all_users %}
+                <tr>
+                    <td>
+                        {{ user.username }}
+                    </td>
+                    {% for project in all_projects %}
+                    <td>
+                        {% if user in project.judges %}
+                        <input type="checkbox", id="{{ user.id }}_{{ project.name }}" onclick="toggleProject('{{ user.id }}', '{{ project.name }}')" checked>
+                        {% else %}
+                        <input type="checkbox", id="{{ user.id }}_{{ project.name }}" onclick="toggleProject('{{ user.id }}', '{{ project.name }}')" >
+                        {% endif %}
+                    </td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <script>
+        function toggleProject(user, project) {
+
+            checkbox_id = user + "_" + project;
+
+            json_dict = {
+                user: user,
+                project: project,
+                action: "remove"
+                };
+
+            check_box = document.getElementById(checkbox_id)
+            if (check_box.checked == true) {
+                json_dict = { user: user, project: project, action: "add" };
+            }
+
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/addusertoproject", true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.send(JSON.stringify(json_dict));
+
+
+            }
+
+    </script>
+</div>
 {% endblock content %}

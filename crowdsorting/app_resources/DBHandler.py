@@ -27,7 +27,7 @@ class DBHandler:
         for file in validFiles:
             if not file.filename in filenamesInDatabase:
                 print(f"{file} is not in the databse yet")
-                self.createDoc(file.filename, file.read(), project)
+                self.create_doc(file.filename, file.read(), project)
                 newFile = True
         if newFile:
             db.session.commit()
@@ -40,9 +40,9 @@ class DBHandler:
         if project not in self.pairsBeingProcessed:
             self.add_pairs_being_processed(project)
         for pair in self.pairsBeingProcessed[project]:
-            if pair.getTimestamp() < (datetime.now() - timedelta(seconds=30)):
-                pair.updateTimestamp()
-                print(f"pair timestamp set to {pair.getTimestamp()}")
+            if pair.get_timestamp() < (datetime.now() - timedelta(seconds=30)):
+                pair.update_time_stamp()
+                print(f"pair timestamp set to {pair.get_timestamp()}")
                 print(f"serving stored pair {pair}")
                 return pair
         allDocs = db.session.query(Doc).filter_by(project_name=project,
@@ -57,9 +57,9 @@ class DBHandler:
             print('no more pairs')
             return pair
         self.pairsBeingProcessed[project].append(pair)
-        doc1 = db.session.query(Doc).filter_by(name=pair.getFirst(),
+        doc1 = db.session.query(Doc).filter_by(name=pair.get_first(),
                                                project_name=project).first()
-        doc2 = db.session.query(Doc).filter_by(name=pair.getSecond(),
+        doc2 = db.session.query(Doc).filter_by(name=pair.get_second(),
                                                project_name=project).first()
         doc1.checked_out = True
         doc2.checked_out = True
@@ -72,10 +72,12 @@ class DBHandler:
     def create_judgment(self, harder, easier, project, judge):
         print(f"The winner is {harder}")
         print(f"The loser is {easier}")
-        harder_doc = db.session.query(Doc).filter_by(name=harder,
-                                                     project_name=project).first()
-        easier_doc = db.session.query(Doc).filter_by(name=easier,
-                                                     project_name=project).first()
+        harder_doc = \
+            db.session.query(Doc).filter_by(name=harder,
+                                            project_name=project).first()
+        easier_doc = \
+            db.session.query(Doc).filter_by(name=easier,
+                                            project_name=project).first()
         harder_doc.checked_out = False
         easier_doc.checked_out = False
         harder_doc.num_compares += 1
@@ -96,7 +98,7 @@ class DBHandler:
                 break
 
     # Function to delete Doc and Judgments from database
-    def deleteFile(self, name, project):
+    def delete_file(self, name, project):
         for j in db.session.query(Judgment).filter_by(
                 project_name=project).all():
             if j.doc_harder.name == name:
@@ -104,65 +106,58 @@ class DBHandler:
                 continue
             if j.doc_easier.name == name:
                 db.session.query(Judgment).filter_by(id=j.id).delete()
-            '''
-            doc1 = db.session.query(Doc).filter_by(id=j.doc_harder_id).first()
-            print('Doc1', doc1)
-            doc2 = db.session.query(Doc).filter_by(id=j.doc_easier_id).first()
-            print('Doc2', doc2)
-            if (type(doc1) == type(Doc()) and doc1.name == name) or (type(doc2) == type(Doc()) and doc2.name == name):
-                print('deleting a judgment')
-                db.session.query(Judgment).filter_by(id=j.id).delete()
-                '''
+
         db.session.query(Doc).filter_by(name=name,
                                         project_name=project).delete()
         db.session.commit()
 
-    def createDoc(self, filename, contents, project):
+    def create_doc(self, filename, contents, project):
         doc1 = Doc(name=filename, contents=contents, project_name=project)
         db.session.add(doc1)
         db.session.commit()
 
-    def getJudge(self, judge_username, project):
+    def get_judge(self, judge_username, project):
         allJudges = db.session.query(Judge).all()
         for judge in allJudges:
             if judge.username == judge_username:
                 return judge.id
         return "Judge not found"
 
-    def getUser(self, user_username):
+    def get_user(self, user_username):
         user = db.session.query(Judge).filter_by(
             username=user_username).first()
         if (user is not None):
             return user.id
         return "User not found"
 
-    def getUserNames(self, user_id):
+    def get_username(self, user_id):
         user = db.session.query(Judge).filter_by(
             id=user_id).first()
         if (user is not None):
             return user.firstName, user.lastName
         return "User not found"
 
-    def createUser(self, firstName, lastName, judge_username, email):
+    def create_user(self, firstName, lastName, judge_username, email):
         db.session.add(Judge(firstName=firstName, lastName=lastName,
                              username=judge_username, email=email))
         db.session.commit()
         return
 
-    def createJudge(self, firstName, lastName, judge_username, email, project):
+    def create_judge(self, firstName, lastName, judge_username, email,
+                     project):
         db.session.add(Judge(firstName=firstName, lastName=lastName,
                              username=judge_username, email=email))
         db.session.commit()
         return
 
-    def getNumberOfJudgments(self, project):
+    def get_number_of_judgments(self, project):
         return pairselectors[project].get_number_comparisons_made()
 
-    def getNumberOfDocs(self, project):
+    def get_number_of_docs(self, project):
         allDocs = db.session.query(Doc).filter_by(project_name=project).all()
         return len(allDocs)
 
-    def getSorted(self, project):
+    def get_sorted(self, project):
         allDocs = db.session.query(Doc).filter_by(project_name=project).all()
         allJudgments = db.session.query(Judgment).filter_by(
             project_name=project).all()
@@ -170,7 +165,7 @@ class DBHandler:
         confidence = pairselectors[project].get_confidence()
         return sortedFiles, confidence
 
-    def getUserProjects(self, user):
+    def get_user_projects(self, user):
         # return self.allProjects() # This is a temporary fix
         projects = db.session.query(Judge).filter_by(
             username=user).first().projects
@@ -178,7 +173,7 @@ class DBHandler:
         print("projects:", projects)
         return projects
 
-    def allProjects(self):
+    def get_all_projects(self):
         projects = []
         for p in db.session.query(Project).all():
             projects.append(
@@ -186,44 +181,49 @@ class DBHandler:
                                p.judges, p.docs, p.judgments))
         return projects
 
-    def createProject(self, project_name):
+    def create_project(self, project_name, selector_algorithm):
         try:
+            print(selector_algorithm)
+            print(ACJProxy)
+            new_sorter = selector_algorithm(project_name)
+            pairselectors[project_name] = new_sorter
             project = Project(name=project_name)
             db.session.add(project)
             db.session.commit()
-            pairselectors[project_name] = ACJProxy(project_name)
             message = f"project {project_name} successfully created"
-        except:
+            return message
+        except Exception:
+            print(Exception)
             message = "unable to create project"
         return message
 
-    def getPossibleJudgmentsCount(self, project):
+    def get_possible_judgments_count(self, project):
         return pairselectors[project].get_possible_judgments_count()
 
-    def getEmail(self, userID):
+    def get_email(self, userID):
         user = db.session.query(Judge).filter_by(
             id=userID).first()
         if (user is not None):
             return user.email
         return "User not found"
 
-    def getAllUsers(self):
+    def get_all_users(self):
         users = db.session.query(Judge).all()
         return users
 
-    def addUserToProject(self, userId, projectName):
+    def add_user_to_project(self, userId, projectName):
         project = db.session.query(Project).filter_by(name=projectName).first()
         user = db.session.query(Judge).filter_by(id=userId).first()
         project.judges.append(user)
         db.session.commit()
 
-    def removeUserFromProject(self, userId, projectName):
+    def remove_user_from_project(self, userId, projectName):
         project = db.session.query(Project).filter_by(name=projectName).first()
         user = db.session.query(Judge).filter_by(id=userId).first()
         project.judges.remove(user)
         db.session.commit()
 
-    def updateUserInfo(self, newFirstName, newLastName, username, newEmail):
+    def update_user_info(self, newFirstName, newLastName, username, newEmail):
         user = db.session.query(Judge).filter_by(username=username).first()
         user.firstName = newFirstName
         user.lastName = newLastName

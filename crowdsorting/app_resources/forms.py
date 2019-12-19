@@ -6,21 +6,22 @@ from crowdsorting.database.models import *
 
 class NewDocForm(FlaskForm):
     content = StringField('Content',
-                            validators=[DataRequired(),
-                            Length(max=500)])
+                          validators=[DataRequired(),
+                                      Length(max=500)])
     submit = SubmitField('Submit Text')
+
 
 class NewUserForm(FlaskForm):
     firstName = StringField('FirstName',
-                             validators=[DataRequired(),
-                             Length(max=100)])
+                            validators=[DataRequired(),
+                                        Length(max=100)])
     lastName = StringField('LastName',
-                             validators=[DataRequired(),
-                             Length(max=100)])
+                           validators=[DataRequired(),
+                                       Length(max=100)])
     email = StringField('Email',
-                         validators=[DataRequired(),
-                         Length(max=120),
-                         Email()])
+                        validators=[DataRequired(),
+                                    Length(max=120),
+                                    Email()])
 
     submit = SubmitField('Sign Up')
 
@@ -32,7 +33,9 @@ class NewUserForm(FlaskForm):
     def validate_username(self, username):
         judge = Judge.query.filter_by(username=username.data).first()
         if judge:
-            raise ValidationError('That username is taken. Please choose a different one.')
+            raise ValidationError(
+                'That username is taken. Please choose a different one.')
+
 
 class NewProjectForm(FlaskForm):
     projectName = StringField('ProjectName',

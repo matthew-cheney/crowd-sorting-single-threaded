@@ -48,3 +48,7 @@ body {
 .info_input:focus {
     outline-width: 0px;
 }
+
+.borderless td, .borderless th {
+    border: none;
+}

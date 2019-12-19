@@ -26,8 +26,13 @@ migrate = Migrate(app, db)
 from crowdsorting.database.models import Project, Doc, Judge, Vote, Judgment
 from crowdsorting.app_resources.sorting_algorithms.selectionalgorithm import SelectionAlgorithm
 from crowdsorting.app_resources.sorting_algorithms.ACJProxy import ACJProxy
+from crowdsorting.app_resources.sorting_algorithms.MonteCarloProxy import MonteCarloProxy
 
-pairselector = ""
+
+pairselector_options = list()
+pairselector_options.append(ACJProxy)
+pairselector_options.append(MonteCarloProxy)
+
 
 pairselectors = dict()
 instance_filenames = glob('crowdsorting/app_resources/sorter_instances/*.pkl')
