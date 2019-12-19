@@ -1,4 +1,4 @@
-from crowdsorting.app_resources.dbhandler import dbHandler
+from crowdsorting.app_resources.DBHandler import DBHandler
 from crowdsorting import app, cas, session, pairselector, pairselectors
 from flask import flash
 from flask import render_template
@@ -17,7 +17,7 @@ from flask_cas import login, logout, login_required
 
 import datetime
 
-dbhandler = dbHandler()
+dbhandler = DBHandler()
 
 dummyUser = User("", False, False, 0, "", "", "")
 
@@ -121,7 +121,7 @@ def sorter():
         return render_template('nopairs.html', title='Check later',
                                message="No project selected", current_user=session['user'])
     try:
-        docPair = dbhandler.getPair(request.cookies.get('project'))
+        docPair = dbhandler.get_pair(request.cookies.get('project'))
     except KeyError:
         flash('Looks like your selected project has been deleted!', 'warning')
         return redirect(url_for('projectsdashboard'))
@@ -226,7 +226,7 @@ def submitanswer():
     else:
         easier = request.form.get("file_one_name")
     judge = current_user=session['user']
-    dbhandler.createJudgment(harder, easier, request.cookies.get('project'), judge)
+    dbhandler.create_judgment(harder, easier, request.cookies.get('project'), judge)
     if isinstance(request.form.get('another_pair_checkbox'), type(None)):
         flash('Judgment submitted', 'success')
         return redirect(url_for('home'))
@@ -264,7 +264,7 @@ def uploadFile():
             else:
                 flash('Allowed file types are txt', 'danger')
         flash(f'{len(validFiles)} file(s) successfully uploaded', 'success')
-        dbhandler.addDocs(validFiles, request.cookies.get('project'))
+        dbhandler.add_docs(validFiles, request.cookies.get('project'))
         filenames = [x.filename for x in files]
         pairselectors[request.cookies.get('project')].create_acj(filenames, rounds=15, maxRounds=15)
         # pairselector.create_acj(filenames, rounds=15, maxRounds=15)

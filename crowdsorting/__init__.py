@@ -24,7 +24,7 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
 from crowdsorting.database.models import Project, Doc, Judge, Vote, Judgment
-from crowdsorting.app_resources.sorting_algorithms.selection_algorithm import selection_algorithm
+from crowdsorting.app_resources.sorting_algorithms.selectionalgorithm import SelectionAlgorithm
 from crowdsorting.app_resources.sorting_algorithms.ACJProxy import ACJProxy
 
 pairselector = ""

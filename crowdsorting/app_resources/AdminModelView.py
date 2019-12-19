@@ -1,7 +1,7 @@
 import flask_admin as admin
 from flask_admin.contrib import sqla
 from crowdsorting import session
-from flask_admin import helpers, expose
+from flask_admin import expose
 from flask import url_for
 from flask import redirect
 
@@ -15,6 +15,7 @@ class AdminModelView(sqla.ModelView):
     def inaccessible_callback(self, name, **kwargs):
         return redirect(url_for('home'))
 
+
 class MyAdminIndexView(admin.AdminIndexView):
     @expose('/')
     def index(self):
@@ -26,7 +27,8 @@ class MyAdminIndexView(admin.AdminIndexView):
 class JudgeView(AdminModelView):
     column_list = ('firstName', 'lastName', 'username', 'email', 'projects')
     column_filters = ['projects.name']
-    column_labels = {'projects.name': 'Projects', 'firstName': 'First Name', 'lastName': 'Last Name'}
+    column_labels = {'projects.name': 'Projects', 'firstName': 'First Name',
+                     'lastName': 'Last Name'}
 
 
 class JudgmentView(AdminModelView):
@@ -36,10 +38,12 @@ class JudgmentView(AdminModelView):
 
 
 class DocView(AdminModelView):
-    column_list = ('name', 'num_compares', 'checked_out', 'project_name', 'judgments_harder', 'judgments_easier')
+    column_list = (
+        'name', 'num_compares', 'checked_out', 'project_name',
+        'judgments_harder',
+        'judgments_easier')
     column_searchable_list = ['name']
     column_filters = ['project_name']
-
 
 
 class ProjectView(AdminModelView):
@@ -47,4 +51,7 @@ class ProjectView(AdminModelView):
 
 
 class VoteView(AdminModelView):
-    column_list = ('id', 'doc_one', 'doc_two', 'doc_one_votes', 'doc_two_votes', 'resolved', 'project_name', 'judges')
+    column_list = (
+        'id', 'doc_one', 'doc_two', 'doc_one_votes', 'doc_two_votes',
+        'resolved',
+        'project_name', 'judges')

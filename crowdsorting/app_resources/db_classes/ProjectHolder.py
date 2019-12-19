@@ -6,6 +6,6 @@ from crowdsorting.app_resources.db_classes.Judgment import Judgment
 class ProjectHolder:
     def __init__(self, name):
         self.name = name
-        self.Doc = Doc()
-        self.Judge = Judge()
-        self.Judgment = Judgment()
+        self.Doc = Doc
+        self.Judge = Judge
+        self.Judgment = Judgment

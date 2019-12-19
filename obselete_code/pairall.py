@@ -1,8 +1,9 @@
-from .selection_algorithm import *
+from crowdsorting.app_resources.sorting_algorithms.selectionalgorithm import *
 
-class pairall(selection_algorithm):
 
-    def getPair(self, allDocs, allJudgments):
+class pairall(SelectionAlgorithm):
+
+    def get_pair(self, allDocs, allJudgments):
         if len(allDocs) < 2:
             return "Not enough docs to compare"
         # Remove docs that are currently checked out from consideration
@@ -27,10 +28,9 @@ class pairall(selection_algorithm):
             allDocs = allDocs[1:]
         return "no good pair found"
 
-
-
     def getNumCompares(self, doc):
-        return len(list(doc.judgments_harder)) + len(list(doc.judgments_easier))
+        return len(list(doc.judgments_harder)) + len(
+            list(doc.judgments_easier))
 
     def isInHarder(self, base_doc, query_doc):
         self.visited_docs = []
@@ -46,7 +46,8 @@ class pairall(selection_algorithm):
                 print(f"found harder one: {query_doc.name}")
                 return True
             print(f"calling hard_R on {judgment.doc_harder.name}")
-            toReturn = (toReturn + self.isInHarderRecurse(judgment.doc_harder, query_doc))
+            toReturn = (toReturn + self.isInHarderRecurse(judgment.doc_harder,
+                                                          query_doc))
         return toReturn
 
     def isInEasier(self, base_doc, query_doc):
@@ -65,7 +66,8 @@ class pairall(selection_algorithm):
                 print(f"found easier one: {query_doc.name}")
                 return True
             print(f"calling easy_R on {judgment.doc_easier.name}")
-            toReturn = (toReturn + self.isInEasierRecurse(judgment.doc_easier, query_doc))
+            toReturn = (toReturn + self.isInEasierRecurse(judgment.doc_easier,
+                                                          query_doc))
         return toReturn
 
     def getCompareDoc(self, allDocs, allJudgments, doc1):
@@ -81,7 +83,7 @@ class pairall(selection_algorithm):
                     return doc
         return "No comparisons available"
 
-    def getSorted(self, allDocs, allJudgments):
+    def get_sorted(self, allDocs, allJudgments):
         if len(allDocs) < 1:
             return "No files in database"
         filesAndScores = {file.name: 0 for file in allDocs}
@@ -91,7 +93,8 @@ class pairall(selection_algorithm):
         files = sorted(filesAndScores.items(), key=operator.itemgetter(1))
         sortedFiles = [x[0] for x in files]
         if len(allDocs) > 1:
-            confidence = len(allJudgments) / (len(allDocs) * (len(allDocs) - 1) * .5)
+            confidence = len(allJudgments) / (
+                        len(allDocs) * (len(allDocs) - 1) * .5)
         else:
             confidence = 0
         return sortedFiles, confidence

@@ -15,7 +15,10 @@ class ACJProxy:
         self.no_more_pairs = False
         self.project_name = project_name
 
-    def create_acj(self, data, rounds=15, maxRounds=10, noOfChoices=1, logPath="crowdsorting/ACJ_Log/", optionNames=["Choice"]):
+    def create_acj(self, data, rounds=15, maxRounds=10, noOfChoices=1,
+                   logPath="crowdsorting/ACJ_Log/", optionNames=None):
+        if optionNames is None:
+            optionNames = ["Choice"]
         print("creating acj")
         self.number_of_docs = len(data)
         self.rounds = rounds
@@ -23,23 +26,15 @@ class ACJProxy:
         np.random.shuffle(dat)
         self.acj = ACJ(dat, maxRounds, noOfChoices, logPath, optionNames)
         self.no_more_pairs = False
-        with open(f"crowdsorting/app_resources/sorter_instances/{self.project_name}.pkl", "wb") as output_file:
+        with open(f"crowdsorting/app_resources/sorter_instances/{self.project_name}.pkl", "wb") as output_file:  # noqa: E501
             pickle.dump(self, output_file)
-        # del (self.acj)
-        # with open(f"crowdsorting/app_resources/sorter_instances/{self.project_name}.pkl", "rb") as input_file:
-        #     self.acj = pickle.load(input_file)
-
-    # def unpickle_acj(self, length):
-    #     print("unpickling acj")
-    #     with open(f"crowdsorting/app_resources/sorter_instances/{self.project_name}.pkl", "rb") as input_file:
-    #         self.acj = pickle.load(input_file)
 
     def pickle_acj(self):
         print("pickling acj")
-        with open(f"crowdsorting/app_resources/sorter_instances/{self.project_name}.pkl", "wb") as f:
+        with open(f"crowdsorting/app_resources/sorter_instances/{self.project_name}.pkl", "wb") as f:  # noqa: E501
             pickle.dump(self, f)
 
-    def getPair(self, number_of_docs, allDocs):
+    def get_pair(self, number_of_docs, allDocs):
         if self.no_more_pairs:
             return "no good pair found"
         try:
@@ -55,7 +50,7 @@ class ACJProxy:
             return "no pair available"
         doc_one_name = self.acj.getScript(acj_pair[0])
         doc_two_name = self.acj.getScript(acj_pair[1])
-        if acj_pair == None:
+        if acj_pair is None:
             return "no good pair found"
         doc_one = False
         doc_two = False
@@ -71,14 +66,15 @@ class ACJProxy:
             return "no pair available"
         return doc_pair
 
-    def makeJudgment(self, easier_doc_name, harder_doc_name, judge_name='Unknown'):
+    def make_judgment(self, easier_doc_name, harder_doc_name,
+                      judge_name='Unknown'):
         easier_doc_id = self.acj.getID(easier_doc_name.name)
         harder_doc_id = self.acj.getID(harder_doc_name.name)
         pair = (easier_doc_id, harder_doc_id)
         self.acj.IDComp(pair, False, reviewer=judge_name, time=datetime.now())
         self.pickle_acj()
 
-    def getSorted(self, allDocs, allJudgments):
+    def get_sorted(self, allDocs, allJudgments):
         if isinstance(self.acj, type(None)):
             self.unpickle_acj(len(allDocs))
         if len(allDocs) < 1:
@@ -86,15 +82,18 @@ class ACJProxy:
         sortedFiles = [x[0] for x in self.acj.results()[0]]
         return sortedFiles
 
-    def getPossibleJudgmentsCount(self):
+    def get_possible_judgments_count(self):
         total = int(self.rounds * (self.number_of_docs / 2))
         if total < 1:
             total = 1
         print(f'returning number of pairs: {total}')
         return total
 
-    def getConfidence(self):
+    def get_confidence(self):
         return self.acj.reliability()[0]
 
-    def getNumberComparisonsMade(self):
+    def get_number_comparisons_made(self):
         return self.acj.getComparisonsMade()
+
+    def unpickle_acj(self, param):
+        pass
