@@ -21,9 +21,10 @@ from pprint import pprint
 class MonteCarlo:
 
     def __init__(self, data, p=.999, N=None, epsilon=1, per_round=25):
-        self.original_data = data
+        self.original_data = data  # Data (scripts to be sorted) as entered
         self.data_dictionary = dict(zip(range(len(data)), data))
-        self.data = list(self.data_dictionary.keys())
+        self.data = list(self.data_dictionary.keys())  # Keys are now ids
+        data = data
         if p <= 0:
             p = .001
         self.p = p
@@ -31,12 +32,12 @@ class MonteCarlo:
         self.length = len(self.data)
         if N is None:
             N = len(data) // 2  # Come back to this number, it's probably bad
-        self.N = N
+        self.N = N  # Candidate lists
         self.N_array = dict(list())
         self.N_dictionaries = {x: dict() for x in range(0, len(self.N_array))}
         self.all_same = False
-        self.data_n_disputes = {x: 0 for x in data}
-        self.data_i_have_beaten = {x: set() for x in data}
+        self.data_n_disputes = {x: 0 for x in self.data}
+        self.data_i_have_beaten = {x: set() for x in self.data}
         self.epsilon = epsilon  # 0 < epsilon << 1, lower is more accurate
         self.per_round = per_round
         for i in range(N):
@@ -52,20 +53,21 @@ class MonteCarlo:
         self._N_array_to_dictionary()
         self.comparisons_made = 0
 
-    def next_pair(self, docs_to_exclude=list()):
+    def next_pair(self, allDocs):
+        allDocs_IDs = [self.get_ID(x) for x in allDocs]
         self._N_array_to_dictionary()
-        return self._get_ij(docs_to_exclude)
+        return self._get_ij(allDocs_IDs)
 
-    def _get_ij(self, docs_to_exclude=list()):
+    def _get_ij(self, allDocs_IDs):
         uncertain_list = []
         min_Nij_minus_Nji = 999999999999999999  # There's probably a more elegant way of doing this
         for i in self.data:
             for j in self.data:
                 if i == j:
                     continue
-                if i in docs_to_exclude:
+                if i not in allDocs_IDs:
                     continue
-                if j in docs_to_exclude:
+                if j not in allDocs_IDs:
                     continue
                 new_min = self._get_Nij_minus_Nji(i, j)
                 if new_min < min_Nij_minus_Nji:
@@ -74,7 +76,10 @@ class MonteCarlo:
                 if new_min == min_Nij_minus_Nji:
                     uncertain_list.append((i, j))
         try:
-            indexer = random.randint(0, len(uncertain_list) - 1)
+            if len(uncertain_list) == 0:
+                return None
+            else:
+                indexer = random.randint(0, len(uncertain_list) - 1)
             pair = uncertain_list[indexer]
         except IndexError:
             print("list:", uncertain_list)
@@ -127,7 +132,7 @@ class MonteCarlo:
     { e: i for i, e in enumerate(a_list) }
     """
 
-    def compare(self, pair, higher):
+    def compare_id(self, pair, higher):
         # for higher: True = 0th higher, False = 1st higher
         self.comparisons_made += 1
         if higher:
@@ -135,14 +140,15 @@ class MonteCarlo:
         else:
             self._process_compare(pair[1], pair[0])
         if self._check_list_unity():
+            self.get_sorted_builder()
             self.all_same = True
 
     def _process_compare(self, higher, lower):
-        higher_name = self.get_script(higher)
-        lower_name = self.get_script(lower)
+        # higher_name = self.get_script(higher)
+        # lower_name = self.get_script(lower)
 
-        self.data_n_disputes[lower_name] += 1
-        self.data_i_have_beaten[higher_name].add(lower)
+        self.data_n_disputes[lower] += 1  # 12/20 - changed higher to lower
+        self.data_i_have_beaten[higher].add(lower)  # 12/20 - changed 1st lower to higher
         for list_id in self.N_array:
             if self._is_i_less_than_j(lower, higher, list_id):
                 continue
@@ -219,10 +225,17 @@ class MonteCarlo:
                 beta_list.append(beta)
 
             Z = sum(beta_list)
+            if Z == 0:
+                Z = .0000000001
 
             accepted_element = False
 
+            if Z == 0:
+                pass
+
             while not accepted_element:
+                if i >= len(beta_list):
+                    i = 0
                 gamma = beta_list[i] / Z
                 if sigma < w + gamma:
                     new_list.append(middle_list[i])
@@ -258,7 +271,12 @@ class MonteCarlo:
         return random.random() < probability
 
     def get_sorted(self):
-        return self.N_array[random.randint(0, self.N - 1)]
+        target_N = self.N_array[random.randint(0, self.N - 1)]
+        toReturn = list()
+        for x_id in target_N:
+            toReturn.append(self.data_dictionary[x_id])
+        # return self.N_array[random.randint(0, self.N - 1)]
+        return toReturn
 
     def get_sorted_builder(self):
         # For each doc, give it score of sum of indeces across N_array
@@ -271,7 +289,11 @@ class MonteCarlo:
                 index_dict[x] += i
         sorted_list = sorted(index_dict.items(), key=lambda kv: kv[1])
         sorted_list = [x[0] for x in sorted_list]
-        return sorted_list
+        toReturn = list()
+        for x_id in sorted_list:
+            toReturn.append(self.data_dictionary[x_id])
+        basic_sorted = self.get_sorted()
+        return toReturn
 
     def get_confidence(self):
         return 42

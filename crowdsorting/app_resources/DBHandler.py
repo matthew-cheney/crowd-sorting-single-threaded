@@ -4,12 +4,26 @@ from crowdsorting.database.models import Project, Doc, Judge, Judgment
 from crowdsorting import models
 from datetime import datetime
 from datetime import timedelta
+import pickle
 
 from crowdsorting.app_resources.sorting_algorithms.ACJProxy import ACJProxy
 
 
 class DBHandler:
-    pairsBeingProcessed = {}
+
+    def __init__(self):
+        self.unpickle_pairs_being_processed()
+
+    def pickle_pairs_being_processed(self):
+        with open(f"crowdsorting/app_resources/pairs_being_processed/pairsBeingProcessed.pkl", "wb") as f:
+            pickle.dump(self.pairsBeingProcessed, f)
+
+    def unpickle_pairs_being_processed(self):
+        try:
+            with open(f"crowdsorting/app_resources/pairs_being_processed/pairsBeingProcessed.pkl", "rb") as f:
+                self.pairsBeingProcessed = pickle.load(f)
+        except FileNotFoundError:
+            self.pairsBeingProcessed = {}
 
     def db_file_names(self, project):
         filesInDatabase = db.session.query(Doc).filter_by(
@@ -34,9 +48,11 @@ class DBHandler:
 
     def add_pairs_being_processed(self, project):
         self.pairsBeingProcessed[project] = []
+        self.pickle_pairs_being_processed()
 
     # Function to get next pair of docs
     def get_pair(self, project):
+        self.unpickle_pairs_being_processed()
         if project not in self.pairsBeingProcessed:
             self.add_pairs_being_processed(project)
         for pair in self.pairsBeingProcessed[project]:
@@ -54,9 +70,11 @@ class DBHandler:
         if not pair:
             return pair
         if type(pair) == type(""):
+            print(pair)
             print('no more pairs')
             return pair
         self.pairsBeingProcessed[project].append(pair)
+        self.pickle_pairs_being_processed()
         doc1 = db.session.query(Doc).filter_by(name=pair.get_first(),
                                                project_name=project).first()
         doc2 = db.session.query(Doc).filter_by(name=pair.get_second(),
@@ -89,6 +107,7 @@ class DBHandler:
         db.session.commit()
         pairselectors[project].make_judgment(easier_doc, harder_doc,
                                              judge.username)
+        self.unpickle_pairs_being_processed()
         if project not in self.pairsBeingProcessed:
             self.add_pairs_being_processed(project)
         for pair in self.pairsBeingProcessed[project]:
@@ -96,6 +115,7 @@ class DBHandler:
                     pair.doc1.name == easier and pair.doc2.name == harder):
                 self.pairsBeingProcessed[project].remove(pair)
                 break
+        self.pickle_pairs_being_processed()
 
     # Function to delete Doc and Judgments from database
     def delete_file(self, name, project):
@@ -161,9 +181,9 @@ class DBHandler:
         allDocs = db.session.query(Doc).filter_by(project_name=project).all()
         allJudgments = db.session.query(Judgment).filter_by(
             project_name=project).all()
-        sortedFiles = pairselectors[project].get_sorted(allDocs, allJudgments)
+        sortedFiles, builtSorted = pairselectors[project].get_sorted(allDocs, allJudgments)
         confidence = pairselectors[project].get_confidence()
-        return sortedFiles, confidence
+        return sortedFiles, builtSorted, confidence
 
     def get_user_projects(self, user):
         # return self.allProjects() # This is a temporary fix

@@ -212,7 +212,7 @@ def sorted():
         return render_template('nopairs.html', title='Check later',
                                message='No docs in this project',
                                current_user=session['user'])
-    sortedFiles, confidence, *args = dbhandler.get_sorted(
+    sortedFiles, builtSorted, confidence, *args = dbhandler.get_sorted(
         request.cookies.get('project'))
     confidence = confidence * 100
     confidence = round(confidence, 2)
@@ -228,6 +228,7 @@ def sorted():
         success = True
     return render_template('sorted.html', title='Sorted',
                            sortedFiles=sortedFiles,
+                           builtSorted=builtSorted,
                            current_user=session['user'],
                            confidence=confidence,
                            number_of_judgments=number_of_judgments,

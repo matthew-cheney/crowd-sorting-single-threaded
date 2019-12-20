@@ -10,3 +10,5 @@ notes.txt
 text_files
 RedKalinka
 crowdsorting/app_resources/sorter_instances/
+crowdsorting/app_resources/sorting_algorithms/MonteCarlo_buggy.py
+..gitignore.swp

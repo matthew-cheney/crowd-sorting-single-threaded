@@ -39,8 +39,8 @@ class MonteCarloProxy:
             pickle.dump(self, f)
 
     def get_pair(self, number_of_docs, allDocs):
-        if self.no_more_pairs:
-            return "no good pair found"
+        # if self.no_more_pairs:
+        #     return "no good pair found"
         try:
             if isinstance(self.mc, type(None)):
                 # self.unpickle_mc(number_of_docs)
@@ -48,10 +48,12 @@ class MonteCarloProxy:
         except FileNotFoundError:
             return False
 
-        mc_pair = self.mc.next_pair()
+        allDocs_names = [x.name for x in allDocs]
+
+        mc_pair = self.mc.next_pair(allDocs_names)
         if isinstance(mc_pair, type(None)):
             self.no_more_pairs = True
-            return "no pair available"
+            return "no pair available now"
         doc_one_name = self.mc.get_script(mc_pair[0])
         doc_two_name = self.mc.get_script(mc_pair[1])
         if mc_pair is None:
@@ -67,7 +69,7 @@ class MonteCarloProxy:
                 break
         doc_pair = DocPair(doc_one, doc_two)
         if not doc_one or not doc_two:
-            return "no pair available"
+            return "no pair available here"
         return doc_pair
 
     def make_judgment(self, easier_doc_name, harder_doc_name,
@@ -75,7 +77,7 @@ class MonteCarloProxy:
         easier_doc_id = self.mc.get_ID(easier_doc_name.name)
         harder_doc_id = self.mc.get_ID(harder_doc_name.name)
         pair = (easier_doc_id, harder_doc_id)
-        self.mc.compare(pair, False)  #, reviewer=judge_name, time=datetime.now())
+        self.mc.compare_id(pair, False)  #, reviewer=judge_name, time=datetime.now())
         self.pickle_mc()
 
     def get_sorted(self, allDocs, allJudgments):
@@ -84,13 +86,16 @@ class MonteCarloProxy:
         if len(allDocs) < 1:
             return "No files in database"
         sortedFiles = self.mc.get_sorted()
-        return sortedFiles
+        builtSorted = self.mc.get_sorted_builder()
+        return sortedFiles, builtSorted
 
     def get_possible_judgments_count(self):
         print(f'returning number of pairs: 9001')
         return "9001"
 
     def get_confidence(self):
+        if self.mc.all_same:
+            return 1
         return self.mc.get_confidence()
 
     def get_number_comparisons_made(self):
