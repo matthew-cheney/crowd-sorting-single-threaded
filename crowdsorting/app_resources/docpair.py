@@ -12,6 +12,7 @@ class DocPair:
         self.doc2 = doc2
         self.timestamp = datetime.now()
         lifeSeconds = 30
+        self.checked_out = True
 
     def equals(self, other):
         if self.doc1.id == other.doc1.id and self.doc2.id == other.doc2.id:

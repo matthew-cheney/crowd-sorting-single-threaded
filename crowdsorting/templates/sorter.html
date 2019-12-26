@@ -1,7 +1,17 @@
 {% extends "layout.html" %}
 
 {% block content %}
-
+<form method="POST" action="/safeexit">
+    <div class="row">
+        <div class="col-md-12 text-left">
+            <button type="submit" class="btn btn-danger btn-lg">Safe exit</button>
+        </div>
+        <input type="hidden" name="file_one_name"
+                   value="{{ file_one_name }}">
+        <input type="hidden" name="file_two_name"
+                   value="{{ file_two_name }}">
+    </div>
+</form>
 <form method="POST" action="/submitAnswer">
     <div class="row">
         <div class="col-md-12 text-center">
@@ -34,6 +44,7 @@
             <h3>Indicate each text's difficulty</h3>
         </div>
     </div>
+    <!--
     <div class="row" style="margin-bottom: 10pt;">
         <div class="col-md-6 text-center">
             <div class="btn-group btn-group-toggle" data-toggle="buttons">
@@ -62,6 +73,7 @@
             </div>
         </div>
     </div>
+    -->
     <div class="row">
         <div class="col-md-12 text-center">
             <button type="submit" class="btn btn-primary btn-lg">Submit
@@ -98,6 +110,7 @@
     document.getElementById("doc_b_div").className = "card border-success mb-3"
     document.getElementById("doc_b_header").className = "card-header bg-success text-center"
   }
+
   function b_harder() {
     document.getElementById("harder_hidden").value = "{{ file_two_name }}"
     document.getElementById("doc_b_header").innerHTML = "HARDER"
@@ -106,6 +119,10 @@
     document.getElementById("doc_b_header").className = "card-header bg-danger text-center"
     document.getElementById("doc_a_div").className = "card border-success mb-3"
     document.getElementById("doc_a_header").className = "card-header bg-success text-center"
+  }
+
+  function safe_exit() {
+
   }
 
 

@@ -19,7 +19,7 @@ class ACJProxy:
     def get_algorithm_name():
         return "Adaptive Comparative Judgment"
 
-    def create_acj(self, data, rounds=15, maxRounds=10, noOfChoices=1,
+    def initialize_selector(self, data, rounds=15, maxRounds=10, noOfChoices=1,
                    logPath="crowdsorting/ACJ_Log/", optionNames=None):
         if optionNames is None:
             optionNames = ["Choice"]

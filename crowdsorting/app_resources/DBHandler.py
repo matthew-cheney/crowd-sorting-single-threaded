@@ -56,10 +56,13 @@ class DBHandler:
         if project not in self.pairsBeingProcessed:
             self.add_pairs_being_processed(project)
         for pair in self.pairsBeingProcessed[project]:
-            if pair.get_timestamp() < (datetime.now() - timedelta(seconds=30)):
+            if (pair.get_timestamp() < (datetime.now() - timedelta(seconds=30))) or \
+                    (pair.checked_out == False):
                 pair.update_time_stamp()
                 print(f"pair timestamp set to {pair.get_timestamp()}")
                 print(f"serving stored pair {pair}")
+                pair.checked_out = True
+                self.pickle_pairs_being_processed()
                 return pair
         allDocs = db.session.query(Doc).filter_by(project_name=project,
                                                   checked_out=False).all()
@@ -181,9 +184,9 @@ class DBHandler:
         allDocs = db.session.query(Doc).filter_by(project_name=project).all()
         allJudgments = db.session.query(Judgment).filter_by(
             project_name=project).all()
-        sortedFiles, builtSorted = pairselectors[project].get_sorted(allDocs, allJudgments)
+        sortedFiles = pairselectors[project].get_sorted(allDocs, allJudgments)
         confidence = pairselectors[project].get_confidence()
-        return sortedFiles, builtSorted, confidence
+        return sortedFiles, confidence
 
     def get_user_projects(self, user):
         # return self.allProjects() # This is a temporary fix
@@ -249,3 +252,13 @@ class DBHandler:
         user.lastName = newLastName
         user.email = newEmail
         db.session.commit()
+
+    def return_pair(self, pair, project):
+        self.unpickle_pairs_being_processed()
+        for out_pair in self.pairsBeingProcessed[project]:
+            if (pair[0] == out_pair.doc1.name and pair[1] == out_pair.doc2.name) or \
+               (pair[1] == out_pair.doc1.name and pair[0] == out_pair.doc2.name):
+                out_pair.checked_out = False
+                self.pickle_pairs_being_processed()
+                return
+        print("pair not found in pairsBeingProcessed")

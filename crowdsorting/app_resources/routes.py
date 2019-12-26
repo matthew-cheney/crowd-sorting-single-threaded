@@ -160,8 +160,15 @@ def sorter():
     if type(docPair) == type(""):
         return render_template('nopairs.html', title='Check later',
                                message=docPair, current_user=session['user'])
-    file_one = docPair.get_first_contents().decode("utf-8")
-    file_two = docPair.get_second_contents().decode("utf-8")
+    try:
+        file_one = docPair.get_first_contents().decode("utf-8")
+    except AttributeError:
+        file_one = docPair.get_first_contents()
+    try:
+        file_two = docPair.get_second_contents().decode("utf-8")
+    except AttributeError:
+        file_two = docPair.get_second_contents()
+
     return render_template('sorter.html', title='Sorter', file_one=file_one,
                            file_two=file_two,
                            file_one_name=docPair.get_first(),
@@ -212,7 +219,7 @@ def sorted():
         return render_template('nopairs.html', title='Check later',
                                message='No docs in this project',
                                current_user=session['user'])
-    sortedFiles, builtSorted, confidence, *args = dbhandler.get_sorted(
+    sortedFiles, confidence, *args = dbhandler.get_sorted(
         request.cookies.get('project'))
     confidence = confidence * 100
     confidence = round(confidence, 2)
@@ -228,7 +235,6 @@ def sorted():
         success = True
     return render_template('sorted.html', title='Sorted',
                            sortedFiles=sortedFiles,
-                           builtSorted=builtSorted,
                            current_user=session['user'],
                            confidence=confidence,
                            number_of_judgments=number_of_judgments,
@@ -268,7 +274,7 @@ def submitanswer():
     print("in submitAnswer route")
     print(request.form.get("harder"))
     harder = request.form.get("harder")
-    easier = "";
+    easier = ""
     if harder == request.form.get("file_one_name"):
         easier = request.form.get("file_two_name")
     else:
@@ -281,6 +287,17 @@ def submitanswer():
         return redirect(url_for('home'))
     else:
         return redirect(url_for('sorter'))
+
+@app.route("/safeexit", methods=['POST'])
+@login_required
+def safeexit():
+    print("in safe exit")
+    doc1 = request.form.get('file_one_name')
+    doc2 = request.form.get('file_two_name')
+    project = request.cookies.get('project')
+    print(doc1)
+    dbhandler.return_pair((doc1, doc2), project)
+    return redirect(url_for('home'))
 
 
 ALLOWED_EXTENSIONS = {'txt'}
@@ -316,7 +333,7 @@ def uploadFile():
         flash(f'{len(validFiles)} file(s) successfully uploaded', 'success')
         dbhandler.add_docs(validFiles, request.cookies.get('project'))
         filenames = [x.filename for x in files]
-        pairselectors[request.cookies.get('project')].create_mc(filenames,
+        pairselectors[request.cookies.get('project')].initialize_selector(filenames,
                                                                 rounds=15,
                                                                 maxRounds=15)
         return redirect('/admin')

@@ -19,7 +19,7 @@ class MonteCarloProxy:
     def get_algorithm_name():
         return "Monte Carlo Sorting"
 
-    def create_mc(self, data, rounds=15, maxRounds=10, noOfChoices=1,
+    def initialize_selector(self, data, rounds=15, maxRounds=10, noOfChoices=1,
                   logPath="crowdsorting/ACJ_Log/", optionNames=None):
         if optionNames is None:
             optionNames = ["Choice"]
@@ -85,9 +85,10 @@ class MonteCarloProxy:
             self.unpickle_mc(len(allDocs))
         if len(allDocs) < 1:
             return "No files in database"
-        sortedFiles = self.mc.get_sorted()
+        # Built sorted more intelligently averages all N candidate lists
+        # sortedFiles = self.mc.get_sorted()
         builtSorted = self.mc.get_sorted_builder()
-        return sortedFiles, builtSorted
+        return builtSorted
 
     def get_possible_judgments_count(self):
         print(f'returning number of pairs: 9001')

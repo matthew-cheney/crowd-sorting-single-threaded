@@ -1,20 +1,13 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<h2>Basic Sorted</h2>
+<h2>Sorted Files</h2>
 <h3>Easy</h3>
 {% for file in sortedFiles %}
 {{ file }}<br>
 {% endfor %}
 <h3>Hard</h3>
 <br><br>
-<h2>Built Sorted</h2>
-<h3>Easy</h3>
-{% for file in builtSorted %}
-{{ file }}<br>
-{% endfor %}
-<h3>Hard</h3>
-
 <p>Confidence: {{ confidence }}%</p>
 <p>Judgments made: {{ number_of_judgments }} / {{ possible_judgments }}</p>
 <p>Number of docs: {{ number_of_docs }}</p>
