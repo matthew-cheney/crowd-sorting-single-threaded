@@ -96,6 +96,63 @@
             {% endfor %}
         </table>
     </div>
+
+    <hr/>
+
+    <div>
+        <h3>Projects Info</h3>
+        <p>Select a project to work on and hit "Submit"</p>
+            <table class="table">
+                <tr>
+                    <td>
+                        Project Name
+                    </td>
+                    <td>
+                        Number of Judges
+                    </td>
+                    <td>
+                        Number of Documents
+                    </td>
+                    <td>
+                        Number of Judgments Made
+                    </td>
+                    <td>
+                        Selection Algorithm
+                    </td>
+                    <td>
+                        Delete
+                    </td>
+                </tr>
+                {% for project in all_projects %}
+                <tr>
+                    <td>
+                        {{ project.name }}
+                    </td>
+                    <td>
+                        {{ project.judges|length }}
+                    </td>
+                    <td>
+                        {{ project.docs|length }}
+                    </td>
+                    <td>
+                        {{ project.judgments|length }}
+                    </td>
+                    <td>
+                        {{ project.sorting_algorithm }}
+                    </td>
+                    <td>
+                        <form method="POST" action="/deleteProject">
+                            <input type="hidden" name="project_name_delete" value="{{ project.name }}">
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+    </div>
+
+    <hr/>
+
     <script>
         function toggleProject(user, project) {
 

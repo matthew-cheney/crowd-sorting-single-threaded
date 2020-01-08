@@ -1,4 +1,5 @@
 import _pickle as pickle
+import os
 
 import numpy as np
 from datetime import datetime
@@ -20,15 +21,20 @@ class MonteCarloProxy:
         return "Monte Carlo Sorting"
 
     def initialize_selector(self, data, rounds=15, maxRounds=10, noOfChoices=1,
-                  logPath="crowdsorting/ACJ_Log/", optionNames=None):
+                  logPath=None, optionNames=None):
         if optionNames is None:
             optionNames = ["Choice"]
+        if logPath is None:
+            defaultPath = f"crowdsorting/MC_Logs/{self.project_name}"
+            if not os.path.isdir(defaultPath):
+                os.mkdir(defaultPath)
+            logPath=defaultPath
         print("creating mc")
         self.number_of_docs = len(data)
         self.rounds = rounds
         dat = np.asarray(data)
         np.random.shuffle(dat)
-        self.mc = MC(dat, epsilon=10)
+        self.mc = MC(dat, epsilon=10, logPath=logPath)
         self.no_more_pairs = False
         with open(f"crowdsorting/app_resources/sorter_instances/{self.project_name}.pkl", "wb") as output_file:  # noqa: E501
             pickle.dump(self, output_file)
@@ -72,12 +78,12 @@ class MonteCarloProxy:
             return "no pair available here"
         return doc_pair
 
-    def make_judgment(self, easier_doc_name, harder_doc_name,
+    def make_judgment(self, easier_doc_name, harder_doc_name, duration,
                       judge_name='Unknown'):
         easier_doc_id = self.mc.get_ID(easier_doc_name.name)
         harder_doc_id = self.mc.get_ID(harder_doc_name.name)
         pair = (easier_doc_id, harder_doc_id)
-        self.mc.compare_id(pair, False)  #, reviewer=judge_name, time=datetime.now())
+        self.mc.compare_id(pair, False, reviewer=judge_name, time=duration)  #, reviewer=judge_name, time=datetime.now())
         self.pickle_mc()
 
     def get_sorted(self, allDocs, allJudgments):
@@ -103,4 +109,7 @@ class MonteCarloProxy:
         return self.mc.get_comparisons_made()
 
     def unpickle_mc(self, param):
+        pass
+
+    def delete_self(self):
         pass

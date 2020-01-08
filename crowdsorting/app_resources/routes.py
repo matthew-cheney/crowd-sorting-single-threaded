@@ -1,3 +1,5 @@
+from math import floor
+
 from crowdsorting.app_resources.DBHandler import DBHandler
 from crowdsorting import app, cas, session, pairselectors, pairselector_options
 from flask import flash
@@ -7,10 +9,13 @@ from flask import redirect
 from flask import request
 from flask import make_response
 import os
-from .settings import ADMIN_PATH
+from .settings import ADMIN_PATH, PM_PATH
 from .user import User
 import json
 import re
+import time
+
+from functools import wraps
 
 from crowdsorting.app_resources.forms import NewUserForm, NewProjectForm
 from flask_cas import login, logout, login_required
@@ -22,6 +27,15 @@ dbhandler = DBHandler()
 dummyUser = User("", False, False, 0, "", "", "")
 
 
+def admin_required(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        if not isAdmin():
+            return "This page is only accessible to administrators", 403
+        else:
+            return fn(*args, **kwargs)
+    return wrapper
+
 @app.route("/login")
 def login(other_dest=""):
     print('In the login route!')
@@ -29,25 +43,43 @@ def login(other_dest=""):
     if type(user_id) == type(""):
         return redirect(url_for('newuser'))
     admins = []
-    f = open(ADMIN_PATH, mode='r')
-    if f.mode == 'r':
-        admins = f.read().split('\n')
-    f.close()
-    adminBool = False
-    for admin in admins:
-        if admin == cas.username:
-            adminBool = True
-            break
+
     db_user_id = dbhandler.get_user(cas.username)
     firstName, lastName = dbhandler.get_username(db_user_id)
     email = dbhandler.get_email(db_user_id)
-    session['user'] = User(cas.username, True, adminBool, user_id, firstName,
+    session['user'] = User(cas.username, True, isInAdminFile(cas.username), isInPMFile(cas.username), user_id, firstName,
                            lastName, email)
     if other_dest == "":
         return redirect(url_for('projectsdashboard'))
     else:
         return redirect(url_for(other_dest))
 
+def isInAdminFile(username):
+    with open(ADMIN_PATH, mode='r') as f:
+        admins = f.read().split('\n')
+    adminBool = False
+    for admin in admins:
+        if admin == username:
+            adminBool = True
+            break
+    return adminBool
+
+def isInPMFile(username):
+    with open(PM_PATH, mode='r') as f:
+        pms = f.read().split('\n')
+    pmBool = False
+    for pm in pms:
+        if pm == username:
+            pmBool = True
+            break
+    return pmBool
+
+def isAdmin():
+    if not 'user' in session:
+        return False
+    if not isinstance(session['user'], User):
+        return False
+    return session['user'].is_admin
 
 @app.route('/newuser', methods=['GET', 'POST'])
 def newuser():
@@ -78,7 +110,7 @@ def projectsdashboard():
                                all_projects=dbhandler.get_all_projects(),
                                all_users=dbhandler.get_all_users(),
                                selector_algorithms=pairselector_options)
-    elif 'user' in session:
+    elif 'user' in session and session['user'].is_pm:
         return render_template('userdashboard.html', title='Home',
                                current_user=session['user'],
                                all_projects=dbhandler.get_user_projects(
@@ -100,6 +132,7 @@ def selectproject():
 
 
 @app.route("/temp")
+@admin_required
 def temp():
     return 'temp'
 
@@ -173,7 +206,8 @@ def sorter():
                            file_two=file_two,
                            file_one_name=docPair.get_first(),
                            file_two_name=docPair.get_second(),
-                           current_user=session['user'])
+                           current_user=session['user'],
+                           time_started=floor(time.time()))
 
 
 # Router to demo page
@@ -195,6 +229,8 @@ def about():
 
 # Router to admin page
 @app.route("/myadmin", methods=['GET', 'POST'])
+@admin_required
+@login_required
 def myadmin():
     # if 'user' not in session or not session['user'].get_is_admin():
     # return redirect(url_for('home'))
@@ -206,6 +242,8 @@ def myadmin():
 
 # Router for sorted page
 @app.route("/sorted")
+@login_required
+@admin_required
 def sorted():
     if not check_project(request):
         return redirect(url_for('projectsdashboard'))
@@ -252,6 +290,7 @@ def accountinfo():
 # Delete file route   - This route is obselete?
 @app.route("/deleteFile", methods=['POST'])
 @login_required
+@admin_required
 def deleteFile():
     print("in deleteFile route with", request.form.get('id'))
     os.remove((app.config['APP_DOCS'] + '/' + request.form.get('id')))
@@ -262,6 +301,7 @@ def deleteFile():
 
 @app.route("/detectFiles", methods=['POST'])
 @login_required
+@admin_required
 def detectFiles():  # This route is obselete?
     print("in detectFiles route")
     dbhandler.detectFiles(request.cookies.get('project'))
@@ -280,8 +320,9 @@ def submitanswer():
     else:
         easier = request.form.get("file_one_name")
     judge = current_user = session['user']
+    time_started = int(request.form.get("time_started"))
     dbhandler.create_judgment(harder, easier, request.cookies.get('project'),
-                              judge)
+                              judge, floor(time.time()) - time_started)
     if isinstance(request.form.get('another_pair_checkbox'), type(None)):
         flash('Judgment submitted', 'success')
         return redirect(url_for('home'))
@@ -310,6 +351,7 @@ def allowed_file(filename):
 
 @app.route("/upload", methods=['POST'])
 @login_required
+@admin_required
 def uploadFile():
     if not check_project(request):
         return redirect(url_for('projectsdashboard'))
@@ -341,6 +383,7 @@ def uploadFile():
 
 @app.route("/addproject", methods=['POST'])
 @login_required
+@admin_required
 def add_project():
     algorithm_to_use = None
     for algorithm in pairselector_options:
@@ -355,6 +398,7 @@ def add_project():
 
 @app.route("/addusertoproject", methods=['POST'])
 @login_required
+@admin_required
 def add_user_to_project():
     print(f"in add_user_to_project at {datetime.datetime.now()}")
     req_body = request.json
@@ -403,3 +447,15 @@ def check(email):
         return True
     else:
         return False
+
+@app.route("/deleteProject", methods=["POST"])
+@login_required
+@admin_required
+def deleteProject():
+    # Remove project from database
+    dbhandler.delete_project(request.form.get('project_name_delete'))
+    # Remove project from pairs being processed
+    # Remove pickled algorithm
+    # Remove pickled log files
+
+    return redirect(url_for('projectsdashboard'))

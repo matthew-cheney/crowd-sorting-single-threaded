@@ -25,6 +25,7 @@ VoteJudges = db.Table('votejudges',
 class Project(db.Model):
     __tablename__ = 'project'
     name = db.Column(db.String(DOC_NAME_LENGTH), nullable=False, primary_key=True)
+    sorting_algorithm = db.Column(db.String(120), nullable=False)
     date_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     judges = db.relationship('Judge', secondary='judges', lazy='subquery', backref=db.backref('myprojects', lazy=True))
     docs = db.relationship('Doc', cascade='all')

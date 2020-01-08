@@ -4,6 +4,8 @@ An implementation of the 'Discrete Adiabatic' Monte Carlo Sorting Algorithm
 
 Algorithm citation: https://arxiv.org/pdf/1612.08555.pdf
 """
+import json
+import os
 
 """
 TO DO:
@@ -20,7 +22,7 @@ from pprint import pprint
 
 class MonteCarlo:
 
-    def __init__(self, data, p=.999, N=None, epsilon=1, per_round=25):
+    def __init__(self, data, p=.999, N=None, epsilon=1, per_round=25, logPath=None):
         self.original_data = data  # Data (scripts to be sorted) as entered
         self.data_dictionary = dict(zip(range(len(data)), data))
         self.data = list(self.data_dictionary.keys())  # Keys are now ids
@@ -52,6 +54,7 @@ class MonteCarlo:
         self.N_changed = [True for x in self.N_array]
         self._N_array_to_dictionary()
         self.comparisons_made = 0
+        self.logPath = logPath
 
     def next_pair(self, allDocs):
         allDocs_IDs = [self.get_ID(x) for x in allDocs]
@@ -132,9 +135,11 @@ class MonteCarlo:
     { e: i for i, e in enumerate(a_list) }
     """
 
-    def compare_id(self, pair, higher):
+    def compare_id(self, pair, higher, reviewer="Unknown", time="0"):
         # for higher: True = 0th higher, False = 1st higher
         self.comparisons_made += 1
+        if self.logPath != None:
+            self._log_comparison(self.logPath, pair, higher, reviewer, time)
         if higher:
             self._process_compare(pair[0], pair[1])
         else:
@@ -142,6 +147,29 @@ class MonteCarlo:
         if self._check_list_unity():
             self.get_sorted_builder()
             self.all_same = True
+
+    def _log_comparison(self, path, pair, result, reviewer='Unknown', time=0):
+        '''Writes out a log of a comparison'''
+
+        timestamp = datetime.datetime.now().strftime('_%Y_%m_%d_%H_%M_%S_%f')
+        comparisonDict = {"Reviewer": reviewer,
+                          "Winner": (self.data_dictionary[pair[0]] if result else self.data_dictionary[pair[1]]),
+                          "Loser": (self.data_dictionary[pair[1]] if result else self.data_dictionary[pair[0]]),
+                          "Time": time}
+        with open(path + os.sep + str(reviewer) + timestamp + ".log",
+                  'w+') as file:
+            json.dump(comparisonDict, file, indent=4)
+
+
+
+        """timestamp = datetime.datetime.now().strftime('_%Y_%m_%d_%H_%M_%S_%f')
+        with open(path + os.sep + str(reviewer) + timestamp + ".log",
+                  'w+') as file:
+            file.write("Reviewer:%s\n" % str(reviewer))
+            file.write("A:%s\n" % str(self.data_dictionary[pair[0]]))
+            file.write("B:%s\n" % str(self.data_dictionary[pair[1]]))
+            file.write("Winner:%s\n" % ("A" if result else "B"))
+            file.write("Time:%s\n" % str(time))"""
 
     def _process_compare(self, higher, lower):
         # higher_name = self.get_script(higher)
@@ -244,7 +272,8 @@ class MonteCarlo:
                     w = w + gamma
                     i += 1
             middle_list.remove(middle_list[i])
-        new_list.append(middle_list[0])
+        if (len(middle_list) == 1):
+            new_list.append(middle_list[0])
         new_list.reverse()
         self.N_array[list_id] = lower_list + new_list + higher_list
 

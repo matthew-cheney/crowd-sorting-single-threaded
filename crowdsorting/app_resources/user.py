@@ -3,10 +3,11 @@ class User():
     is_authenticated = False
     is_admin = False
     judge_id = 0
-    def __init__(self, username, authenticated, admin, judge_id, first_name, last_name, email=""):
+    def __init__(self, username, authenticated, admin, pm, judge_id, first_name, last_name, email=""):
         self.username = username
         self.is_authenticated = authenticated
         self.is_admin = admin
+        self.is_pm = pm
         self.judge_id = judge_id
         self.first_name = first_name
         self.last_name = last_name

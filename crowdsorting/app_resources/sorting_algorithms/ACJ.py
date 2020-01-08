@@ -552,13 +552,23 @@ class UniACJ(object):
     def log(self, path, pair, result, reviewer='Unknown', time=0):
         '''Writes out a log of a comparison'''
         timestamp = datetime.datetime.now().strftime('_%Y_%m_%d_%H_%M_%S_%f')
+        comparisonDict = {"Reviewer": reviewer,
+                          "Winner": (pair[0] if result else pair[1]),
+                          "Loser": (pair[1] if result else pair[0]),
+                          "Time": time}
+        with open(path + os.sep + str(reviewer) + timestamp + ".log",
+                  'w+') as file:
+            json.dump(comparisonDict, file, indent=4)
+
+
+        """timestamp = datetime.datetime.now().strftime('_%Y_%m_%d_%H_%M_%S_%f')
         with open(path + os.sep + str(reviewer) + timestamp + ".log",
                   'w+') as file:
             file.write("Reviewer:%s\n" % str(reviewer))
             file.write("A:%s\n" % str(pair[0]))
             file.write("B:%s\n" % str(pair[1]))
             file.write("Winner:%s\n" % ("A" if result else "B"))
-            file.write("Time:%s\n" % str(time))
+            file.write("Time:%s\n" % str(time))"""
 
     def JSONLog(self, path=None):
         '''Writes out a JSON containing data from ACJ'''

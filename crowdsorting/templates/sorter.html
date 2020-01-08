@@ -1,22 +1,12 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<form method="POST" action="/safeexit">
-    <div class="row">
-        <div class="col-md-12 text-left">
-            <button type="submit" class="btn btn-danger btn-lg">Safe exit</button>
-        </div>
-        <input type="hidden" name="file_one_name"
-                   value="{{ file_one_name }}">
-        <input type="hidden" name="file_two_name"
-                   value="{{ file_two_name }}">
-    </div>
-</form>
 <form method="POST" action="/submitAnswer">
     <div class="row">
         <div class="col-md-12 text-center">
             <h3>Select the harder text</h3>
             <input type="hidden" name="harder" id="harder_hidden" value="">
+            <input type="hidden" name="time_started" value="{{ time_started }}">
         </div>
     </div>
     <div class="row">
@@ -97,6 +87,19 @@
         </div>
     </div>
 </form>
+
+<form method="POST" action="/safeexit">
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <button type="submit" class="btn btn-danger btn-lg">Exit Without Submitting</button>
+        </div>
+        <input type="hidden" name="file_one_name"
+                   value="{{ file_one_name }}">
+        <input type="hidden" name="file_two_name"
+                   value="{{ file_two_name }}">
+    </div>
+</form>
+
 <script>
 
 

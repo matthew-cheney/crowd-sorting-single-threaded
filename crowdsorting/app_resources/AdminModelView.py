@@ -9,7 +9,7 @@ from flask import redirect
 class AdminModelView(sqla.ModelView):
 
     def is_accessible(self):
-        print(f"sending back {session['user'].get_is_admin()}")
+        # print(f"sending back {session['user'].get_is_admin()}")
         return session['user'].get_is_admin()
 
     def inaccessible_callback(self, name, **kwargs):
@@ -47,7 +47,7 @@ class DocView(AdminModelView):
 
 
 class ProjectView(AdminModelView):
-    column_list = ('name', 'date_created', 'judges')
+    column_list = ('name', 'sorting_algorithm', 'date_created', 'judges')
 
 
 class VoteView(AdminModelView):

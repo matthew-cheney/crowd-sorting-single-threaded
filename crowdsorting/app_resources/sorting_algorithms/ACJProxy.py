@@ -1,4 +1,6 @@
 import _pickle as pickle
+import os
+import shutil
 
 import numpy as np
 from datetime import datetime
@@ -14,21 +16,26 @@ class ACJProxy:
         self.rounds = 0
         self.no_more_pairs = False
         self.project_name = project_name
+        self.logPath = f"crowdsorting/ACJ_Logs/{self.project_name}"
 
     @staticmethod
     def get_algorithm_name():
         return "Adaptive Comparative Judgment"
 
     def initialize_selector(self, data, rounds=15, maxRounds=10, noOfChoices=1,
-                   logPath="crowdsorting/ACJ_Log/", optionNames=None):
+                   logPath=None, optionNames=None):
         if optionNames is None:
             optionNames = ["Choice"]
+        if not logPath is None:
+            self.logPath = logPath
+        if not os.path.isdir(self.logPath):
+            os.mkdir(self.logPath)
         print("creating acj")
         self.number_of_docs = len(data)
         self.rounds = rounds
         dat = np.asarray(data)
         np.random.shuffle(dat)
-        self.acj = ACJ(dat, maxRounds, noOfChoices, logPath, optionNames)
+        self.acj = ACJ(dat, maxRounds, noOfChoices, self.logPath, optionNames)
         self.no_more_pairs = False
         with open(f"crowdsorting/app_resources/sorter_instances/{self.project_name}.pkl", "wb") as output_file:  # noqa: E501
             pickle.dump(self, output_file)
@@ -70,12 +77,12 @@ class ACJProxy:
             return "no pair available"
         return doc_pair
 
-    def make_judgment(self, easier_doc_name, harder_doc_name,
+    def make_judgment(self, easier_doc_name, harder_doc_name, duration,
                       judge_name='Unknown'):
         easier_doc_id = self.acj.getID(easier_doc_name.name)
         harder_doc_id = self.acj.getID(harder_doc_name.name)
         pair = (easier_doc_id, harder_doc_id)
-        self.acj.IDComp(pair, False, reviewer=judge_name, time=datetime.now())
+        self.acj.IDComp(pair, False, reviewer=judge_name, time=duration)
         self.pickle_acj()
 
     def get_sorted(self, allDocs, allJudgments):
@@ -101,3 +108,8 @@ class ACJProxy:
 
     def unpickle_acj(self, param):
         pass
+
+    def delete_self(self):
+        print(f"deleting {self.acj} pickles")
+        os.remove(f"crowdsorting/app_resources/sorter_instances/{self.project_name}.pkl")
+        shutil.rmtree(self.logPath)

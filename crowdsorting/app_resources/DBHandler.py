@@ -90,7 +90,7 @@ class DBHandler:
         return pair
 
     # Function to create new judgment
-    def create_judgment(self, harder, easier, project, judge):
+    def create_judgment(self, harder, easier, project, judge, duration):
         print(f"The winner is {harder}")
         print(f"The loser is {easier}")
         harder_doc = \
@@ -108,7 +108,7 @@ class DBHandler:
             Judgment(doc_harder_id=harder_doc.id, doc_easier_id=easier_doc.id,
                      judge_id=judge_id, project_name=project))
         db.session.commit()
-        pairselectors[project].make_judgment(easier_doc, harder_doc,
+        pairselectors[project].make_judgment(easier_doc, harder_doc, duration,
                                              judge.username)
         self.unpickle_pairs_being_processed()
         if project not in self.pairsBeingProcessed:
@@ -200,17 +200,18 @@ class DBHandler:
         projects = []
         for p in db.session.query(Project).all():
             projects.append(
-                models.Project(models.Project, p.name, p.date_created,
+                models.Project(p.name, p.sorting_algorithm, p.date_created,
                                p.judges, p.docs, p.judgments))
+        print("in get_all_projects")
+        print(projects)
         return projects
 
     def create_project(self, project_name, selector_algorithm):
         try:
             print(selector_algorithm)
-            print(ACJProxy)
             new_sorter = selector_algorithm(project_name)
             pairselectors[project_name] = new_sorter
-            project = Project(name=project_name)
+            project = Project(name=project_name, sorting_algorithm=selector_algorithm.get_algorithm_name())
             db.session.add(project)
             db.session.commit()
             message = f"project {project_name} successfully created"
@@ -262,3 +263,28 @@ class DBHandler:
                 self.pickle_pairs_being_processed()
                 return
         print("pair not found in pairsBeingProcessed")
+
+    def delete_project(self, project_name):
+
+        # Remove project from pairs_being_processed
+        self.unpickle_pairs_being_processed()
+        if project_name in self.pairsBeingProcessed:
+            del self.pairsBeingProcessed[project_name]
+        self.pickle_pairs_being_processed()
+
+        # Remove all judges from project
+        project = db.session.query(Project).filter_by(name=project_name).first()
+        project.judges = []
+        db.session.commit()
+
+        # Delete project
+        project = db.session.query(Project).filter_by(name=project_name).first()
+        db.session.delete(project)
+        db.session.commit()
+
+        # Run algorithm delete function
+
+        pairselectors[project_name].delete_self()
+
+        # Remove algorithm from pairselectors
+        del pairselectors[project_name]
