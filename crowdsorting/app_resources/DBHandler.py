@@ -284,7 +284,8 @@ class DBHandler:
 
         # Run algorithm delete function
 
-        pairselectors[project_name].delete_self()
+        if project_name in pairselectors:
+            pairselectors[project_name].delete_self()
 
-        # Remove algorithm from pairselectors
-        del pairselectors[project_name]
+            # Remove algorithm from pairselectors
+            del pairselectors[project_name]

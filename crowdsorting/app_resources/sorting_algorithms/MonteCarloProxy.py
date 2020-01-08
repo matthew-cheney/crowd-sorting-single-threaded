@@ -1,5 +1,6 @@
 import _pickle as pickle
 import os
+import shutil
 
 import numpy as np
 from datetime import datetime
@@ -15,6 +16,7 @@ class MonteCarloProxy:
         self.rounds = 0
         self.no_more_pairs = False
         self.project_name = project_name
+        self.logPath = f"crowdsorting/MC_Logs/{self.project_name}"
 
     @staticmethod
     def get_algorithm_name():
@@ -24,17 +26,16 @@ class MonteCarloProxy:
                   logPath=None, optionNames=None):
         if optionNames is None:
             optionNames = ["Choice"]
-        if logPath is None:
-            defaultPath = f"crowdsorting/MC_Logs/{self.project_name}"
-            if not os.path.isdir(defaultPath):
-                os.mkdir(defaultPath)
-            logPath=defaultPath
+        if not logPath is None:
+            self.logPath = logPath
+        if not os.path.isdir(self.logPath):
+                os.mkdir(self.logPath)
         print("creating mc")
         self.number_of_docs = len(data)
         self.rounds = rounds
         dat = np.asarray(data)
         np.random.shuffle(dat)
-        self.mc = MC(dat, epsilon=10, logPath=logPath)
+        self.mc = MC(dat, epsilon=10, logPath=self.logPath)
         self.no_more_pairs = False
         with open(f"crowdsorting/app_resources/sorter_instances/{self.project_name}.pkl", "wb") as output_file:  # noqa: E501
             pickle.dump(self, output_file)
@@ -111,5 +112,10 @@ class MonteCarloProxy:
     def unpickle_mc(self, param):
         pass
 
+
     def delete_self(self):
-        pass
+        print(f"deleting {self.mc} pickles")
+        if os.path.exists(f"crowdsorting/app_resources/sorter_instances/{self.project_name}.pkl"):
+            os.remove(f"crowdsorting/app_resources/sorter_instances/{self.project_name}.pkl")
+        if os.path.exists(self.logPath):
+            shutil.rmtree(self.logPath)

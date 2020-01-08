@@ -2,10 +2,10 @@
 	DONE - Change log format to JSON
 	DONE - Maybe add Monte Carlo log
 	DONE - Safe Exit bug
-Project Info section
+	DONE - Project Info section
 Project manager - no db admin, filtered dashboard
 Too hard or too easy opt out
-Add delete project w/ cleanup
+	DONE - Add delete project w/ cleanup
 Auth with Google
 CSV download of sorted, comparisons
 Add docs then begin project
