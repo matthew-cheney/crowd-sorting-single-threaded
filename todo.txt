@@ -9,4 +9,4 @@ Too hard or too easy opt out
 Auth with Google
 CSV download of sorted, comparisons
 Add docs then begin project
-
+Automated tests

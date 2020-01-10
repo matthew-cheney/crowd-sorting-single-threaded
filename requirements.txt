@@ -11,3 +11,6 @@ flask-admin
 flask-YAMLConfig
 flask-cas
 numpy
+requests
+oauthlib
+pyOpenSSL
