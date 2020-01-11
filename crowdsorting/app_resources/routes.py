@@ -253,7 +253,7 @@ def projectsdashboard():
                                    session['user'].get_user_full_name()))
     else:
         return render_template('userdashboard.html', title='Home',
-                               current_user=dummyUser,
+                               current_user=session['user'],
                                all_projects=dbhandler.get_all_projects())
 
 
@@ -569,7 +569,7 @@ def update_user_info():
         return redirect(url_for("accountinfo"))
 
     dbhandler.update_user_info(newFirstName, newLastName, email)
-    return login('accountinfo')
+    return load_user(email)
 
 
 def _json_string_to_dict(json_string):
