@@ -12,7 +12,7 @@ from oauthlib.oauth2 import WebApplicationClient
 from crowdsorting.app_resources.yamlReader import yamlReader
 import os
 
-from flask_cas import CAS
+# from flask_cas import CAS
 
 from crowdsorting.models.User import User
 
@@ -20,7 +20,8 @@ app = Flask(__name__)
 
 yamlReader.readConfig("config.yaml", app)
 
-cas = CAS(app, '/cas')
+# cas = CAS(app, '/cas')
+cas = False
 
 login_manager = LoginManager()
 login_manager.init_app(app)

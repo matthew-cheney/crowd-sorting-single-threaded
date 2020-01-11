@@ -25,7 +25,7 @@ class MyAdminIndexView(admin.AdminIndexView):
 
 
 class JudgeView(AdminModelView):
-    column_list = ('firstName', 'lastName', 'username', 'email', 'projects')
+    column_list = ('email', 'firstName', 'lastName', 'projects')
     column_filters = ['projects.name']
     column_labels = {'projects.name': 'Projects', 'firstName': 'First Name',
                      'lastName': 'Last Name'}

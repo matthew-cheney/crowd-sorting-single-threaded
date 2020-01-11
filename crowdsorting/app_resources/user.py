@@ -2,12 +2,10 @@ from flask_login import UserMixin
 
 
 class User(UserMixin):
-    username = ""
     is_authenticated = False
     is_admin = False
     judge_id = 0
-    def __init__(self, username, authenticated, admin, pm, judge_id, first_name, last_name, email=""):
-        self.username = username
+    def __init__(self, authenticated, admin, pm, judge_id, first_name, last_name, email=""):
         self.is_authenticated = authenticated
         self.is_admin = admin
         self.is_pm = pm
@@ -15,13 +13,10 @@ class User(UserMixin):
         self.first_name = first_name
         self.last_name = last_name
         self.email = email
-        self.id = username
+        self.id = email
 
     def get_is_authenticated(self):
         return self.is_authenticated
-
-    def get_username(self):
-        return self.username
 
     def get_is_admin(self):
         return self.is_admin

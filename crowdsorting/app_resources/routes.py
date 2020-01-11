@@ -23,7 +23,7 @@ import time
 from functools import wraps
 
 from crowdsorting.app_resources.forms import NewUserForm, NewProjectForm
-from flask_cas import login, logout, login_required
+from flask_cas import login as cas_login
 
 import datetime
 
@@ -32,21 +32,28 @@ dbhandler = DBHandler()
 dummyUser = User("", False, False, 0, "", "", "")
 
 
+def login_required(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        return fn(*args, **kwargs)
+    return wrapper
+
+
 # @login_manager.user_loader
-def load_user(username):
+def load_user(email):
     print('In the login route!')
     # username = user.username
-    print("user:", username)
-    user_id = dbhandler.get_user(username)
+    print("user:", email)
+    user_id = dbhandler.get_user(email)
     print("userID", user_id)
     if type(user_id) == type(""):
         print("new user detected")
-        session['user'] = User(username, False, False,
+        session['user'] = User(False, False,
                                False, "", "",
-                               "", "")
+                               "", email)
         return redirect(url_for('newuser'))
     else:
-        return returninguser(username, user_id)
+        return returninguser(email, user_id)
 
 
 @app.route('/newuser', methods=['GET', 'POST'])
@@ -57,10 +64,11 @@ def newuser():
     if form.validate_on_submit():
         current_user = session['user']  # Need to add user to session before this
         dbhandler.create_user(form.firstName.data, form.lastName.data,
-                              current_user.username, form.email.data)
-        session['user'] = User(current_user.username, True, isInAdminFile(current_user.username),
-                               isInPMFile(current_user.username), dbhandler.get_user(current_user.username), form.firstName.data,
-                               form.lastName.data, form.email.data)
+                              current_user.email)
+        session['user'] = User(True, isInAdminFile(current_user.email),
+                               isInPMFile(current_user.email), dbhandler.get_user(current_user.email), form.firstName.data,
+                               form.lastName.data, current_user.email)
+        print("admin:", session["user"].email, session['user'].is_admin)
         return postLoadUser()
     if request.method == 'POST':
         flash('Failed to register user', 'danger')
@@ -68,13 +76,13 @@ def newuser():
 
 
 
-def returninguser(username, user_id):
+def returninguser(email, user_id):
     admins = []
-    db_user_id = dbhandler.get_user(username)
-    firstName, lastName = dbhandler.get_username(db_user_id)
+    db_user_id = dbhandler.get_user(email)
+    firstName, lastName = dbhandler.get_user_full_name(db_user_id)
     email = dbhandler.get_email(db_user_id)
-    session['user'] = User(username, True, isInAdminFile(username),
-                           isInPMFile(username), user_id, firstName,
+    session['user'] = User(True, isInAdminFile(email),
+                           isInPMFile(email), user_id, firstName,
                            lastName, email)
     return postLoadUser()
 
@@ -147,16 +155,18 @@ def callback():
     # Create a user in our db with the information provided
     # by Google
     user = User(
-        users_email, False, False, False, 0, "", "", ""
+        False, False, False, 0, "", "", ""
     )
 
     # Begin user session by logging the user in
     return load_user(users_email)
 
 
-@app.route("/logout")
+@app.route("/logout_master")
 @login_required
-def logout():
+def logout_master():
+    print("in logout()")
+    del session['user']
     logout_user()
     return redirect(url_for("home"))
 
@@ -173,6 +183,7 @@ def admin_required(fn):
             return fn(*args, **kwargs)
     return wrapper
 
+
 @app.route("/cas_login")
 def cas_login(other_dest=""):
     print('In the login route!')
@@ -182,7 +193,7 @@ def cas_login(other_dest=""):
     admins = []
 
     db_user_id = dbhandler.get_user(cas.username)
-    firstName, lastName = dbhandler.get_username(db_user_id)
+    firstName, lastName = dbhandler.get_user_full_name(db_user_id)
     email = dbhandler.get_email(db_user_id)
     session['user'] = User(cas.username, True, isInAdminFile(cas.username), isInPMFile(cas.username), user_id, firstName,
                            lastName, email)
@@ -191,22 +202,22 @@ def cas_login(other_dest=""):
     else:
         return redirect(url_for(other_dest))
 
-def isInAdminFile(username):
+def isInAdminFile(email):
     with open(ADMIN_PATH, mode='r') as f:
         admins = f.read().split('\n')
     adminBool = False
     for admin in admins:
-        if admin == username:
+        if admin == email:
             adminBool = True
             break
     return adminBool
 
-def isInPMFile(username):
+def isInPMFile(email):
     with open(PM_PATH, mode='r') as f:
         pms = f.read().split('\n')
     pmBool = False
     for pm in pms:
-        if pm == username:
+        if pm == email:
             pmBool = True
             break
     return pmBool
@@ -220,7 +231,8 @@ def isAdmin():
 
 
 @app.route('/old_logout')
-def logout_old():
+def _logout_old():
+    print("in old logout")
     session.clear()
     return redirect(url_for('cas.logout'))
 
@@ -238,7 +250,7 @@ def projectsdashboard():
         return render_template('userdashboard.html', title='Home',
                                current_user=session['user'],
                                all_projects=dbhandler.get_user_projects(
-                                   session['user'].get_username()))
+                                   session['user'].get_user_full_name()))
     else:
         return render_template('userdashboard.html', title='Home',
                                current_user=dummyUser,
@@ -541,8 +553,7 @@ def add_user_to_project():
 def update_user_info():
     newFirstName = request.form.get('firstName')
     newLastName = request.form.get('lastName')
-    username = request.form.get('username')
-    newEmail = request.form.get('email')
+    email = request.form.get('email')
 
     if newFirstName == "":
         flash("First Name cannot be empty", 'warning')
@@ -550,14 +561,14 @@ def update_user_info():
     if newLastName == "":
         flash("Last Name cannot be empty", "warning")
         return redirect(url_for('accountinfo'))
-    if newEmail == "":
+    if email == "":
         flash("Email cannot be empty", "warning")
         return redirect(url_for("accountinfo"))
-    if not check(newEmail):
+    if not check(email):
         flash("Please enter a valid email", "warning")
         return redirect(url_for("accountinfo"))
 
-    dbhandler.update_user_info(newFirstName, newLastName, username, newEmail)
+    dbhandler.update_user_info(newFirstName, newLastName, email)
     return login('accountinfo')
 
 

@@ -30,7 +30,7 @@ class NewUserForm(FlaskForm):
         if judge:
             raise ValidationError('A user with that email already exists.')
 
-    def validate_username(self, username):
+    def _validate_username(self, username):
         judge = Judge.query.filter_by(username=username.data).first()
         if judge:
             raise ValidationError(

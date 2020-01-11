@@ -109,7 +109,7 @@ class DBHandler:
                      judge_id=judge_id, project_name=project))
         db.session.commit()
         pairselectors[project].make_judgment(easier_doc, harder_doc, duration,
-                                             judge.username)
+                                             judge.email)
         self.unpickle_pairs_being_processed()
         if project not in self.pairsBeingProcessed:
             self.add_pairs_being_processed(project)
@@ -139,37 +139,37 @@ class DBHandler:
         db.session.add(doc1)
         db.session.commit()
 
-    def get_judge(self, judge_username, project):
+    def get_judge(self, judge_email, project):
         allJudges = db.session.query(Judge).all()
         for judge in allJudges:
-            if judge.username == judge_username:
+            if judge.email == judge_email:
                 return judge.id
         return "Judge not found"
 
-    def get_user(self, user_username):
+    def get_user(self, user_email):
         user = db.session.query(Judge).filter_by(
-            username=user_username).first()
+            email=user_email).first()
         if (user is not None):
             return user.id
         return "User not found"
 
-    def get_username(self, user_id):
+    def get_user_full_name(self, user_id):
         user = db.session.query(Judge).filter_by(
             id=user_id).first()
         if (user is not None):
             return user.firstName, user.lastName
         return "User not found"
 
-    def create_user(self, firstName, lastName, judge_username, email):
+    def create_user(self, firstName, lastName, email):
         db.session.add(Judge(firstName=firstName, lastName=lastName,
-                             username=judge_username, email=email))
+                             email=email))
         db.session.commit()
         return
 
-    def create_judge(self, firstName, lastName, judge_username, email,
+    def create_judge(self, firstName, lastName, email,
                      project):
         db.session.add(Judge(firstName=firstName, lastName=lastName,
-                             username=judge_username, email=email))
+                             email=email))
         db.session.commit()
         return
 
@@ -188,10 +188,10 @@ class DBHandler:
         confidence = pairselectors[project].get_confidence()
         return sortedFiles, confidence
 
-    def get_user_projects(self, user):
+    def get_user_projects(self, user_email):
         # return self.allProjects() # This is a temporary fix
         projects = db.session.query(Judge).filter_by(
-            username=user).first().projects
+            email=user_email).first().projects
         # projects = [p.name for p in projects]
         print("projects:", projects)
         return projects
@@ -247,11 +247,10 @@ class DBHandler:
         project.judges.remove(user)
         db.session.commit()
 
-    def update_user_info(self, newFirstName, newLastName, username, newEmail):
-        user = db.session.query(Judge).filter_by(username=username).first()
+    def update_user_info(self, newFirstName, newLastName, email):
+        user = db.session.query(Judge).filter_by(email=email).first()
         user.firstName = newFirstName
         user.lastName = newLastName
-        user.email = newEmail
         db.session.commit()
 
     def return_pair(self, pair, project):

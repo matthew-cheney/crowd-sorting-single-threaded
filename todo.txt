@@ -6,7 +6,9 @@
 Project manager - no db admin, filtered dashboard
 Too hard or too easy opt out
 	DONE - Add delete project w/ cleanup
-Auth with Google
+	DONE - Auth with Google
+Switch to email dependent
+Fix non-admin login
 CSV download of sorted, comparisons
 Add docs then begin project
 Automated tests

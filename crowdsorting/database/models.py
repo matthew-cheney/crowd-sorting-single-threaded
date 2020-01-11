@@ -59,14 +59,13 @@ class Judge(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     firstName = db.Column(db.String(100), nullable=False)
     lastName = db.Column(db.String(100), nullable=False)
-    username = db.Column(db.String(120), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     judgments = db.relationship('Judgment', backref='judger', lazy=True)
     projects = db.relationship('Project', secondary='judges', lazy='subquery', backref=db.backref('myusers', lazy=True))
     votes = db.relationship('Vote', secondary='votejudges', lazy='subquery', backref=db.backref('myjudges', lazy=True))
 
     def __repr__(self):
-        return f"\nJudge('{self.firstName} {self.lastName}', '{self.username}', '{self.email}')"
+        return f"\nJudge('{self.firstName} {self.lastName}', '{self.email}', '{self.email}')"
 
 
 class Judgment(db.Model):
@@ -88,7 +87,7 @@ class Judgment(db.Model):
     project_name = db.Column(db.String(120), ForeignKey('project.name'))
 
     def __repr__(self):
-        return f"\nJudgment(Judge='{self.judge.username}', doc_harder='{self.doc_harder.name}', doc_easier='{self.doc_easier.name}')"
+        return f"\nJudgment(Judge='{self.judge.email}', doc_harder='{self.doc_harder.name}', doc_easier='{self.doc_easier.name}')"
 
 
 class Vote(db.Model):

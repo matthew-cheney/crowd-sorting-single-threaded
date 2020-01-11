@@ -44,18 +44,17 @@
               {% if current_user.get_is_authenticated() %}
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  {{ current_user.get_username() }}
+                  {{ current_user.get_email() }}
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                   <a class="dropdown-item" href="{{ url_for('projectsdashboard') }}">Change Project</a>
                   <a class="dropdown-item" href="{{ url_for('accountinfo') }}">Account Info</a>
                   <div class="dropdown-divider"></div>
-                  <a class="dropdown-item" href="{{ url_for('logout') }}">Logout</a>
+                  <a class="dropdown-item" href="{{ url_for('logout_master') }}">Logout</a>
                 </div>
               </li>
 
               {% else %}
-              <!--<a class="nav-item nav-link" href="{{ url_for('cas.login') }}">Login</a>-->
               <a class="nav-item nav-link" href="{{ url_for('login') }}">Login</a>
               {% endif %}
             </div>
