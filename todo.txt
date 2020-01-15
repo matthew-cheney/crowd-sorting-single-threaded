@@ -11,7 +11,7 @@ Too hard or too easy opt out
 	DONE - Fix non-admin login
 CSV download of sorted, comparisons
 	DONE - Add docs then begin project
-Automated tests
+*Automated tests
 	OBSELETE - Verify email functionality
 Break DBHandler into smaller pieces
 Prettify code

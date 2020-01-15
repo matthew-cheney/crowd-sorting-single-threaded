@@ -2,6 +2,7 @@ from crowdsorting import session, pairselectors
 from crowdsorting import db
 from crowdsorting.database.models import Project, Doc, Judge, Judgment
 from crowdsorting import models
+from crowdsorting import app
 from datetime import datetime
 from datetime import timedelta
 import pickle
@@ -12,15 +13,16 @@ from crowdsorting.app_resources.sorting_algorithms.ACJProxy import ACJProxy
 class DBHandler:
 
     def __init__(self):
+        self.PBP_Path = app.config['PAIRS_BEING_PROCESSED_PATH']
         self.unpickle_pairs_being_processed()
 
     def pickle_pairs_being_processed(self):
-        with open(f"crowdsorting/app_resources/pairs_being_processed/pairsBeingProcessed.pkl", "wb") as f:
+        with open(self.PBP_Path, "wb") as f:
             pickle.dump(self.pairsBeingProcessed, f)
 
     def unpickle_pairs_being_processed(self):
         try:
-            with open(f"crowdsorting/app_resources/pairs_being_processed/pairsBeingProcessed.pkl", "rb") as f:
+            with open(self.PBP_Path, "rb") as f:
                 self.pairsBeingProcessed = pickle.load(f)
         except FileNotFoundError:
             self.pairsBeingProcessed = {}
@@ -40,7 +42,7 @@ class DBHandler:
         newFile = False
         for file in validFiles:
             if not file.filename in filenamesInDatabase:
-                print(f"{file} is not in the databse yet")
+                print(f"{file} is not in the database yet")
                 self.create_doc(file.filename, file.read(), project)
                 newFile = True
         if newFile:
@@ -139,6 +141,9 @@ class DBHandler:
         db.session.add(doc1)
         db.session.commit()
 
+    def get_doc(self, filename):
+        return db.session.query(Doc).filter_by(name=filename).first()
+
     def get_judge(self, judge_email, project):
         allJudges = db.session.query(Judge).all()
         for judge in allJudges:
@@ -186,6 +191,10 @@ class DBHandler:
         db.session.commit()
         return True
 
+    def delete_user(self, email):
+        user_to_delete = db.session.query(Judge).filter_by(email=email).first()
+        db.session.delete(user_to_delete)
+        db.session.commit()
 
     def get_cas_email(self, username):
         user = db.session.query(Judge).filter_by(
