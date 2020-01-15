@@ -60,6 +60,7 @@ class Judge(db.Model):
     firstName = db.Column(db.String(100), nullable=False)
     lastName = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
+    username = db.Column(db.String(120), unique=True, nullable=True)
     judgments = db.relationship('Judgment', backref='judger', lazy=True)
     projects = db.relationship('Project', secondary='judges', lazy='subquery', backref=db.backref('myusers', lazy=True))
     votes = db.relationship('Vote', secondary='votejudges', lazy='subquery', backref=db.backref('myjudges', lazy=True))

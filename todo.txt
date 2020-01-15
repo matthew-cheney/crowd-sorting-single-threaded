@@ -7,8 +7,25 @@ Project manager - no db admin, filtered dashboard
 Too hard or too easy opt out
 	DONE - Add delete project w/ cleanup
 	DONE - Auth with Google
-Switch to email dependent
-Fix non-admin login
+	DONE - Switch to email dependent
+	DONE - Fix non-admin login
 CSV download of sorted, comparisons
-Add docs then begin project
+	DONE - Add docs then begin project
 Automated tests
+	OBSELETE - Verify email functionality
+Break DBHandler into smaller pieces
+Prettify code
+	DONE - CAS login - just use @byu.edu
+Timestamp with project name
+On delete project - move to trash
+	DONE - *Replace "Admin" with download database directly
+	DONE - *Change project to drop down menu
+	DONE - *Sort User Info by last name, first name, etc.
+	DONE - *Create project - make first row in projects table
+Log (somewhere) when pairs are rejected
+Center change project drop down
+Add delete user function
+
+Questions
+Restrict where you can change project?
+Where should download db button be?

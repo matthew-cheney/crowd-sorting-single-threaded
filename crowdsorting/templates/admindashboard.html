@@ -2,107 +2,30 @@
 
 {% block content %}
 
-<div class="text-center">
-    <div class="text-center">
+<div class="row">
+    <div class="col-lg-12 text-center">
         <h1>Admin Dashboard</h1>
+        <a href="/crowdsorting.db" target="blank"><button class='btn btn-default'>Download!</button></a>
     </div>
+</div>
 
-    <hr/>
+<hr/>
 
-    <div>
-        <h3>Current Projects</h3>
-        <p>Select a project to work on and hit "Submit"</p>
-        <form method="POST" action="/selectproject">
-            {% for project in all_projects %}
-                <input type="radio" name="project" value="{{ project.name }}" onclick="activate_admin_project_submit()"> {{ project.name }}<br>
-            {% endfor %}
-            <button type="submit" id="select_project_submit" disabled>Submit</button>
-        </form>
+<div class="row">
+    <div class="col-lg-4">
+        <!-- Space holder -->
     </div>
-    <script>
-
-        function activate_admin_project_submit() {
-            document.getElementById("select_project_submit").disabled = false;
-        }
-
-        function activate_new_project_submit() {
-            if (document.getElementById("project_name").value == "") {
-                document.getElementById("new_project_submit").disabled = true;
-            } else {
-                document.getElementById("new_project_submit").disabled = false;
-            }
-        }
-
-    </script>
-
-    <hr/>
-
-    <div>
-
-        <h3>Create New Project</h3>
-
-        <form method="POST" action="/addproject">
-        <table class="table borderless">
-            <tr>
-                <td>
-                    <h4>Enter a name for the project</h4>
-                    <input type="text" name="project_name" placeholder="project name" id="project_name" onkeyup="activate_new_project_submit()">
-                    <button type="submit" id="new_project_submit" disabled>Create Project</button>
-                </td>
-                <td>
-                    <h4>Choose a selection algorithm</h4>
-                    <div>
-                        {% for selector in selector_algorithms %}
-                        <input type="radio" name="selector_algorithm" value="{{ selector.get_algorithm_name() }}" onclick=""> {{ selector.get_algorithm_name() }}<br>
-                        {% endfor %}
-                    </div>
-                </td>
-            </tr>
-        </table>
-        </form>
-
+    <div class="col-lg-4 text-center">
+        <h3>Projects</h3>
     </div>
-
-    <hr/>
-
-    <div>
-        <h3>Manage Users</h3>
-        <table class="table borderless">
-            <tr>
-                <td>
-                    Username
-                </td>
-                {% for project in all_projects %}
-                    <td>
-                        {{ project.name }}
-                    </td>
-                    {% endfor %}
-            </tr>
-            {% for user in all_users %}
-                <tr>
-                    <td>
-                        {{ user.email }}
-                    </td>
-                    {% for project in all_projects %}
-                    <td>
-                        {% if user in project.judges %}
-                        <input type="checkbox", id="{{ user.id }}_{{ project.name }}" onclick="toggleProject('{{ user.id }}', '{{ project.name }}')" checked>
-                        {% else %}
-                        <input type="checkbox", id="{{ user.id }}_{{ project.name }}" onclick="toggleProject('{{ user.id }}', '{{ project.name }}')" >
-                        {% endif %}
-                    </td>
-                    {% endfor %}
-                </tr>
-            {% endfor %}
-        </table>
+    <div class="col-lg-4 text-right">
+        <button class="btn btn-success" onclick="create_project()">Create Project</button>
     </div>
+</div>
 
-    <hr/>
-
-    <div>
-        <h3>Projects Info</h3>
-        <p>Select a project to work on and hit "Submit"</p>
-            <table class="table">
+<div class="row">
+    <div class="col-lg-12 text-center">
+<table class="table borderless">
                 <tr>
                     <td>
                         Project Name
@@ -123,7 +46,7 @@
                         Delete
                     </td>
                 </tr>
-                {% for project in all_projects %}
+                {% for project in all_projects|sort(attribute='name') %}
                 <tr>
                     <td>
                         {{ project.name }}
@@ -150,10 +73,114 @@
                 {% endfor %}
             </table>
     </div>
+</div>
 
-    <hr/>
+<hr/>
 
-    <script>
+<div class="row">
+    <div class="col-lg-12 text-center">
+        <h3>Users</h3>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12 text-center">
+<table class="table borderless">
+            <tr>
+                <td>
+                    Username
+                </td>
+                {% for project in all_projects %}
+                    <td>
+                        {{ project.name }}
+                    </td>
+                    {% endfor %}
+            </tr>
+            {% for user in all_users|sort(attribute='firstName')|sort(attribute='lastName') %}
+                <tr>
+                    <td class="text-left">
+                        {{ user.lastName }}, {{ user.firstName }}
+                    </td>
+                    {% for project in all_projects %}
+                    <td>
+                        {% if user in project.judges %}
+                        <input type="checkbox", id="{{ user.id }}_{{ project.name }}" onclick="toggleProject('{{ user.id }}', '{{ project.name }}')" checked>
+                        {% else %}
+                        <input type="checkbox", id="{{ user.id }}_{{ project.name }}" onclick="toggleProject('{{ user.id }}', '{{ project.name }}')" >
+                        {% endif %}
+                    </td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+
+<div id="create_project_modal" class="modal">
+      <div class="modal-content text-center">
+          <h3>Create New Project</h3>
+
+            <form method="POST" action="/addproject" enctype="multipart/form-data">
+            <table class="table borderless">
+                <tr>
+                    <td>
+                        <h4>Enter a name for the project</h4>
+                        <input type="text" name="project_name" placeholder="project name" id="project_name" onkeyup="activate_new_project_submit()">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <h4>Choose a selection algorithm</h4>
+                        <div>
+                            {% for selector in selector_algorithms %}
+                            <input type="radio" name="selector_algorithm" class="selector_radio" value="{{ selector.get_algorithm_name() }}" onclick="activate_new_project_submit()"> {{ selector.get_algorithm_name() }}<br>
+                            {% endfor %}
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <!--<form method="POST" action="/upload" enctype="multipart/form-data">-->
+                        <input type="file" id="file_uploader" name="file" autocomplete="off" multiple="" required>
+                        <!--<input type="submit" value="Submit" onclick="submit_project">-->
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <button type="submit" id="new_project_submit" class="btn btn-md btn-success" disabled onclick="submit_project()">Create Project</button>
+                    </td>
+                </tr>
+            </table>
+            </form>
+        </div>
+      </div>
+
+
+<script>
+    function activate_admin_project_submit() {
+            document.getElementById("select_project_submit").disabled = false;
+        }
+
+        function activate_new_project_submit() {
+            if (document.getElementById("project_name").value == "") {
+                document.getElementById("new_project_submit").disabled = true;
+            } else {
+                selector_radios = document.getElementsByClassName("selector_radio")
+                one_checked = false;
+                for (radio of selector_radios) {
+                  if (radio.checked) {
+                    one_checked = true
+                    break
+                  }
+                }
+                if (one_checked && document.getElementById("file_uploader").value != "") {
+                  document.getElementById("new_project_submit").disabled = false;
+                } else {
+                  document.getElementById("new_project_submit").disabled = true;
+                }
+            }
+        }
+
         function toggleProject(user, project) {
 
             checkbox_id = user + "_" + project;
@@ -169,15 +196,37 @@
                 json_dict = { user: user, project: project, action: "add" };
             }
 
-
             var xhr = new XMLHttpRequest();
             xhr.open("POST", "/addusertoproject", true);
             xhr.setRequestHeader('Content-Type', 'application/json');
             xhr.send(JSON.stringify(json_dict));
 
-
             }
 
-    </script>
-</div>
+            var modal = document.getElementById("create_project_modal");
+
+            // When the user clicks anywhere outside of the modal, close it
+            window.onclick = function(event) {
+              console.log("window.onclick")
+              if (event.target == modal) {
+                modal.style.display = "none";
+              }
+            }
+
+            document.getElementById("file_uploader").onchange = function() {
+                activate_new_project_submit()
+            }
+
+
+            function create_project() {
+              modal.style.display = "block";
+            }
+
+            function submit_project() {
+              modal.style.display = "none";
+            }
+
+
+</script>
+
 {% endblock content %}

@@ -12,7 +12,7 @@ from oauthlib.oauth2 import WebApplicationClient
 from crowdsorting.app_resources.yamlReader import yamlReader
 import os
 
-# from flask_cas import CAS
+from flask_cas import CAS
 
 from crowdsorting.models.User import User
 
@@ -20,8 +20,7 @@ app = Flask(__name__)
 
 yamlReader.readConfig("config.yaml", app)
 
-# cas = CAS(app, '/cas')
-cas = False
+cas = CAS(app, '/cas')
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -64,12 +63,13 @@ if len(instance_filenames) > 0:
         pairselectors[os.path.basename(file)[:-4]] = pickle.load(open(file, 'rb'))
 
 
-from crowdsorting.app_resources.AdminModelView import *
+# from crowdsorting.app_resources.AdminModelView import *
 from crowdsorting.app_resources import routes
 
-admin = Admin(app, name='sorter', template_mode='bootstrap3', index_view=MyAdminIndexView())
+"""admin = Admin(app, name='sorter', template_mode='bootstrap3', index_view=MyAdminIndexView())
 admin.add_view(ProjectView(Project, db.session))
 admin.add_view(DocView(Doc, db.session))
 admin.add_view(JudgeView(Judge, db.session))
 admin.add_view(VoteView(Vote, db.session))
 admin.add_view(JudgmentView(Judgment, db.session))
+"""

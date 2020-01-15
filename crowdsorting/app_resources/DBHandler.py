@@ -153,6 +153,12 @@ class DBHandler:
             return user.id
         return "User not found"
 
+    def get_cas_user(self, username):
+        user = db.session.query(Judge).filter_by(username=username).first()
+        if (user is not None):
+            return user.id
+        return "User not found"
+
     def get_user_full_name(self, user_id):
         user = db.session.query(Judge).filter_by(
             id=user_id).first()
@@ -160,11 +166,33 @@ class DBHandler:
             return user.firstName, user.lastName
         return "User not found"
 
-    def create_user(self, firstName, lastName, email):
+    def create_user(self, firstName, lastName, email, username):
         db.session.add(Judge(firstName=firstName, lastName=lastName,
-                             email=email))
+                             email=email, username=username))
         db.session.commit()
         return
+
+    def create_cas_user(self, firstName, lastName, email, username):
+        # Check if email is already taken
+        user = db.session.query(Judge).filter_by(
+            email=email).first()
+        if user is not None:
+            print('no email user:', user)
+            return False
+
+        # Email not taken, create user and return true
+        db.session.add(Judge(firstName=firstName, lastName=lastName,
+                             email=email, username=username))
+        db.session.commit()
+        return True
+
+
+    def get_cas_email(self, username):
+        user = db.session.query(Judge).filter_by(
+            username=username).first()
+        if (user is not None):
+            return user.email
+        return "User not found"
 
     def create_judge(self, firstName, lastName, email,
                      project):
@@ -204,6 +232,8 @@ class DBHandler:
                                p.judges, p.docs, p.judgments))
         print("in get_all_projects")
         print(projects)
+        if projects is None:
+            return []
         return projects
 
     def create_project(self, project_name, selector_algorithm):

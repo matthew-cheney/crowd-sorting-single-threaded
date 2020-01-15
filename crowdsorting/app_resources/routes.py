@@ -7,7 +7,7 @@ from crowdsorting.app_resources.DBHandler import DBHandler
 from crowdsorting import app, cas, session, pairselectors, \
     pairselector_options, GOOGLE_DISCOVERY_URL, client, login_manager, \
     GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
-from flask import flash
+from flask import flash, send_file
 from flask import render_template
 from flask import url_for
 from flask import redirect
@@ -56,15 +56,32 @@ def load_user(email):
         return returninguser(email, user_id)
 
 
+def load_cas_user(username):
+    print('In the login route!')
+    # username = user.username
+    print("cas_user:", username)
+    user_id = dbhandler.get_cas_user(username)
+    print("userID", user_id)
+    if type(user_id) == type(""):
+        print("new user detected")
+        session['user'] = User(False, False,
+                               False, "", "",
+                               "", "")
+        return redirect(url_for('newcasuser'))  # newcasuser()  # Login with CAS - work on this next
+    else:
+        email = dbhandler.get_cas_email(username)
+        return returninguser(email, user_id)
+
+
 @app.route('/newuser', methods=['GET', 'POST'])
 def newuser():
     if 'user' in session and session['user'].get_is_authenticated():
-        return redirect(url_for('projectsdashboard'))
+        return redirect(url_for('dashboard'))
     form = NewUserForm()
     if form.validate_on_submit():
         current_user = session['user']  # Need to add user to session before this
         dbhandler.create_user(form.firstName.data, form.lastName.data,
-                              current_user.email)
+                              current_user.email, None)
         session['user'] = User(True, isInAdminFile(current_user.email),
                                isInPMFile(current_user.email), dbhandler.get_user(current_user.email), form.firstName.data,
                                form.lastName.data, current_user.email)
@@ -72,6 +89,30 @@ def newuser():
         return postLoadUser()
     if request.method == 'POST':
         flash('Failed to register user', 'danger')
+    return render_template('newuser.html', form=form, current_user=dummyUser)
+
+
+@app.route('/newcasuser', methods=['GET', 'POST'])
+def newcasuser():
+    if 'user' in session and session['user'].get_is_authenticated():
+        return redirect(url_for('dashboard'))
+    form = NewUserForm()
+    if form.validate_on_submit():
+    # if request.method == 'POST':
+        current_user = session['user']  # Need to add user to session before this
+        print("creating cas user for", cas.username)
+        if not dbhandler.create_cas_user(form.firstName.data, form.lastName.data,
+                              form.email.data, cas.username):
+            flash('Email already taken', 'danger')
+            return render_template('newuser.html', form=form, current_user=dummyUser)
+        session['user'] = User(True, isInAdminFile(current_user.email),
+                               isInPMFile(current_user.email), dbhandler.get_user(current_user.email), form.firstName.data,
+                               form.lastName.data, form.email.data)
+        print("admin:", session["user"].email, session['user'].is_admin)
+        return postLoadUser()
+    print('Form.validate._on_submit:', form.validate_on_submit())
+    if request.method == 'POST':
+        flash('Failed to register user, email likely taken', 'danger')
     return render_template('newuser.html', form=form, current_user=dummyUser)
 
 
@@ -87,7 +128,7 @@ def returninguser(email, user_id):
     return postLoadUser()
 
 def postLoadUser():
-    return redirect(url_for('projectsdashboard'))
+    return redirect(url_for('dashboard'))
 
 
 @app.route("/login")
@@ -166,7 +207,8 @@ def callback():
 @login_required
 def logout_master():
     print("in logout()")
-    del session['user']
+    if 'user' in session:
+        session.pop('user', None)
     logout_user()
     return redirect(url_for("home"))
 
@@ -187,7 +229,11 @@ def admin_required(fn):
 @app.route("/cas_login")
 def cas_login(other_dest=""):
     print('In the login route!')
-    user_id = dbhandler.get_user(cas.username)
+    print(cas.username)
+    a = cas
+    return load_cas_user(cas.username)
+
+    """user_id = dbhandler.get_user(cas.username)
     if type(user_id) == type(""):
         return redirect(url_for('newuser'))
     admins = []
@@ -200,7 +246,7 @@ def cas_login(other_dest=""):
     if other_dest == "":
         return redirect(url_for('projectsdashboard'))
     else:
-        return redirect(url_for(other_dest))
+        return redirect(url_for(other_dest))"""
 
 def isInAdminFile(email):
     with open(ADMIN_PATH, mode='r') as f:
@@ -237,33 +283,64 @@ def _logout_old():
     return redirect(url_for('cas.logout'))
 
 
-@app.route("/projectsdashboard")
-def projectsdashboard():
+@app.route("/dashboard")
+def dashboard():
     if 'user' in session and session[
             'user'].get_is_admin():  # This is bad - fix it
+        print("returning admindashboard")
         return render_template('admindashboard.html', title='Home',
                                current_user=session['user'],
-                               all_projects=dbhandler.get_all_projects(),
                                all_users=dbhandler.get_all_users(),
-                               selector_algorithms=pairselector_options)
+                               selector_algorithms=pairselector_options,
+                               all_projects=get_all_projects(),
+                               current_project=get_current_project()
+                               )
     elif 'user' in session and session['user'].is_pm:
         return render_template('userdashboard.html', title='Home',
                                current_user=session['user'],
-                               all_projects=dbhandler.get_user_projects(
-                                   session['user'].get_user_full_name()))
-    else:
+                               all_projects=get_all_projects(),
+                               current_project=get_current_project()
+                               )
+    elif 'user' in session:
         return render_template('userdashboard.html', title='Home',
                                current_user=session['user'],
-                               all_projects=dbhandler.get_all_projects())
+                               all_projects=get_all_projects(),
+                               current_project=get_current_project()
+                               )
+    else:
+        return redirect(url_for('home'))
 
+def get_current_project():
+    current_project = request.cookies.get('project')
+    if check_current_project(current_project):
+        return current_project
+    return "select project"
 
-@app.route("/selectproject", methods=["POST"])
-def selectproject():
-    print(request.form.get('project'))
-    if request.form.get('project') == 'None':
-        return redirect(url_for('projectsdashboard'))
-    response = make_response(redirect(url_for('home')))
-    response.set_cookie('project', request.form.get('project'))
+@login_required
+def check_current_project(project):
+    if 'user' not in session:
+        return False
+    all_projects = dbhandler.get_user_projects(session['user'].email)
+    if project not in [x.name for x in all_projects]:
+        return False
+    return True
+
+def get_all_projects():
+    if isAdmin():
+        return dbhandler.get_all_projects()
+    if 'user' in session:
+        return dbhandler.get_user_projects(session['user'].email)
+    else:
+        return []
+
+@app.route("/selectproject/<project_name>", methods=["POST"])
+def selectproject(project_name):
+    print("in selectproject with", project_name)
+    if project_name == 'None':
+        return redirect(url_for('dashboard'))
+    # response = make_response(redirect(url_for('home')))
+    response = make_response()
+    response.set_cookie('project', project_name)
     return response
 
 
@@ -279,7 +356,7 @@ def check_project(current_request):
         return False
     else:
         project = current_request.cookies.get('project')
-        all_projects = dbhandler.get_all_projects()
+        all_projects = dbhandler.get_user_projects(session['user'].email)
         if project not in [x.name for x in all_projects]:
             return False
         return True
@@ -290,17 +367,19 @@ def check_project(current_request):
 @app.route("/home")
 def home():
     #     if 'user' in Session:
-    current_project = request.cookies.get('project')
     if 'user' in session:
         if not check_project(request):
-            return redirect(url_for('projectsdashboard'))
+            return redirect(url_for('dashboard'))
         return render_template('home.html', title='Home',
                                current_user=session['user'],
-                               current_project=current_project)
+                               all_projects=get_all_projects(),
+                               current_project=get_current_project())
     else:
         return render_template('home.html', title='Home',
                                current_user=dummyUser,
-                               current_project=current_project)
+                               current_project=get_current_project(),
+                               all_projects=get_all_projects(),
+                               )
 
 
 #     else:
@@ -311,24 +390,30 @@ def home():
 @app.route("/sorter")
 def sorter():
     if not check_project(request):
-        return redirect(url_for('projectsdashboard'))
+        return redirect(url_for('dashboard'))
     if 'user' not in session:
         return redirect(url_for('home'))
     if isinstance(request.cookies.get('project'), type(None)):
         return render_template('nopairs.html', title='Check later',
                                message="No project selected",
-                               current_user=session['user'])
+                               current_user=session['user'],
+                               all_projects=get_all_projects(),
+                               current_project=get_current_project()
+                               )
     try:
         docPair = dbhandler.get_pair(request.cookies.get('project'))
     except KeyError:
         flash('Looks like your selected project has been deleted!', 'warning')
-        return redirect(url_for('projectsdashboard'))
+        return redirect(url_for('dashboard'))
     if not docPair:
         flash('Project not ready', 'warning')
         return redirect(url_for('home'))
     if type(docPair) == type(""):
         return render_template('nopairs.html', title='Check later',
-                               message=docPair, current_user=session['user'])
+                               message=docPair, current_user=session['user'],
+                               all_projects=get_all_projects(),
+                               current_project=get_current_project()
+                               )
     try:
         file_one = docPair.get_first_contents().decode("utf-8")
     except AttributeError:
@@ -343,7 +428,10 @@ def sorter():
                            file_one_name=docPair.get_first(),
                            file_two_name=docPair.get_second(),
                            current_user=session['user'],
-                           time_started=floor(time.time()))
+                           time_started=floor(time.time()),
+                           all_projects=get_all_projects(),
+                           current_project=get_current_project()
+                           )
 
 
 # Router to demo page
@@ -357,13 +445,19 @@ def demo():
 def about():
     if 'user' in session:
         if not check_project(request):
-            return redirect(url_for('projectsdashboard'))
-        return render_template('about.html', current_user=session['user'])
+            return redirect(url_for('dashboard'))
+        return render_template('about.html', current_user=session['user'],
+                               all_projects=get_all_projects(),
+                               current_project=get_current_project()
+                               )
     else:
-        return render_template('about.html', current_user=dummyUser)
+        return render_template('about.html', current_user=dummyUser,
+                               all_projects=get_all_projects(),
+                               current_project=get_current_project()
+                               )
 
 
-# Router to admin page
+"""# Router to admin page
 @app.route("/myadmin", methods=['GET', 'POST'])
 @admin_required
 @login_required
@@ -373,7 +467,7 @@ def myadmin():
     # allFiles = [i for i in listdir(app.config['APP_DOCS'])]
     allFiles = []
     return render_template('myadmin.html', title='Admin',
-                           allFiles=allFiles, current_user=session['user'])
+                           allFiles=allFiles, current_user=session['user'])"""
 
 
 # Router for sorted page
@@ -382,17 +476,23 @@ def myadmin():
 @admin_required
 def sorted():
     if not check_project(request):
-        return redirect(url_for('projectsdashboard'))
+        return redirect(url_for('dashboard'))
     if 'user' not in session:
         return redirect(url_for('home'))
     if isinstance(request.cookies.get('project'), type(None)):
         return render_template('nopairs.html', title='Check later',
                                message='No project selected',
-                               current_user=session['user'])
+                               current_user=session['user'],
+                               all_projects=get_all_projects(),
+                               current_project=get_current_project()
+                               )
     if dbhandler.get_number_of_docs(request.cookies.get('project')) == 0:
         return render_template('nopairs.html', title='Check later',
                                message='No docs in this project',
-                               current_user=session['user'])
+                               current_user=session['user'],
+                               all_projects=get_all_projects(),
+                               current_project=get_current_project()
+                               )
     sortedFiles, confidence, *args = dbhandler.get_sorted(
         request.cookies.get('project'))
     confidence = confidence * 100
@@ -414,16 +514,22 @@ def sorted():
                            number_of_judgments=number_of_judgments,
                            number_of_docs=number_of_docs,
                            possible_judgments=possible_judgments,
-                           success=success)
+                           success=success,
+                           all_projects=get_all_projects(),
+                           current_project=get_current_project()
+                           )
 
 
 @app.route("/accountinfo", methods=['GET'])
 @login_required
 def accountinfo():
-    return render_template('accountinfo.html', current_user=session['user'])
+    return render_template('accountinfo.html', current_user=session['user'],
+                           all_projects=get_all_projects(),
+                           current_project=get_current_project()
+                           )
 
 
-# Delete file route   - This route is obselete?
+"""# Delete file route   - This route is obselete?
 @app.route("/deleteFile", methods=['POST'])
 @login_required
 @admin_required
@@ -432,16 +538,16 @@ def deleteFile():
     os.remove((app.config['APP_DOCS'] + '/' + request.form.get('id')))
     dbhandler.delete_file(request.form.get('id'),
                           request.cookies.get('project'))
-    return redirect(url_for('myadmin'))
+    return redirect(url_for('myadmin'))"""
 
 
-@app.route("/detectFiles", methods=['POST'])
+"""@app.route("/detectFiles", methods=['POST'])
 @login_required
 @admin_required
 def detectFiles():  # This route is obselete?
     print("in detectFiles route")
     dbhandler.detectFiles(request.cookies.get('project'))
-    return redirect(url_for('myadmin'))
+    return redirect(url_for('myadmin'))"""
 
 
 @app.route("/submitAnswer", methods=['POST'])
@@ -488,33 +594,27 @@ def allowed_file(filename):
 @app.route("/upload", methods=['POST'])
 @login_required
 @admin_required
-def uploadFile():
-    if not check_project(request):
-        return redirect(url_for('projectsdashboard'))
-    if request.method == 'POST':
-        if isinstance(request.cookies.get('project'), type(None)):
-            return render_template('nopairs.html', title='Check later',
-                                   message="No project selected",
-                                   current_user=session['user'])
-        validFiles = []
-        if 'file' not in request.files:
-            return redirect(request.url)
-        files = request.files.getlist("file")
-        for file in files:
-            if file.filename == '':
-                print("No file selected for uploading")
-                return redirect(request.url)
-            if file and allowed_file(file.filename):
-                validFiles.append(file)
-            else:
-                flash('Allowed file types are txt', 'danger')
-        flash(f'{len(validFiles)} file(s) successfully uploaded', 'success')
-        dbhandler.add_docs(validFiles, request.cookies.get('project'))
-        filenames = [x.filename for x in files]
-        pairselectors[request.cookies.get('project')].initialize_selector(filenames,
-                                                                rounds=15,
-                                                                maxRounds=15)
-        return redirect('/admin')
+def uploadFile(files, project):
+    # if not check_project(request):
+    #     return redirect(url_for('projectsdashboard'))
+
+    validFiles = []
+    # if 'file' not in request.files:
+    #     return redirect(request.url)
+    # files = request.files.getlist("file")
+    for file in files:
+        if file.filename == '':
+            print("No file selected for uploading")
+            return "Error: No file selected for uploading"
+        if file and allowed_file(file.filename):
+            validFiles.append(file)
+        else:
+            pass
+            # flash('Allowed file types are txt', 'danger')
+    flash(f'{len(validFiles)} file(s) successfully uploaded', 'success')
+    dbhandler.add_docs(validFiles, project)
+    filenames = [x.filename for x in files]
+    return filenames
 
 
 @app.route("/addproject", methods=['POST'])
@@ -529,7 +629,14 @@ def add_project():
     print(message)
     if message == "unable to create project":
         flash(message, "warning")
-    return redirect(url_for('projectsdashboard'))
+    filenames = uploadFile(request.files.getlist("file"), request.form.get('project_name'))
+
+    pairselectors[request.form.get('project_name')].initialize_selector(
+        filenames,
+        rounds=15,
+        maxRounds=15)
+
+    return redirect(url_for('dashboard'))
 
 
 @app.route("/addusertoproject", methods=['POST'])
@@ -589,8 +696,20 @@ def check(email):
 def deleteProject():
     # Remove project from database
     dbhandler.delete_project(request.form.get('project_name_delete'))
+
     # Remove project from pairs being processed
     # Remove pickled algorithm
     # Remove pickled log files
 
-    return redirect(url_for('projectsdashboard'))
+    return redirect(url_for('dashboard'))
+
+@app.route("/crowdsorting.db", methods=["GET"])
+@login_required
+@admin_required
+def downloadDatabase():
+    try:
+        return send_file(
+            'database/crowdsorting.db',
+            attachment_filename='crowdsorting.db')
+    except Exception as e:
+        return str(e)
