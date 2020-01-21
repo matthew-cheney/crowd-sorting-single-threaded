@@ -61,6 +61,29 @@ class Create_Delete_Projects(unittest.TestCase):
         self.assertEqual('Adaptive Comparative Judgment',
                          return_p3[0].sorting_algorithm)
 
+    def test_delete_project(self):
+        message = self.dbhandler.create_project('project_one', ACJProxy)
+        self.assertEqual(f'project project_one successfully created', message)
+
+        # Check the database directly
+        return_p1 = crowdsorting.db.session.query(Project).all()
+        self.assertEqual(1, len(return_p1))
+        self.assertEqual('project_one', return_p1[0].name)
+        self.assertEqual('Adaptive Comparative Judgment',
+                         return_p1[0].sorting_algorithm)
+
+        # Delete the project
+        success = self.dbhandler.delete_project('project_one')
+        self.assertTrue(success)
+
+        # Verify project is deleted
+        db_project = crowdsorting.db.session.query(Project).filter_by(name='project_one').first()
+        self.assertIsNone(db_project)
+        project_in_pairsbeingprocessed = ('project_one' in self.dbhandler.pairsBeingProcessed)
+        self.assertFalse(project_in_pairsbeingprocessed)
+        project_in_pairselectors = ('project_one' in crowdsorting.pairselectors)
+        self.assertFalse(project_in_pairselectors)
+
 class Dummy_Project:
     def __init__(self, project_name, sorting_algorithm):
         self.project_name = project_name

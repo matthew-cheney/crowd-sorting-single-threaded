@@ -193,8 +193,11 @@ class DBHandler:
 
     def delete_user(self, email):
         user_to_delete = db.session.query(Judge).filter_by(email=email).first()
+        if user_to_delete is None:
+            return False
         db.session.delete(user_to_delete)
         db.session.commit()
+        return True
 
     def get_cas_email(self, username):
         user = db.session.query(Judge).filter_by(
@@ -310,8 +313,18 @@ class DBHandler:
             del self.pairsBeingProcessed[project_name]
         self.pickle_pairs_being_processed()
 
+        # Run algorithm delete function
+
+        if project_name in pairselectors:
+            pairselectors[project_name].delete_self()
+
+            # Remove algorithm from pairselectors
+            del pairselectors[project_name]
+
         # Remove all judges from project
         project = db.session.query(Project).filter_by(name=project_name).first()
+        if project is None:
+            return False
         project.judges = []
         db.session.commit()
 
@@ -320,10 +333,4 @@ class DBHandler:
         db.session.delete(project)
         db.session.commit()
 
-        # Run algorithm delete function
-
-        if project_name in pairselectors:
-            pairselectors[project_name].delete_self()
-
-            # Remove algorithm from pairselectors
-            del pairselectors[project_name]
+        return True

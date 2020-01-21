@@ -4,14 +4,14 @@
 	DONE - Safe Exit bug
 	DONE - Project Info section
 Project manager - no db admin, filtered dashboard
-Too hard or too easy opt out
+***Too hard or too easy opt out
 	DONE - Add delete project w/ cleanup
 	DONE - Auth with Google
 	DONE - Switch to email dependent
 	DONE - Fix non-admin login
 CSV download of sorted, comparisons
 	DONE - Add docs then begin project
-*Automated tests
+Automated tests
 	OBSELETE - Verify email functionality
 Break DBHandler into smaller pieces
 Prettify code
@@ -23,9 +23,23 @@ On delete project - move to trash
 	DONE - *Sort User Info by last name, first name, etc.
 	DONE - *Create project - make first row in projects table
 Log (somewhere) when pairs are rejected
-Center change project drop down
+If you have time - Center change project drop down
 Add delete user function
+***Hide layout bar in the sorter
+***Dynamic timeout
+***On page leave event
+***Make project public option(s)
+Reference projects by id, not name
+***Terms/Agreement page - make sure they read it - by project
+***Edit project from dashboard
+
+Lower Priority:
+Authenticate with other places
+
 
 Questions
 Restrict where you can change project?
 Where should download db button be?
+
+Persistence:
+Making unit tests, left off with make_judgments

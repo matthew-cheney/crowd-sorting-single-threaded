@@ -44,6 +44,48 @@ class Create_Delete_Projects(unittest.TestCase):
         db_userID = crowdsorting.db.session.query(Judge).filter_by(email=self.user1.email).first().id
         self.assertEqual(db_userID, userID)
 
+    def test_delete_user(self):
+        # Add user1 to the database
+        self.dbhandler.create_user(self.user1.firstName, self.user1.lastName,
+                                   self.user1.email, self.user1.username)
+
+        # Verify user1 successfully added
+        db_user = crowdsorting.db.session.query(Judge).filter_by(email=self.user1.email).first()
+        self.assertEqual(self.user1.firstName, db_user.firstName)
+        self.assertEqual(self.user1.lastName, db_user.lastName)
+
+        # Delete user1 from the database
+        self.dbhandler.delete_user(self.user1.email)
+
+        db_user = crowdsorting.db.session.query(Judge).filter_by(
+            email=self.user1.email).first()
+        self.assertIsNone(db_user)
+
+    def test_delete_user_multiple(self):
+        # Add user1,2,3 to the database
+        for user in [self.user1, self.user2, self.user3]:
+            self.dbhandler.create_user(user.firstName,
+                                       user.lastName,
+                                       user.email, user.username)
+
+        # Verify user1,2,3 successfully added
+        for user in [self.user1, self.user2, self.user3]:
+            db_user = crowdsorting.db.session.query(Judge).filter_by(
+                email=user.email).first()
+            self.assertEqual(user.firstName, db_user.firstName)
+            self.assertEqual(user.lastName, db_user.lastName)
+
+        # Delete user1,2,3 from the database
+        for user in [self.user1, self.user2, self.user3]:
+            self.dbhandler.delete_user(user.email)
+            db_user = crowdsorting.db.session.query(Judge).filter_by(
+                email=user.email).first()
+            self.assertIsNone(db_user)
+
+    def test_delete_from_empty_table(self):
+        success = self.dbhandler.delete_user(self.user1.email)
+        self.assertFalse(success)
+
 class Dummy_User:
     def __init__(self, firstName, lastName, email, username):
         self.firstName = firstName

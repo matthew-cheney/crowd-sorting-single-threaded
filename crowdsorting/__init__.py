@@ -66,6 +66,8 @@ if len(instance_filenames) > 0:
 # from crowdsorting.app_resources.AdminModelView import *
 from crowdsorting.app_resources import routes
 
+# app.routes = routes
+
 """admin = Admin(app, name='sorter', template_mode='bootstrap3', index_view=MyAdminIndexView())
 admin.add_view(ProjectView(Project, db.session))
 admin.add_view(DocView(Doc, db.session))
@@ -73,3 +75,7 @@ admin.add_view(JudgeView(Judge, db.session))
 admin.add_view(VoteView(Vote, db.session))
 admin.add_view(JudgmentView(Judgment, db.session))
 """
+
+def print_name(names):
+    for name in names:
+        print(name)

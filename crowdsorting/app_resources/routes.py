@@ -7,6 +7,7 @@ from crowdsorting.app_resources.DBHandler import DBHandler
 from crowdsorting import app, cas, session, pairselectors, \
     pairselector_options, GOOGLE_DISCOVERY_URL, client, login_manager, \
     GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
+from flask import abort
 from flask import flash, send_file
 from flask import render_template
 from flask import url_for
@@ -35,6 +36,8 @@ dummyUser = User("", False, False, 0, "", "", "")
 def login_required(fn):
     @wraps(fn)
     def wrapper(*args, **kwargs):
+        if 'user' not in session:
+            pass  # Fix the login_required redirect
         return fn(*args, **kwargs)
     return wrapper
 
@@ -320,7 +323,7 @@ def get_current_project():
 def check_current_project(project):
     if 'user' not in session:
         return False
-    all_projects = dbhandler.get_user_projects(session['user'].email)
+    all_projects = get_all_projects()
     if project not in [x.name for x in all_projects]:
         return False
     return True
@@ -353,11 +356,16 @@ def temp():
 def check_project(current_request):
     if isinstance(current_request.cookies.get('project'), type(None)):
         flash("Please select a project", "warning")
+        print("User has not selected project")
         return False
     else:
         project = current_request.cookies.get('project')
-        all_projects = dbhandler.get_user_projects(session['user'].email)
+        if isAdmin():
+            all_projects = dbhandler.get_all_projects()
+        else:
+            all_projects = dbhandler.get_user_projects(session['user'].email)
         if project not in [x.name for x in all_projects]:
+            print("User not given access to project")
             return False
         return True
 
@@ -387,6 +395,7 @@ def home():
 
 
 # Router to sorting page
+@login_required
 @app.route("/sorter")
 def sorter():
     if not check_project(request):

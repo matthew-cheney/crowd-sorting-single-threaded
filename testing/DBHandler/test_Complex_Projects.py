@@ -54,6 +54,7 @@ class Create_Delete_Projects(unittest.TestCase):
         self.assertEqual(0, len(user1_db.projects))
 
 
+
 class Dummy_User:
     def __init__(self, firstName, lastName, email, username):
         self.firstName = firstName
