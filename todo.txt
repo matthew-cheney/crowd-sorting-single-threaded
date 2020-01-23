@@ -34,7 +34,7 @@ Reference projects by id, not name
 ***Edit project from dashboard
 	DONE - ***Select the easier one (change sorter page)
 	DONE - ***Timeout reject submission
-***User select project
+	DONE - ***User select project
 Admin - access to pairsbeingprocessed?
 
 Lower Priority:

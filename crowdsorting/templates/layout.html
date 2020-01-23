@@ -96,7 +96,8 @@
           var params = "search=" + project_name; // probably use document.getElementById(...).value
           http.send(params);
           http.onload = function() {
-              document.getElementById('displayed_project').innerHTML = project_name
+              document.getElementById('displayed_project').innerHTML = project_name;
+              location.reload();
           }
         }
       </script>

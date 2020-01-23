@@ -91,3 +91,22 @@ body {
   text-decoration: none;
   cursor: pointer;
 }
+
+.loading_modal {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 40px;
+  border-radius: 25px;
+}
+
+.loading_gif {
+    padding: 10px;
+}
+
+.sorter_header {
+    color: white;
+    font-weight: bold;
+}

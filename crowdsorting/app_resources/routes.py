@@ -651,7 +651,7 @@ def add_project():
     for algorithm in pairselector_options:
         if request.form.get('selector_algorithm') == algorithm.get_algorithm_name():
             algorithm_to_use = algorithm
-    message = dbhandler.create_project(request.form.get('project_name'), algorithm_to_use)
+    message = dbhandler.create_project(request.form.get('project_name'), algorithm_to_use, request.form.get('description'))
     print(message)
     if message == "unable to create project":
         flash(message, "warning")

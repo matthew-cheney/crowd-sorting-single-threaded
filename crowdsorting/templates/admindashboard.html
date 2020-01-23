@@ -120,7 +120,7 @@
       <div class="modal-content text-center">
           <h3>Create New Project</h3>
 
-            <form method="POST" action="/addproject" enctype="multipart/form-data">
+            <form method="POST" id="create_project_form" action="/addproject" enctype="multipart/form-data">
             <table class="table borderless">
                 <tr>
                     <td>
@@ -140,6 +140,7 @@
                 </tr>
                 <tr>
                     <td>
+                        <h4>Select Files</h4>
                         <!--<form method="POST" action="/upload" enctype="multipart/form-data">-->
                         <input type="file" id="file_uploader" name="file" autocomplete="off" multiple="" required>
                         <!--<input type="submit" value="Submit" onclick="submit_project">-->
@@ -147,13 +148,27 @@
                 </tr>
                 <tr>
                     <td>
-                        <button type="submit" id="new_project_submit" class="btn btn-md btn-success" disabled onclick="submit_project()">Create Project</button>
+                        <h4>Add Description</h4>
+                        <textarea class="form-control" id="description" name="description" maxlength="588"></textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <button id="new_project_submit" class="btn btn-md btn-success" disabled onclick="submit_project()">Create Project</button>
                     </td>
                 </tr>
             </table>
             </form>
         </div>
-      </div>
+  </div>
+
+<div id="processing_modal" class="modal">
+  <div class="text-center loading_modal">
+      <h3>creating project</h3>
+    <img src="{{ url_for('static', filename='loading_wheel_lg.gif')}}" class="loading_gif">
+      <h4 style="padding-top: 5px;">This may take a while</h4>
+  </div>
+</div>
 
 
 <script>
@@ -224,8 +239,9 @@
 
             function submit_project() {
               modal.style.display = "none";
+              document.getElementById('processing_modal').style.display = "block";
+              document.getElementById('create_project_form').submit();
             }
-
 
 </script>
 

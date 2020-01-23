@@ -261,12 +261,12 @@ class DBHandler:
             return []
         return projects
 
-    def create_project(self, project_name, selector_algorithm):
+    def create_project(self, project_name, selector_algorithm, description=''):
         try:
             print(selector_algorithm)
             new_sorter = selector_algorithm(project_name)
             pairselectors[project_name] = new_sorter
-            project = Project(name=project_name, sorting_algorithm=selector_algorithm.get_algorithm_name())
+            project = Project(name=project_name, sorting_algorithm=selector_algorithm.get_algorithm_name(), description=description)
             db.session.add(project)
             db.session.commit()
             message = f"project {project_name} successfully created"

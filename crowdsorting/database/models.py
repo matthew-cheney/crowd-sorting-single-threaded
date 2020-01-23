@@ -27,6 +27,7 @@ class Project(db.Model):
     name = db.Column(db.String(DOC_NAME_LENGTH), nullable=False, primary_key=True)
     sorting_algorithm = db.Column(db.String(120), nullable=False)
     date_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    description = db.Column(db.String(1024), nullable=True)
     judges = db.relationship('Judge', secondary='judges', lazy='subquery', backref=db.backref('myprojects', lazy=True))
     docs = db.relationship('Doc', cascade='all')
     judgments = db.relationship('Judgment', cascade='all')
