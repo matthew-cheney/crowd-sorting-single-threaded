@@ -1,7 +1,65 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<form method="POST" action="/submitAnswer">
+
+<script>
+    header_bar = document.getElementById('header_bar').style.display = 'none';
+
+    var stop_user = 1;
+
+    window.addEventListener('beforeunload', function (e) {
+        if (stop_user == 1) {
+          // Cancel the event
+          e.preventDefault();
+          // Chrome requires returnValue to be set
+          e.returnValue = '';
+      }
+    });
+
+
+  function safe_exit() {
+    console.log("allowed to leave");
+    stop_user = 0;
+    document.getElementById('safe_exit_form').submit();
+  }
+
+  function submit_pair() {
+    stop_user = 0;
+    document.getElementById('submit_answer_form').submit();
+  }
+
+</script>
+
+
+<div class="row">
+    <div class="col-lg-6">
+        <form id="safe_exit_form" method="POST" action="/safeexit">
+            <div class="row">
+                <div class="col-md-12 text-left">
+                    <button class="btn btn-danger btn-lg" onclick="safe_exit()">Exit Without Submitting</button>
+                </div>
+                <input type="hidden" name="file_one_name"
+                           value="{{ file_one_name }}">
+                <input type="hidden" name="file_two_name"
+                           value="{{ file_two_name }}">
+            </div>
+        </form>
+    </div>
+    <div class="col-lg-6">
+        <form id="hard_easy_form" method="POST" action="/hardeasy">
+            <div class="row">
+                <div class="col-md-12 text-right">
+                    <button class="btn btn-warning btn-lg" onclick="safe_exit()">Too Hard / Too Easy</button>
+                </div>
+                <input type="hidden" name="file_one_name"
+                           value="{{ file_one_name }}">
+                <input type="hidden" name="file_two_name"
+                           value="{{ file_two_name }}">
+            </div>
+        </form>
+    </div>
+</div>
+<form id="submit_answer_form" method="POST" action="/submitAnswer">
     <div class="row">
         <div class="col-md-12 text-center">
             <h3>Select the harder text</h3>
@@ -66,7 +124,7 @@
     -->
     <div class="row">
         <div class="col-md-12 text-center">
-            <button type="submit" class="btn btn-primary btn-lg">Submit
+            <button id="pair_submit_button" class="btn btn-primary btn-lg" onclick="submit_pair()" disabled>Submit
                 Answer
             </button>
             <br>
@@ -88,20 +146,7 @@
     </div>
 </form>
 
-<form method="POST" action="/safeexit">
-    <div class="row">
-        <div class="col-md-12 text-center">
-            <button type="submit" class="btn btn-danger btn-lg">Exit Without Submitting</button>
-        </div>
-        <input type="hidden" name="file_one_name"
-                   value="{{ file_one_name }}">
-        <input type="hidden" name="file_two_name"
-                   value="{{ file_two_name }}">
-    </div>
-</form>
-
 <script>
-
 
 
   function a_harder() {
@@ -112,6 +157,7 @@
     document.getElementById("doc_a_header").className = "card-header bg-danger text-center"
     document.getElementById("doc_b_div").className = "card border-success mb-3"
     document.getElementById("doc_b_header").className = "card-header bg-success text-center"
+    document.getElementById("pair_submit_button").disabled = false;
   }
 
   function b_harder() {
@@ -122,12 +168,36 @@
     document.getElementById("doc_b_header").className = "card-header bg-danger text-center"
     document.getElementById("doc_a_div").className = "card border-success mb-3"
     document.getElementById("doc_a_header").className = "card-header bg-success text-center"
+    document.getElementById("pair_submit_button").disabled = false;
   }
 
-  function safe_exit() {
 
-  }
+</script>
 
+<div id="timeout_modal" class="modal">
+  <div class="modal-content text-center">
+      <div class="row">
+          <div class="col-md-12 text-center">
+          <h3>Timeout</h3>
+          <p>Your time to submit this pair has expired.</p>
+          <a href="/sorter"><button class="btn btn-primary btn-lg">New Pair</button></a>
+          <a href="/home"><button class="btn btn-success btn-lg">Home</button></a>
+          </div>
+      </div>
+  </div>
+</div>
+
+<script>
+
+    var modal = document.getElementById('timeout_modal')
+
+    function show_timeout_modal() {
+              modal.style.display = "block";
+            }
+
+    setTimeout(() => {
+    stop_user = 0;
+    show_timeout_modal(); }, {{ timeout }});
 
 </script>
 {% endblock content %}

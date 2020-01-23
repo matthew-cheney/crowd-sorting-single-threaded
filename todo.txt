@@ -4,7 +4,7 @@
 	DONE - Safe Exit bug
 	DONE - Project Info section
 Project manager - no db admin, filtered dashboard
-***Too hard or too easy opt out
+	DONE - ***Too hard or too easy opt out
 	DONE - Add delete project w/ cleanup
 	DONE - Auth with Google
 	DONE - Switch to email dependent
@@ -25,13 +25,17 @@ On delete project - move to trash
 Log (somewhere) when pairs are rejected
 If you have time - Center change project drop down
 Add delete user function
-***Hide layout bar in the sorter
-***Dynamic timeout
-***On page leave event
+	DONE - ***Hide layout bar in the sorter
+	DONE - ***Dynamic timeout
+	DONE - ***On page leave event - NOTE: Cannot send request on page leave reliably, moved safe exit to upper left instead; fix with training?
 ***Make project public option(s)
 Reference projects by id, not name
 ***Terms/Agreement page - make sure they read it - by project
 ***Edit project from dashboard
+***Select the easier one (change sorter page)
+	DONE - ***Timeout reject submission
+***User select project
+Admin - access to pairsbeingprocessed?
 
 Lower Priority:
 Authenticate with other places

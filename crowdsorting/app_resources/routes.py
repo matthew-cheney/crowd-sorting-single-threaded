@@ -352,6 +352,11 @@ def selectproject(project_name):
 def temp():
     return 'temp'
 
+@app.route("/temp_two")
+def temp_two():
+    print("in temp_two!")
+    return 'Hello, World!'
+
 
 def check_project(current_request):
     if isinstance(current_request.cookies.get('project'), type(None)):
@@ -410,7 +415,7 @@ def sorter():
                                current_project=get_current_project()
                                )
     try:
-        docPair = dbhandler.get_pair(request.cookies.get('project'))
+        docPair = dbhandler.get_pair(request.cookies.get('project'), session['user'].email)
     except KeyError:
         flash('Looks like your selected project has been deleted!', 'warning')
         return redirect(url_for('dashboard'))
@@ -439,7 +444,8 @@ def sorter():
                            current_user=session['user'],
                            time_started=floor(time.time()),
                            all_projects=get_all_projects(),
-                           current_project=get_current_project()
+                           current_project=get_current_project(),
+                           timeout=docPair.lifeSeconds * 1000
                            )
 
 
@@ -563,6 +569,8 @@ def detectFiles():  # This route is obselete?
 @login_required
 def submitanswer():
     print("in submitAnswer route")
+    if not check_project(request):
+        redirect(url_for('home'))
     print(request.form.get("harder"))
     harder = request.form.get("harder")
     easier = ""
@@ -591,6 +599,15 @@ def safeexit():
     dbhandler.return_pair((doc1, doc2), project)
     return redirect(url_for('home'))
 
+@app.route("/hardeasy", methods=['POST'])
+@login_required
+def hardeasy():
+    print(f"in hardeasy for {session['user'].email}")
+    doc1 = request.form.get('file_one_name')
+    doc2 = request.form.get('file_two_name')
+    project = request.cookies.get('project')
+    dbhandler.return_pair((doc1, doc2), project, session['user'].email)
+    return redirect(url_for('home'))
 
 ALLOWED_EXTENSIONS = {'txt'}
 
