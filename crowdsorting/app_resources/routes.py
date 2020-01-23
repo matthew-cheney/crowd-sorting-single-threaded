@@ -571,16 +571,16 @@ def submitanswer():
     print("in submitAnswer route")
     if not check_project(request):
         redirect(url_for('home'))
-    print(request.form.get("harder"))
-    harder = request.form.get("harder")
-    easier = ""
-    if harder == request.form.get("file_one_name"):
-        easier = request.form.get("file_two_name")
+    print(request.form.get("preferred"))
+    preferred = request.form.get("preferred")
+    not_preferred = ""
+    if preferred == request.form.get("file_one_name"):
+        not_preferred = request.form.get("file_two_name")
     else:
-        easier = request.form.get("file_one_name")
+        not_preferred = request.form.get("file_one_name")
     judge = current_user = session['user']
     time_started = int(request.form.get("time_started"))
-    dbhandler.create_judgment(harder, easier, request.cookies.get('project'),
+    dbhandler.create_judgment(preferred, not_preferred, request.cookies.get('project'),
                               judge, floor(time.time()) - time_started)
     if isinstance(request.form.get('another_pair_checkbox'), type(None)):
         flash('Judgment submitted', 'success')

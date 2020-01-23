@@ -2,11 +2,11 @@
 
 {% block content %}
 <h2>Sorted Files</h2>
-<h3>Easy</h3>
+<h3>Hard</h3>
 {% for file in sortedFiles %}
 {{ file }}<br>
 {% endfor %}
-<h3>Hard</h3>
+<h3>Easy</h3>
 <br><br>
 <p>Confidence: {{ confidence }}%</p>
 <p>Judgments made: {{ number_of_judgments }} / {{ possible_judgments }}</p>

@@ -32,7 +32,7 @@ Add delete user function
 Reference projects by id, not name
 ***Terms/Agreement page - make sure they read it - by project
 ***Edit project from dashboard
-***Select the easier one (change sorter page)
+	DONE - ***Select the easier one (change sorter page)
 	DONE - ***Timeout reject submission
 ***User select project
 Admin - access to pairsbeingprocessed?

@@ -62,13 +62,13 @@
 <form id="submit_answer_form" method="POST" action="/submitAnswer">
     <div class="row">
         <div class="col-md-12 text-center">
-            <h3>Select the harder text</h3>
-            <input type="hidden" name="harder" id="harder_hidden" value="">
+            <h3>Select the easier text</h3>
+            <input type="hidden" name="preferred" id="preferred_hidden" value="">
             <input type="hidden" name="time_started" value="{{ time_started }}">
         </div>
     </div>
     <div class="row">
-        <div class="col-md-6 text_window" onclick="a_harder()">
+        <div class="col-md-6 text_window" onclick="a_preferred()">
             <div class="card border-secondary mb-3" id="doc_a_div">
                 <div class="card-header text-center" id="doc_a_header">
                     <div class="hidden_div">Holding</div>
@@ -77,7 +77,7 @@
                           style="resize: none">{{ file_one }}</textarea>
             </div>
         </div>
-        <div class="col-md-6 text_window" onclick="b_harder()">
+        <div class="col-md-6 text_window" onclick="b_preferred()">
             <div class="card border-secondary mb-3" id="doc_b_div">
                 <div class="card-header text-center" id="doc_b_header">
                     <div class="hidden_div">Holding</div>
@@ -149,25 +149,25 @@
 <script>
 
 
-  function a_harder() {
-    document.getElementById("harder_hidden").value = "{{ file_one_name }}"
-    document.getElementById("doc_a_header").innerHTML = "HARDER"
-    document.getElementById("doc_b_header").innerHTML = "EASIER"
-    document.getElementById("doc_a_div").className = "card border-danger mb-3"
-    document.getElementById("doc_a_header").className = "card-header bg-danger text-center"
-    document.getElementById("doc_b_div").className = "card border-success mb-3"
-    document.getElementById("doc_b_header").className = "card-header bg-success text-center"
-    document.getElementById("pair_submit_button").disabled = false;
-  }
-
-  function b_harder() {
-    document.getElementById("harder_hidden").value = "{{ file_two_name }}"
-    document.getElementById("doc_b_header").innerHTML = "HARDER"
+  function a_preferred() {
+    document.getElementById("preferred_hidden").value = "{{ file_one_name }}"
     document.getElementById("doc_a_header").innerHTML = "EASIER"
+    document.getElementById("doc_b_header").innerHTML = "HARDER"
     document.getElementById("doc_b_div").className = "card border-danger mb-3"
     document.getElementById("doc_b_header").className = "card-header bg-danger text-center"
     document.getElementById("doc_a_div").className = "card border-success mb-3"
     document.getElementById("doc_a_header").className = "card-header bg-success text-center"
+    document.getElementById("pair_submit_button").disabled = false;
+  }
+
+  function b_preferred() {
+    document.getElementById("preferred_hidden").value = "{{ file_two_name }}"
+    document.getElementById("doc_b_header").innerHTML = "EASIER"
+    document.getElementById("doc_a_header").innerHTML = "HARDER"
+    document.getElementById("doc_a_div").className = "card border-danger mb-3"
+    document.getElementById("doc_a_header").className = "card-header bg-danger text-center"
+    document.getElementById("doc_b_div").className = "card border-success mb-3"
+    document.getElementById("doc_b_header").className = "card-header bg-success text-center"
     document.getElementById("pair_submit_button").disabled = false;
   }
 
