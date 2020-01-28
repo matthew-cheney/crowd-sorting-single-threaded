@@ -8,6 +8,7 @@ from crowdsorting import app
 from datetime import datetime
 from datetime import timedelta
 import pickle
+from crowdsorting.app_resources.settings import *
 
 from crowdsorting.app_resources.sorting_algorithms.ACJProxy import ACJProxy
 
@@ -173,7 +174,7 @@ class DBHandler:
 
     def get_cas_user(self, username):
         user = db.session.query(Judge).filter_by(username=username).first()
-        if (user is not None):
+        if user is not None:
             return user.id
         return "User not found"
 
@@ -261,12 +262,22 @@ class DBHandler:
             return []
         return projects
 
-    def create_project(self, project_name, selector_algorithm, description=''):
+    def create_project(self, project_name, selector_algorithm, description=None, selection_prompt=None, preferred_prompt=None, unpreferred_prompt=None, consent_form=None):
+        if description is None:
+            description = DEFAULT_DESCRIPTION
+        if selection_prompt is None:
+            selection_prompt = DEFAULT_SELECTION_PROMPT
+        if preferred_prompt is None:
+            preferred_prompt = DEFAULT_PREFERRED_PROMPT
+        if unpreferred_prompt is None:
+            unpreferred_prompt = DEFAULT_UNPREFERRED_PROMPT
+        if consent_form is None:
+            consent_form = DEFAULT_CONSENT_FORM
         try:
             print(selector_algorithm)
             new_sorter = selector_algorithm(project_name)
             pairselectors[project_name] = new_sorter
-            project = Project(name=project_name, sorting_algorithm=selector_algorithm.get_algorithm_name(), description=description)
+            project = Project(name=project_name, sorting_algorithm=selector_algorithm.get_algorithm_name(), description=description, selection_prompt=selection_prompt, preferred_prompt=preferred_prompt, unpreferred_prompt=unpreferred_prompt, consent_form=consent_form)
             db.session.add(project)
             db.session.commit()
             message = f"project {project_name} successfully created"
@@ -275,6 +286,50 @@ class DBHandler:
             print(Exception)
             message = "unable to create project"
         return message
+
+    def get_project_prompts(self, project):
+        project_result = db.session.query(Project).filter_by(name=project).first()
+        return project_result.selection_prompt, project_result.preferred_prompt, project_result.unpreferred_prompt
+
+    def get_all_project_data(self, project):
+        project_result = db.session.query(Project).filter_by(name=project).first()
+        return project_result.name, project_result.description, project_result.selection_prompt, project_result.preferred_prompt, project_result.unpreferred_prompt, project_result.consent_form
+
+    def update_project_info(self, project, name, description, selection_prompt, preferred_prompt, unpreferred_prompt, consent_form):
+        project_result = db.session.query(Project).filter_by(name=project).first()
+        if project_result == None:
+            return False
+        project_result.name = name
+        project_result.description = description
+        project_result.selection_prompt = selection_prompt
+        project_result.preferred_prompt = preferred_prompt
+        project_result.unpreferred_prompt = unpreferred_prompt
+        current_consent = project_result.consent_form
+        if current_consent != consent_form:
+            project_result.cjudges = []
+            project_result.consent_form = consent_form
+        db.session.commit()
+        return True
+
+    def user_consented(self, user, project):
+        project_result = db.session.query(Project).filter_by(name=project).first()
+        if project_result is None:
+            return False
+        if user.email not in [x.email for x in project_result.cjudges]:
+            return False
+        return True
+
+    def add_consent_judge(self, user_email, projectName):
+        project = db.session.query(Project).filter_by(name=projectName).first()
+        user = db.session.query(Judge).filter_by(email=user_email).first()
+        project.cjudges.append(user)
+        db.session.commit()
+
+    def get_consent_form(self, projectName):
+        project = db.session.query(Project).filter_by(name=projectName).first()
+        if project is None:
+            return False
+        return project.consent_form
 
     def get_possible_judgments_count(self, project):
         return pairselectors[project].get_possible_judgments_count()
@@ -341,6 +396,7 @@ class DBHandler:
         if project is None:
             return False
         project.judges = []
+        project.cjudges = []
         db.session.commit()
 
         # Delete project

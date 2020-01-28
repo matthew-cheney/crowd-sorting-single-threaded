@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+
+{% block content %}
+{{ consent_form_text | safe }}
+
+<form id="consent_form" method="POST" action="/signconsent">
+    <input name="user_email" value="{{ current_user.email }}" hidden>
+    <input name="current_project" value="{{ current_project }}" hidden>
+    <button type="submit" class="btn btn-lg btn-primary">Agree</button>
+</form>
+{% endblock content %}

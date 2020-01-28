@@ -80,43 +80,38 @@ def load_cas_user(username):
 def newuser():
     if 'user' in session and session['user'].get_is_authenticated():
         return redirect(url_for('dashboard'))
-    form = NewUserForm()
-    if form.validate_on_submit():
+    if request.method == 'POST':
         current_user = session['user']  # Need to add user to session before this
-        dbhandler.create_user(form.firstName.data, form.lastName.data,
+        dbhandler.create_user(request.form.get('firstName'), request.form.get('lastName'),
                               current_user.email, None)
         session['user'] = User(True, isInAdminFile(current_user.email),
-                               isInPMFile(current_user.email), dbhandler.get_user(current_user.email), form.firstName.data,
-                               form.lastName.data, current_user.email)
+                               isInPMFile(current_user.email), dbhandler.get_user(current_user.email), request.form.get('firstName'),
+                               request.form.get('lastName'), current_user.email)
         print("admin:", session["user"].email, session['user'].is_admin)
         return postLoadUser()
     if request.method == 'POST':
         flash('Failed to register user', 'danger')
-    return render_template('newuser.html', form=form, current_user=dummyUser)
+    return render_template('newuser.html', current_user=dummyUser)
 
 
 @app.route('/newcasuser', methods=['GET', 'POST'])
 def newcasuser():
     if 'user' in session and session['user'].get_is_authenticated():
         return redirect(url_for('dashboard'))
-    form = NewUserForm()
-    if form.validate_on_submit():
+    if request.method == 'POST':
     # if request.method == 'POST':
         current_user = session['user']  # Need to add user to session before this
         print("creating cas user for", cas.username)
-        if not dbhandler.create_cas_user(form.firstName.data, form.lastName.data,
-                              form.email.data, cas.username):
+        if not dbhandler.create_cas_user(request.form.get('firstName'), request.form.get('lastName'),
+                              cas.username + '@byu.edu', cas.username):
             flash('Email already taken', 'danger')
-            return render_template('newuser.html', form=form, current_user=dummyUser)
+            return render_template('newcasuser.html', current_user=dummyUser)
         session['user'] = User(True, isInAdminFile(current_user.email),
-                               isInPMFile(current_user.email), dbhandler.get_user(current_user.email), form.firstName.data,
-                               form.lastName.data, form.email.data)
+                               isInPMFile(current_user.email), dbhandler.get_user(cas.username + '@byu.edu'), request.form.get('firstName'),
+                               request.form.get('lastName'), cas.username + '@byu.edu')
         print("admin:", session["user"].email, session['user'].is_admin)
         return postLoadUser()
-    print('Form.validate._on_submit:', form.validate_on_submit())
-    if request.method == 'POST':
-        flash('Failed to register user, email likely taken', 'danger')
-    return render_template('newuser.html', form=form, current_user=dummyUser)
+    return render_template('newcasuser.html', current_user=dummyUser)
 
 
 
@@ -233,7 +228,6 @@ def admin_required(fn):
 def cas_login(other_dest=""):
     print('In the login route!')
     print(cas.username)
-    a = cas
     return load_cas_user(cas.username)
 
     """user_id = dbhandler.get_user(cas.username)
@@ -403,10 +397,17 @@ def home():
 @login_required
 @app.route("/sorter")
 def sorter():
-    if not check_project(request):
-        return redirect(url_for('dashboard'))
     if 'user' not in session:
         return redirect(url_for('home'))
+    if not check_project(request):
+        return redirect(url_for('dashboard'))
+    if not dbhandler.user_consented(session['user'], request.cookies.get('project')):
+        return render_template('consentform.html', title='Consent Form',
+                               current_user=session['user'],
+                               all_projects=get_all_projects(),
+                               current_project=get_current_project(),
+                               consent_form_text=dbhandler.get_consent_form(request.cookies.get('project'))
+                               )
     if isinstance(request.cookies.get('project'), type(None)):
         return render_template('nopairs.html', title='Check later',
                                message="No project selected",
@@ -415,6 +416,7 @@ def sorter():
                                current_project=get_current_project()
                                )
     try:
+        user_email = session['user'].email
         docPair = dbhandler.get_pair(request.cookies.get('project'), session['user'].email)
     except KeyError:
         flash('Looks like your selected project has been deleted!', 'warning')
@@ -437,6 +439,8 @@ def sorter():
     except AttributeError:
         file_two = docPair.get_second_contents()
 
+    selection_prompt, preferred_prompt, unpreferred_prompt = dbhandler.get_project_prompts(request.cookies.get('project'))
+
     return render_template('sorter.html', title='Sorter', file_one=file_one,
                            file_two=file_two,
                            file_one_name=docPair.get_first(),
@@ -445,9 +449,19 @@ def sorter():
                            time_started=floor(time.time()),
                            all_projects=get_all_projects(),
                            current_project=get_current_project(),
-                           timeout=docPair.lifeSeconds * 1000
+                           timeout=docPair.lifeSeconds * 1000,
+                           selection_prompt=selection_prompt,
+                           preferred_prompt=preferred_prompt,
+                           unpreferred_prompt=unpreferred_prompt
                            )
 
+@app.route("/signconsent", methods=['POST'])
+@login_required
+def signconsent():
+    user_email = request.form.get('user_email')
+    current_project = request.form.get('current_project')
+    dbhandler.add_consent_judge(user_email, current_project)
+    return redirect(url_for('sorter'))
 
 # Router to demo page
 @app.route("/demo")
@@ -522,6 +536,7 @@ def sorted():
         success = False
     else:
         success = True
+    selection_prompt, preferred_prompt, unpreferred_prompt = dbhandler.get_project_prompts(request.cookies.get('project'))
     return render_template('sorted.html', title='Sorted',
                            sortedFiles=sortedFiles,
                            current_user=session['user'],
@@ -531,7 +546,9 @@ def sorted():
                            possible_judgments=possible_judgments,
                            success=success,
                            all_projects=get_all_projects(),
-                           current_project=get_current_project()
+                           current_project=get_current_project(),
+                           preferred_prompt=preferred_prompt,
+                           unpreferred_prompt=unpreferred_prompt
                            )
 
 
@@ -578,7 +595,8 @@ def submitanswer():
         not_preferred = request.form.get("file_two_name")
     else:
         not_preferred = request.form.get("file_one_name")
-    judge = current_user = session['user']
+    judge = session['user']
+    print(f'judge: {judge.email}')
     time_started = int(request.form.get("time_started"))
     dbhandler.create_judgment(preferred, not_preferred, request.cookies.get('project'),
                               judge, floor(time.time()) - time_started)
@@ -607,7 +625,7 @@ def hardeasy():
     doc2 = request.form.get('file_two_name')
     project = request.cookies.get('project')
     dbhandler.return_pair((doc1, doc2), project, session['user'].email)
-    return redirect(url_for('home'))
+    return redirect(url_for('sorter'))
 
 ALLOWED_EXTENSIONS = {'txt'}
 
@@ -704,6 +722,40 @@ def update_user_info():
     dbhandler.update_user_info(newFirstName, newLastName, email)
     return load_user(email)
 
+@app.route("/editproject", methods=['POST'])
+@login_required
+@admin_required
+def edit_project():
+    project = request.form.get('project_name_edit')
+    name, description, selection_prompt, preferred_prompt, unpreferred_prompt, consent_form = dbhandler.get_all_project_data(project)
+    return render_template('editproject.html', current_user=session['user'],
+                           all_projects=get_all_projects(),
+                           current_project=get_current_project(),
+                           name=name,
+                           description=description,
+                           selection_prompt=selection_prompt,
+                           preferred_prompt=preferred_prompt,
+                           unpreferred_prompt=unpreferred_prompt,
+                           consent_form=consent_form
+                           )
+
+
+@app.route("/updateprojectinfo", methods=['POST'])
+@login_required
+@admin_required
+def update_project_info():
+    name = request.form.get('name')
+    description = request.form.get('description')
+    selection_prompt = request.form.get('selection_prompt')
+    preferred_prompt = request.form.get('preferred_prompt')
+    unpreferred_prompt = request.form.get('unpreferred_prompt')
+    consent_form = request.form.get('consent_form')
+    success = dbhandler.update_project_info(name, name, description, selection_prompt, preferred_prompt, unpreferred_prompt, consent_form)
+    if success:
+        return redirect(url_for('dashboard'))
+    else:
+        flash('Error editing project')
+        return redirect(url_for('dashboard'))
 
 def _json_string_to_dict(json_string):
     return json.loads(json_string)
@@ -727,6 +779,13 @@ def deleteProject():
     # Remove pickled algorithm
     # Remove pickled log files
 
+    return redirect(url_for('dashboard'))
+
+@app.route("/deleteuser", methods=['POST'])
+@login_required
+@admin_required
+def deleteUser():
+    dbhandler.delete_user(request.form.get('email'))
     return redirect(url_for('dashboard'))
 
 @app.route("/crowdsorting.db", methods=["GET"])

@@ -16,6 +16,11 @@ Judges = db.Table('judges',
     db.Column('judge_id', db.Integer, ForeignKey('judge.id'), primary_key=True)
 )
 
+CJudges = db.Table('cjudges',
+    db.Column('project_name', db.String(120), ForeignKey('project.name'), primary_key=True),
+    db.Column('judge_id', db.Integer, ForeignKey('judge.id'), primary_key=True)
+)
+
 VoteJudges = db.Table('votejudges',
     db.Column('vote_id', db.Integer, ForeignKey('vote.id'), primary_key=True),
     db.Column('judge_id', db.Integer, ForeignKey('judge.id'), primary_key=True)
@@ -27,8 +32,13 @@ class Project(db.Model):
     name = db.Column(db.String(DOC_NAME_LENGTH), nullable=False, primary_key=True)
     sorting_algorithm = db.Column(db.String(120), nullable=False)
     date_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    description = db.Column(db.String(1024), nullable=True)
+    description = db.Column(db.String(1024), nullable=False)
+    selection_prompt = db.Column(db.String(120), nullable=False)
+    preferred_prompt = db.Column(db.String(120), nullable=False)
+    unpreferred_prompt = db.Column(db.String(120), nullable=False)
+    consent_form = db.Column(db.String(9001), nullable=False)
     judges = db.relationship('Judge', secondary='judges', lazy='subquery', backref=db.backref('myprojects', lazy=True))
+    cjudges = db.relationship('Judge', secondary='cjudges', lazy='subquery', backref=db.backref('mycprojects', lazy=True))
     docs = db.relationship('Doc', cascade='all')
     judgments = db.relationship('Judgment', cascade='all')
 
@@ -64,6 +74,7 @@ class Judge(db.Model):
     username = db.Column(db.String(120), unique=True, nullable=True)
     judgments = db.relationship('Judgment', backref='judger', lazy=True)
     projects = db.relationship('Project', secondary='judges', lazy='subquery', backref=db.backref('myusers', lazy=True))
+    cprojects = db.relationship('Project', secondary='cjudges', lazy='subquery', backref=db.backref('mycusers', lazy=True))
     votes = db.relationship('Vote', secondary='votejudges', lazy='subquery', backref=db.backref('myjudges', lazy=True))
 
     def __repr__(self):

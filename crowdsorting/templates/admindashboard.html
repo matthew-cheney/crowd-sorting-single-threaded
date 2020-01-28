@@ -64,6 +64,12 @@
                         {{ project.sorting_algorithm }}
                     </td>
                     <td>
+                        <form method="POST" action="/editproject">
+                            <input type="hidden" name="project_name_edit" value="{{ project.name }}">
+                            <button type="submit" class="btn btn-primary btn-sm">Edit</button>
+                        </form>
+                    </td>
+                    <td>
                         <form method="POST" action="/deleteProject">
                             <input type="hidden" name="project_name_delete" value="{{ project.name }}">
                             <button type="submit" class="btn btn-danger btn-sm">Delete</button>
@@ -110,6 +116,12 @@
                         {% endif %}
                     </td>
                     {% endfor %}
+                    <td>
+                        <form method="POST" action="/deleteuser">
+                            <input type="hidden" name="email" value="{{ user.email }}">
+                            <button type="submit" class="btn btn-danger btn-sm"><img src="{{ url_for('static', filename='trash.svg') }}"> </button>
+                        </form>
+                    </td>
                 </tr>
             {% endfor %}
         </table>

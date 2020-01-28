@@ -3,46 +3,60 @@
 	DONE - Maybe add Monte Carlo log
 	DONE - Safe Exit bug
 	DONE - Project Info section
-Project manager - no db admin, filtered dashboard
 	DONE - ***Too hard or too easy opt out
 	DONE - Add delete project w/ cleanup
 	DONE - Auth with Google
 	DONE - Switch to email dependent
 	DONE - Fix non-admin login
-CSV download of sorted, comparisons
 	DONE - Add docs then begin project
-Automated tests
 	OBSELETE - Verify email functionality
-Break DBHandler into smaller pieces
-Prettify code
 	DONE - CAS login - just use @byu.edu
-Timestamp with project name
-On delete project - move to trash
 	DONE - *Replace "Admin" with download database directly
 	DONE - *Change project to drop down menu
 	DONE - *Sort User Info by last name, first name, etc.
 	DONE - *Create project - make first row in projects table
-Log (somewhere) when pairs are rejected
-If you have time - Center change project drop down
-Add delete user function
+	DONE - Add delete user function
 	DONE - ***Hide layout bar in the sorter
 	DONE - ***Dynamic timeout
 	DONE - ***On page leave event - NOTE: Cannot send request on page leave reliably, moved safe exit to upper left instead; fix with training?
-***Make project public option(s)
-Reference projects by id, not name
-***Terms/Agreement page - make sure they read it - by project
-***Edit project from dashboard
+	DONE - ***Terms/Agreement page - make sure they read it - by project
+	DONE - ***Edit project from dashboard
 	DONE - ***Select the easier one (change sorter page)
 	DONE - ***Timeout reject submission
 	DONE - ***User select project
+Project manager - no db admin, filtered dashboard
+Allow upload of file for consent form? - in WISYWIG?
+If you have time - Center change project drop down
+Reference projects by id, not name
+Timestamp with project name
+On delete project - move to trash
+Break DBHandler into smaller pieces
+Prettify code
+Automated tests
+CSV download of sorted, comparisons
 Admin - access to pairsbeingprocessed?
+Back button to dashboard from edit project page
+When to set prompts - on project create or after?
+Trash and gear icons
+Move consent form to DB - split into multiple entries
+Move the download button
+WYSIWYG - html editor for consent form
+***Map Too Hard/Too Easy to new pair w/ confirm
+***60 second warning for timeout w/ increment
+***Log (somewhere) when pairs are rejected
+***Project instruction landing page (in DB)
+***Make project public option(s)
+***Confirmation modal - confirm and new pair, confirm and exit, cancel
+***Make the site look good - editable fields, where are the buttons, etc.
+***Create project and all settings in one page
+***Find a decent consent form
+***Fix user not found judgment bug
 
 Lower Priority:
 Authenticate with other places
 
 
 Questions
-Restrict where you can change project?
 Where should download db button be?
 
 Persistence:
