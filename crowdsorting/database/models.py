@@ -33,6 +33,7 @@ class Project(db.Model):
     sorting_algorithm = db.Column(db.String(120), nullable=False)
     date_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     description = db.Column(db.String(1024), nullable=False)
+    public = db.Column(db.Boolean, default=False)
     selection_prompt = db.Column(db.String(120), nullable=False)
     preferred_prompt = db.Column(db.String(120), nullable=False)
     unpreferred_prompt = db.Column(db.String(120), nullable=False)
@@ -94,7 +95,7 @@ class Judgment(db.Model):
     # doc_one = db.Column(db.Integer, db.ForeignKey('doc.id'), nullable=False)
     # doc_two = db.Column(db.Integer, db.ForeignKey('doc.id'), nullable=False)
     # winner = db.Column(db.Integer, db.ForeignKey(Judge.id), nullable=False) # ID of the harder doc
-    judge_id = db.Column(db.Integer, db.ForeignKey('judge.id'), nullable=False)
+    judge_id = db.Column(db.Integer, db.ForeignKey('judge.id'), nullable=True, default=0)
 
     judge = db.relationship('Judge', foreign_keys=[judge_id])
     project_name = db.Column(db.String(120), ForeignKey('project.name'))

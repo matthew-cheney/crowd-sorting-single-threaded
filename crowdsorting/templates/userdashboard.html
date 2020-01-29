@@ -2,14 +2,21 @@
 
 {% block content %}
 
-{% if all_projects|length == 0 %}
-Looks like there are no current projects. Check back later!
-{% else %}
 <div class="row">
   <div class="col-lg-12 text-center">
-    <h5>Dashboard</h5>
+    <h1>Dashboard</h1>
   </div>
 </div>
+
+<div class="row">
+  <div class="col-lg-12 text-center">
+    <h2>Group Projects</h2>
+  </div>
+</div>
+
+{% if all_projects|length == 0 %}
+Looks like you have no group projects to work on. Check back later!
+{% else %}
 <div class="row">
   <div class="col-lg-12 text-center">
     <h2>Select a project</h2>
@@ -19,6 +26,31 @@ Looks like there are no current projects. Check back later!
 <div class="row">
   <div class="col-lg-12 text-center">
     <button class="btn btn-primary btn-lg" onclick="set_current_project_user('{{ project.name }}')">{{ project.name }}</button>
+    <p>{{ project.description }}</p>
+    <hr/>
+  </div>
+</div>
+{% endfor %}
+{% endif %}
+
+<div class="row">
+  <div class="col-lg-12 text-center">
+    <h2>Public Projects</h2>
+  </div>
+</div>
+
+{% if public_projects|length == 0 %}
+Looks like there are no public projects. Check back later!
+{% else %}
+<div class="row">
+  <div class="col-lg-12 text-center">
+    <h2>Select a project</h2>
+  </div>
+</div>
+{% for project in public_projects %}
+<div class="row">
+  <div class="col-lg-12 text-center">
+      <button class="btn btn-primary btn-lg" onclick="set_current_project_user_public('{{ project.name }}')">{{ project.name }}</button>
     <p>{{ project.description }}</p>
     <hr/>
   </div>
@@ -41,7 +73,23 @@ Looks like there are no current projects. Check back later!
           http.onload = function() {
               window.location.href = '/home';
           }
-        }
+      }
+
+      function set_current_project_user_public(project_name) {
+
+          json_dict = {
+                    user_email: '{{ current_user.email }}',
+                    project_name: project_name
+                    };
+
+          var http = new XMLHttpRequest();
+          http.open("POST", "/selectpublicproject", true);
+          http.setRequestHeader("Content-type","application/json");
+          http.send(JSON.stringify(json_dict));
+          http.onload = function() {
+              window.location.href = '/home';
+          }
+      }
 
 </script>
 

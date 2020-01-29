@@ -5,7 +5,7 @@ from datetime import datetime
 
 class Project(object):
 
-    def __init__(self, name, sorting_algorithm, date_created, judges, docs, judgments):
+    def __init__(self, name, sorting_algorithm, date_created, judges, docs, judgments, public):
         self.name = name
         self.sorting_algorithm = sorting_algorithm
         self.date_created = date_created
@@ -13,6 +13,7 @@ class Project(object):
         self.docs = docs
         self.judgments = judgments
         self.selection_algorithm = "temp"
+        self.public = public
 
     def __repr__(self):
         return f"Name: {self.name}; alg: {self.sorting_algorithm}"

@@ -77,6 +77,37 @@
                     </td>
                 </tr>
                 {% endfor %}
+                {% for project in public_projects|sort(attribute='name') %}
+                <tr>
+                    <td>
+                        {{ project.name }}
+                    </td>
+                    <td>
+                        {{ project.judges|length }}
+                    </td>
+                    <td>
+                        {{ project.docs|length }}
+                    </td>
+                    <td>
+                        {{ project.judgments|length }}
+                    </td>
+                    <td>
+                        {{ project.sorting_algorithm }}
+                    </td>
+                    <td>
+                        <form method="POST" action="/editproject">
+                            <input type="hidden" name="project_name_edit" value="{{ project.name }}">
+                            <button type="submit" class="btn btn-primary btn-sm">Edit</button>
+                        </form>
+                    </td>
+                    <td>
+                        <form method="POST" action="/deleteProject">
+                            <input type="hidden" name="project_name_delete" value="{{ project.name }}">
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
             </table>
     </div>
 </div>
@@ -101,6 +132,11 @@
                         {{ project.name }}
                     </td>
                     {% endfor %}
+                {% for project in public_projects %}
+                    <td>
+                        {{ project.name }}
+                    </td>
+                    {% endfor %}
             </tr>
             {% for user in all_users|sort(attribute='firstName')|sort(attribute='lastName') %}
                 <tr>
@@ -110,9 +146,18 @@
                     {% for project in all_projects %}
                     <td>
                         {% if user in project.judges %}
-                        <input type="checkbox", id="{{ user.id }}_{{ project.name }}" onclick="toggleProject('{{ user.id }}', '{{ project.name }}')" checked>
+                            <input type="checkbox", id="{{ user.id }}_{{ project.name }}" onclick="toggleProject('{{ user.id }}', '{{ project.name }}')" checked>
                         {% else %}
-                        <input type="checkbox", id="{{ user.id }}_{{ project.name }}" onclick="toggleProject('{{ user.id }}', '{{ project.name }}')" >
+                            <input type="checkbox", id="{{ user.id }}_{{ project.name }}" onclick="toggleProject('{{ user.id }}', '{{ project.name }}')" >
+                        {% endif %}
+                    </td>
+                    {% endfor %}
+                    {% for project in public_projects %}
+                    <td>
+                        {% if user in project.judges %}
+                            <input type="checkbox", id="{{ user.id }}_{{ project.name }}" onclick="toggleProject('{{ user.id }}', '{{ project.name }}')" checked disabled>
+                        {% else %}
+                            <input type="checkbox", id="{{ user.id }}_{{ project.name }}" onclick="toggleProject('{{ user.id }}', '{{ project.name }}')" disabled>
                         {% endif %}
                     </td>
                     {% endfor %}
@@ -156,6 +201,12 @@
                         <!--<form method="POST" action="/upload" enctype="multipart/form-data">-->
                         <input type="file" id="file_uploader" name="file" autocomplete="off" multiple="" required>
                         <!--<input type="submit" value="Submit" onclick="submit_project">-->
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <h4>Public?</h4>
+                        <input type="checkbox" name="public">
                     </td>
                 </tr>
                 <tr>

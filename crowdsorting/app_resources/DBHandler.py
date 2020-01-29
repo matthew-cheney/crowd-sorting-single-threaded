@@ -209,8 +209,21 @@ class DBHandler:
         user_to_delete = db.session.query(Judge).filter_by(email=email).first()
         if user_to_delete is None:
             return False
+        user_to_delete.projects = []
+        user_to_delete.cprojects = []
+        db.session.commit()
+
+        user_to_delete = db.session.query(Judge).filter_by(email=email).first()
+        if user_to_delete is None:
+            return False
         db.session.delete(user_to_delete)
         db.session.commit()
+        return True
+
+    def check_user(self, email):
+        user = db.session.query(Judge).filter_by(email=email).first()
+        if user is None:
+            return False
         return True
 
     def get_cas_email(self, username):
@@ -244,10 +257,17 @@ class DBHandler:
 
     def get_user_projects(self, user_email):
         # return self.allProjects() # This is a temporary fix
-        projects = db.session.query(Judge).filter_by(
+        try:
+            projects = db.session.query(Judge).filter_by(
             email=user_email).first().projects
-        # projects = [p.name for p in projects]
+        except AttributeError:
+            return []
+        projects = [p for p in projects if not p.public]
         print("projects:", projects)
+        return projects
+
+    def get_public_projects(self):
+        projects = db.session.query(Project).filter_by(public=True).all()
         return projects
 
     def get_all_projects(self):
@@ -255,16 +275,39 @@ class DBHandler:
         for p in db.session.query(Project).all():
             projects.append(
                 models.Project(p.name, p.sorting_algorithm, p.date_created,
-                               p.judges, p.docs, p.judgments))
+                               p.judges, p.docs, p.judgments, p.public))
         print("in get_all_projects")
         print(projects)
         if projects is None:
             return []
         return projects
 
-    def create_project(self, project_name, selector_algorithm, description=None, selection_prompt=None, preferred_prompt=None, unpreferred_prompt=None, consent_form=None):
+    def get_all_group_projects(self):
+        projects = []
+        for p in db.session.query(Project).all():
+            if not p.public:
+                projects.append(
+                    models.Project(p.name, p.sorting_algorithm, p.date_created,
+                                   p.judges, p.docs, p.judgments, p.public))
+        print("in get_all_group_projects")
+        print(projects)
+        if projects is None:
+            return []
+        return projects
+
+    def project_is_public(self, project_name):
+        project = db.session.query(Project).filter_by(name=project_name).first()
+        if project is None:
+            return False
+        return project.public
+
+    def create_project(self, project_name, selector_algorithm, description=None, selection_prompt=None, preferred_prompt=None, unpreferred_prompt=None, consent_form=None, public=None):
         if description is None:
             description = DEFAULT_DESCRIPTION
+        if public is None:
+            public = False
+        if public == 'on':
+            public = True
         if selection_prompt is None:
             selection_prompt = DEFAULT_SELECTION_PROMPT
         if preferred_prompt is None:
@@ -277,7 +320,7 @@ class DBHandler:
             print(selector_algorithm)
             new_sorter = selector_algorithm(project_name)
             pairselectors[project_name] = new_sorter
-            project = Project(name=project_name, sorting_algorithm=selector_algorithm.get_algorithm_name(), description=description, selection_prompt=selection_prompt, preferred_prompt=preferred_prompt, unpreferred_prompt=unpreferred_prompt, consent_form=consent_form)
+            project = Project(name=project_name, sorting_algorithm=selector_algorithm.get_algorithm_name(), description=description, public=public, selection_prompt=selection_prompt, preferred_prompt=preferred_prompt, unpreferred_prompt=unpreferred_prompt, consent_form=consent_form)
             db.session.add(project)
             db.session.commit()
             message = f"project {project_name} successfully created"
@@ -345,11 +388,18 @@ class DBHandler:
         users = db.session.query(Judge).all()
         return users
 
+    def get_user_id(self, email):
+        user = db.session.query(Judge).filter_by(email=email).first()
+        if user is None:
+            return False
+        return user.id
+
     def add_user_to_project(self, userId, projectName):
         project = db.session.query(Project).filter_by(name=projectName).first()
         user = db.session.query(Judge).filter_by(id=userId).first()
-        project.judges.append(user)
-        db.session.commit()
+        if user not in project.judges:
+            project.judges.append(user)
+            db.session.commit()
 
     def remove_user_from_project(self, userId, projectName):
         project = db.session.query(Project).filter_by(name=projectName).first()

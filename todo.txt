@@ -41,16 +41,16 @@ Trash and gear icons
 Move consent form to DB - split into multiple entries
 Move the download button
 WYSIWYG - html editor for consent form
-***Map Too Hard/Too Easy to new pair w/ confirm
+	DONE - ***Map Too Hard/Too Easy to new pair w/ confirm
 ***60 second warning for timeout w/ increment
 ***Log (somewhere) when pairs are rejected
 ***Project instruction landing page (in DB)
-***Make project public option(s)
+	DONE - ***Make project public option(s) - need to add user to project when they select it?
 ***Confirmation modal - confirm and new pair, confirm and exit, cancel
 ***Make the site look good - editable fields, where are the buttons, etc.
 ***Create project and all settings in one page
 ***Find a decent consent form
-***Fix user not found judgment bug
+	DONE - ***Fix user not found judgment bug
 
 Lower Priority:
 Authenticate with other places

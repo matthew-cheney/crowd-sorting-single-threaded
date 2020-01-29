@@ -44,7 +44,10 @@
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                   {% for proj in all_projects %}
-                  <a class="dropdown-item" href="#" onclick="set_current_project('{{ proj.name }}')">{{ proj.name }}</a>
+                    <a class="dropdown-item" href="#" onclick="set_current_project('{{ proj.name }}')">Group: {{ proj.name }}</a>
+                  {% endfor %}
+                  {% for proj in public_projects %}
+                    <a class="dropdown-item" href="#" onclick="set_current_project_public('{{ proj.name }}')">Public: {{ proj.name }}</a>
                   {% endfor %}
                 </div>
               </li>
@@ -98,6 +101,23 @@
           http.onload = function() {
               document.getElementById('displayed_project').innerHTML = project_name;
               location.reload();
+          }
+        }
+
+        function set_current_project_public(project_name) {
+
+          json_dict = {
+                    user_email: '{{ current_user.email }}',
+                    project_name: project_name
+                    };
+
+          var http = new XMLHttpRequest();
+          http.open("POST", "/selectpublicproject", true);
+          http.setRequestHeader("Content-type","application/json");
+          http.send(JSON.stringify(json_dict));
+          http.onload = function() {
+            document.getElementById('displayed_project').innerHTML = project_name;
+            location.reload();
           }
         }
       </script>
