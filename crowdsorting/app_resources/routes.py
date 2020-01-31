@@ -15,6 +15,8 @@ from flask import redirect
 from flask import request
 from flask import make_response
 import os
+
+from .RejectLogger import RejectLogger
 from .settings import ADMIN_PATH, PM_PATH
 from .user import User
 import json
@@ -29,6 +31,7 @@ from flask_cas import login as cas_login
 import datetime
 
 dbhandler = DBHandler()
+rejectLogger = RejectLogger()
 
 dummyUser = User("", False, False, 0, "", "", "")
 
@@ -487,8 +490,19 @@ def sorter():
                            timeout=docPair.lifeSeconds * 1000,
                            selection_prompt=selection_prompt,
                            preferred_prompt=preferred_prompt,
-                           unpreferred_prompt=unpreferred_prompt
+                           unpreferred_prompt=unpreferred_prompt,
+                           pair_id=docPair.id,
+                           project_name=request.cookies.get('project')
                            )
+
+@app.route("/moretime", methods=['POST'])
+@login_required
+def moretime():
+    req_body = request.json
+    pair_id = req_body['pair_id']
+    project_name = req_body['project_name']
+    dbhandler.reset_timestamp(project_name, pair_id)
+    return ""
 
 @app.route("/signconsent", methods=['POST'])
 @login_required
@@ -664,9 +678,16 @@ def hardeasy():
     print(f"in hardeasy for {session['user'].email}")
     doc1 = request.form.get('file_one_name')
     doc2 = request.form.get('file_two_name')
+    too_hard = request.form.get('too_hard')
+    if too_hard == '1':
+        too_hard = True
+    else:
+        too_hard = False
     project = request.cookies.get('project')
     dbhandler.return_pair((doc1, doc2), project, session['user'].email)
+    rejectLogger.log_reject(project, session['user'].email, doc1, doc2, too_hard)
     return redirect(url_for('sorter'))
+
 
 ALLOWED_EXTENSIONS = {'txt'}
 

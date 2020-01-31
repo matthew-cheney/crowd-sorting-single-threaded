@@ -23,10 +23,54 @@
     document.getElementById('safe_exit_form').submit();
   }
 
+  function too_hard() {
+    console.log("allowed to leave");
+    stop_user = 0;
+    document.getElementById('too_hard_input').value = "1";
+    document.getElementById('hard_easy_form').submit();
+  }
+
+  function too_easy() {
+    console.log("allowed to leave");
+    stop_user = 0;
+    document.getElementById('too_hard_input').value = "0";
+    document.getElementById('hard_easy_form').submit();
+  }
+
   function submit_pair() {
     stop_user = 0;
     document.getElementById('submit_answer_form').submit();
   }
+
+  function submit_pair_then_home() {
+    document.getElementById('another_pair').checked = false;
+    submit_pair()
+  }
+
+  function show_confirm_modal() {
+    document.getElementById('confirm_submit_modal').style.display = "block";
+  }
+
+  function hide_confirm_modal() {
+    document.getElementById('confirm_submit_modal').style.display = "none";
+  }
+
+  function show_hard_easy_modal() {
+    document.getElementById('confirm_hard_easy_modal').style.display = "block";
+  }
+
+  function hide_hard_easy_modal() {
+    document.getElementById('confirm_hard_easy_modal').style.display = "none";
+  }
+
+  function show_safe_exit_modal() {
+    document.getElementById('confirm_safe_exit_modal').style.display = "block";
+  }
+
+  function hide_safe_exit_modal() {
+    document.getElementById('confirm_safe_exit_modal').style.display = "none";
+  }
+
 
 </script>
 
@@ -36,7 +80,7 @@
         <form id="safe_exit_form" method="POST" action="/safeexit">
             <div class="row">
                 <div class="col-md-12 text-left">
-                    <button class="btn btn-danger btn-lg" onclick="safe_exit()">Exit Without Submitting</button>
+                    <button type="button" class="btn btn-danger btn-lg" onclick="show_safe_exit_modal()">Exit Without Submitting</button>
                 </div>
                 <input type="hidden" name="file_one_name"
                            value="{{ file_one_name }}">
@@ -49,12 +93,14 @@
         <form id="hard_easy_form" method="POST" action="/hardeasy">
             <div class="row">
                 <div class="col-md-12 text-right">
-                    <button class="btn btn-lg btn-warning text-white" onclick="safe_exit()">Too Hard / Too Easy</button>
+                    <button type="button" class="btn btn-lg btn-warning text-white" onclick="show_hard_easy_modal()">Too Hard / Too Easy</button>
                 </div>
                 <input type="hidden" name="file_one_name"
                            value="{{ file_one_name }}">
                 <input type="hidden" name="file_two_name"
                            value="{{ file_two_name }}">
+                <input type="hidden" name="too_hard"
+                            value="1" id="too_hard_input">
             </div>
         </form>
     </div>
@@ -124,7 +170,7 @@
     -->
     <div class="row">
         <div class="col-md-12 text-center">
-            <button id="pair_submit_button" class="btn btn-primary btn-lg" onclick="submit_pair()" disabled>Submit
+            <button type="button" id="pair_submit_button" class="btn btn-primary btn-lg" onclick="show_confirm_modal()" disabled>Submit
                 Answer
             </button>
             <br>
@@ -134,7 +180,7 @@
                    value="{{ file_two_name }}">
         </div>
     </div>
-    <div class="row">
+    <div class="row" style="display: none;">
         <div class="col-md-12 text-center">
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" value="" id="another_pair" name="another_pair_checkbox" checked>
@@ -145,6 +191,50 @@
         </div>
     </div>
 </form>
+
+<div id="confirm_submit_modal" class="modal">
+  <div class="modal-content text-center">
+      <div class="row">
+          <div class="col-md-12 text-center">
+          <h2>Confirm</h2>
+          <h3>Would you like to judge another pair?</h3>
+          <button class="btn btn-success btn-lg" onclick="submit_pair()">New Pair</button>
+          <button class="btn btn-primary btn-lg" onclick="submit_pair_then_home()"> Home </button>
+          <h3>or</h3>
+          <button class="btn btn-warning btn-lg" onclick="hide_confirm_modal()">Cancel</button>
+          </div>
+      </div>
+  </div>
+</div>
+
+<div id="confirm_hard_easy_modal" class="modal">
+  <div class="modal-content text-center">
+      <div class="row">
+          <div class="col-md-12 text-center">
+          <h2>Confirm</h2>
+          <h3>Are you sure these are too hard/easy?</h3>
+          <button class="btn btn-success btn-lg" onclick="too_hard()">Hard</button>
+          <button class="btn btn-danger btn-lg" onclick="too_easy()">Easy</button><br/>
+              <h3>or</h3>
+          <button class="btn btn-warning btn-lg" onclick="hide_hard_easy_modal()">Cancel</button>
+          </div>
+      </div>
+  </div>
+</div>
+
+<div id="confirm_safe_exit_modal" class="modal">
+  <div class="modal-content text-center">
+      <div class="row">
+          <div class="col-md-12 text-center">
+          <h2>Confirm</h2>
+          <h3>Are you sure you want to leave without submitting?</h3>
+          <button class="btn btn-success btn-lg" onclick="safe_exit()">Yes</button>
+          <button class="btn btn-warning btn-lg" onclick="hide_safe_exit_modal()">Cancel</button>
+          </div>
+      </div>
+  </div>
+</div>
+
 
 <script>
 
@@ -174,6 +264,21 @@
 
 </script>
 
+<div id="timeout_countdown_modal" class="modal">
+  <div class="modal-content text-center">
+      <div class="row">
+          <div class="col-md-12 text-center">
+          <h3>Timeout</h3>
+          <p>Your time to submit this pair will expire in <span id="time_left_countdown">60</span> seconds.</p>
+          <button class="btn btn-primary btn-lg" onclick="more_time()">More time</button>
+              <h3>or</h3>
+          <button class="btn btn-success btn-lg" onclick="safe_exit()">Exit</button>
+          </div>
+      </div>
+  </div>
+</div>
+
+
 <div id="timeout_modal" class="modal">
   <div class="modal-content text-center">
       <div class="row">
@@ -195,9 +300,50 @@
               modal.style.display = "block";
             }
 
-    setTimeout(() => {
-    stop_user = 0;
-    show_timeout_modal(); }, {{ timeout }});
+    function show_timeout_countdown_modal() {
+        document.getElementById('timeout_countdown_modal').style.display = "block";
+    }
+
+    function hide_timeout_countdown_modal() {
+        document.getElementById('timeout_countdown_modal').style.display = "none";
+    }
+
+    function more_time() {
+        json_dict = {
+                    pair_id: '{{ pair_id }}',
+                    project_name: '{{ project_name }}'
+                    };
+
+          var http = new XMLHttpRequest();
+          http.open("POST", "/moretime", true);
+          http.setRequestHeader("Content-type","application/json");
+          http.send(JSON.stringify(json_dict));
+          http.onload = function() {
+            console.log("more time added");
+            set_timeout();
+            hide_timeout_countdown_modal();
+        }
+    }
+
+    function set_timeout() {
+        setTimeout(() => {
+        stop_user = 0;
+        var time_left_countdown = document.getElementById('time_left_countdown');
+        i = 59;
+        interval = setInterval(function(){
+            time_left_countdown.innerHTML = i;
+            i -= 1
+            if (i == -1) {
+                hide_timeout_countdown_modal();
+                show_timeout_modal();
+                clearInterval(interval);
+            }
+            }, 1000);
+        show_timeout_countdown_modal(); }, {{ timeout }} - 60000);
+    }
+
+    set_timeout()
+
 
 </script>
 {% endblock content %}

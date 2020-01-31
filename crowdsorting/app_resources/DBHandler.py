@@ -1,4 +1,5 @@
 import re
+import uuid
 
 from crowdsorting import session, pairselectors
 from crowdsorting import db
@@ -82,6 +83,9 @@ class DBHandler:
             print('no more pairs')
             return pair
 
+        if pair.id is None:
+            pair.id = uuid.uuid4()
+
         doc1_contents = re.split(' |\n', pair.doc1.contents.decode('utf-8'))
         doc2_contents = re.split(' |\n', pair.doc2.contents.decode('utf-8'))
         total_length = len(doc1_contents) + len(doc2_contents)
@@ -135,6 +139,16 @@ class DBHandler:
                 self.pairsBeingProcessed[project].remove(pair)
                 break
         self.pickle_pairs_being_processed()
+
+    def reset_timestamp(self, project_name, pair_id):
+        self.unpickle_pairs_being_processed()
+        for each_pair in self.pairsBeingProcessed[project_name]:
+            if each_pair.id == pair_id:
+                each_pair.update_timestamp()
+                self.pickle_pairs_being_processed()
+                return True  # Updated timestamp
+        self.pickle_pairs_being_processed()
+        return False  # Pair not found
 
     # Function to delete Doc and Judgments from database
     def delete_file(self, name, project):
@@ -424,6 +438,10 @@ class DBHandler:
                 self.pickle_pairs_being_processed()
                 return
         print("pair not found in pairsBeingProcessed")
+
+    def log_rejected_pair(self, pair, project, user=None):
+        self.unpickle_pairs_being_processed()
+        
 
     def delete_project(self, project_name):
 
