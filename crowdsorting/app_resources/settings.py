@@ -11,6 +11,11 @@ DEFAULT_DESCRIPTION = ""
 DEFAULT_SELECTION_PROMPT = "Select the better text"
 DEFAULT_PREFERRED_PROMPT = "Better"
 DEFAULT_UNPREFERRED_PROMPT = "Worse"
+DEFAULT_LANDING_PAGE = "<div class=\"text-center\">" \
+                       "<h1>Crowd Sorting</h1>" \
+                       "<h2>with the BYU Department of Digital Humanities</h2>" \
+                       "<h3>To begin, click on Sorter in the toolbar.</h3>" \
+                       "</div>"
 DEFAULT_CONSENT_FORM = """
 Generic Terms and Conditions Template<br/>
 Please read these terms and conditions ("terms", "terms and conditions") carefully before using<br/>

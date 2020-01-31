@@ -16,3 +16,4 @@ crowdsorting/app_resources/sorting_algorithms/MonteCarlo_buggy.py
 rootCA.key
 rootCA.pem
 crowdsorting/Reject_Logs
+default_landing_page.html

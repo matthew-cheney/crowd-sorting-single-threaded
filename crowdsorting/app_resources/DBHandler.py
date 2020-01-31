@@ -315,7 +315,7 @@ class DBHandler:
             return False
         return project.public
 
-    def create_project(self, project_name, selector_algorithm, description=None, selection_prompt=None, preferred_prompt=None, unpreferred_prompt=None, consent_form=None, public=None):
+    def create_project(self, project_name, selector_algorithm, description=None, selection_prompt=None, preferred_prompt=None, unpreferred_prompt=None, consent_form=None, public=None, landing_page=None):
         if description is None:
             description = DEFAULT_DESCRIPTION
         if public is None:
@@ -330,11 +330,13 @@ class DBHandler:
             unpreferred_prompt = DEFAULT_UNPREFERRED_PROMPT
         if consent_form is None:
             consent_form = DEFAULT_CONSENT_FORM
+        if landing_page is None:
+            landing_page = DEFAULT_LANDING_PAGE
         try:
             print(selector_algorithm)
             new_sorter = selector_algorithm(project_name)
             pairselectors[project_name] = new_sorter
-            project = Project(name=project_name, sorting_algorithm=selector_algorithm.get_algorithm_name(), description=description, public=public, selection_prompt=selection_prompt, preferred_prompt=preferred_prompt, unpreferred_prompt=unpreferred_prompt, consent_form=consent_form)
+            project = Project(name=project_name, sorting_algorithm=selector_algorithm.get_algorithm_name(), description=description, public=public, selection_prompt=selection_prompt, preferred_prompt=preferred_prompt, unpreferred_prompt=unpreferred_prompt, consent_form=consent_form, landing_page=landing_page)
             db.session.add(project)
             db.session.commit()
             message = f"project {project_name} successfully created"
@@ -367,6 +369,12 @@ class DBHandler:
             project_result.consent_form = consent_form
         db.session.commit()
         return True
+
+    def get_landing_page(self, project_name):
+        project = db.session.query(Project).filter_by(name=project_name).first()
+        if project is None:
+            return False
+        return project.landing_page
 
     def user_consented(self, user, project):
         project_result = db.session.query(Project).filter_by(name=project).first()
@@ -441,7 +449,7 @@ class DBHandler:
 
     def log_rejected_pair(self, pair, project, user=None):
         self.unpickle_pairs_being_processed()
-        
+
 
     def delete_project(self, project_name):
 

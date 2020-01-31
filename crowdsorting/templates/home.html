@@ -2,12 +2,15 @@
 
 {% block content %}
 {% if current_user.get_is_authenticated() %}
-
+{% if landing_page != False %}
+    {{ landing_page|safe }}
+{% else %}
 <h1 class="text-center">Welcome {{ current_user.get_first_name() }}!</h1>
 
   is_authenticated: {{ current_user.get_is_authenticated() }}</br>
   is_admin: {{ current_user.get_is_admin() }}</br>
   current_project: {{ current_project }}
+{% endif %}
 {% else %}
 <div class="home_div">
     <h1 class="text-center">Welcome to CrowdSorting!</h1>

@@ -17,7 +17,7 @@ from flask import make_response
 import os
 
 from .RejectLogger import RejectLogger
-from .settings import ADMIN_PATH, PM_PATH
+from .settings import ADMIN_PATH, PM_PATH, DEFAULT_LANDING_PAGE
 from .user import User
 import json
 import re
@@ -410,11 +410,14 @@ def home():
     if 'user' in session:
         if not check_project(request):
             return redirect(url_for('dashboard'))
+        current_project = get_current_project()
         return render_template('home.html', title='Home',
                                current_user=session['user'],
                                all_projects=get_all_projects(),
                                public_projects=dbhandler.get_public_projects(),
-                               current_project=get_current_project())
+                               current_project=current_project,
+                               landing_page=dbhandler.get_landing_page(current_project))
+                               # landing_page=DEFAULT_LANDING_PAGE)
     else:
         return render_template('home.html', title='Home',
                                current_user=dummyUser,
@@ -813,6 +816,7 @@ def update_project_info():
     preferred_prompt = request.form.get('preferred_prompt')
     unpreferred_prompt = request.form.get('unpreferred_prompt')
     consent_form = request.form.get('consent_form')
+    consent_form_2 = request.form.get('consent_page')
     success = dbhandler.update_project_info(name, name, description, selection_prompt, preferred_prompt, unpreferred_prompt, consent_form)
     if success:
         return redirect(url_for('dashboard'))
@@ -837,6 +841,7 @@ def check(email):
 def deleteProject():
     # Remove project from database
     dbhandler.delete_project(request.form.get('project_name_delete'))
+    rejectLogger.delete_project_logs(request.form.get('project_name_delete'))
 
     # Remove project from pairs being processed
     # Remove pickled algorithm

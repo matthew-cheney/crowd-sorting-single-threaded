@@ -1,6 +1,7 @@
 import datetime
 import json
 import os
+import shutil
 
 
 class RejectLogger:
@@ -32,3 +33,8 @@ class RejectLogger:
 
     def log_json(self, log_dict, file):
         json.dump(log_dict, file, indent=4)
+
+    def delete_project_logs(self, project_name):
+        project_name = project_name.replace(' ', '_')
+        if os.path.exists(self.folder_path + project_name):
+            shutil.rmtree(self.folder_path + project_name)

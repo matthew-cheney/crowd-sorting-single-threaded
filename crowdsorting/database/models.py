@@ -38,6 +38,7 @@ class Project(db.Model):
     preferred_prompt = db.Column(db.String(120), nullable=False)
     unpreferred_prompt = db.Column(db.String(120), nullable=False)
     consent_form = db.Column(db.String(9001), nullable=False)
+    landing_page = db.Column(db.String(9001), nullable=False)
     judges = db.relationship('Judge', secondary='judges', lazy='subquery', backref=db.backref('myprojects', lazy=True))
     cjudges = db.relationship('Judge', secondary='cjudges', lazy='subquery', backref=db.backref('mycprojects', lazy=True))
     docs = db.relationship('Doc', cascade='all')
