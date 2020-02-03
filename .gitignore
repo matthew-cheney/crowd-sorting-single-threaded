@@ -3,10 +3,8 @@ venv
 flask_session
 **.pyc
 .idea
-crowdsorting/ACJ_Logs
-crowdsorting/MC_Logs
 crowdsorting/database/crowdsorting.db
-crowdsorting/app_resources/admins.txt
+#crowdsorting/app_resources/admins.txt
 notes.txt
 text_files
 RedKalinka
@@ -15,5 +13,5 @@ crowdsorting/app_resources/sorting_algorithms/MonteCarlo_buggy.py
 ..gitignore.swp
 rootCA.key
 rootCA.pem
-crowdsorting/Reject_Logs
+#crowdsorting/Reject_Logs
 default_landing_page.html
