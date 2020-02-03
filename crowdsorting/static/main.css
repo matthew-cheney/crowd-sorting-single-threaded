@@ -41,12 +41,9 @@ body {
 }
 
 .info_input {
-    border-width: 0px;
-    border: none;
 }
 
 .info_input:focus {
-    outline-width: 0px;
 }
 
 .borderless td, .borderless th {

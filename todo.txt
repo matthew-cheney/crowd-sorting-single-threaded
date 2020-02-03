@@ -51,6 +51,12 @@ WYSIWYG - html editor for consent form
 Create project and all settings in one page
 ***Find a decent consent form
 	DONE - ***Fix user not found judgment bug
+Dashboard just store projects you're enrolled in
+Button to add another public project
+Users table to separate page w/ each project
+   List of users, add user "search" bar w/ auto-fill
+   W/ remove button
+
 
 Lower Priority:
 Authenticate with other places
