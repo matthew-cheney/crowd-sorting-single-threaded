@@ -15,5 +15,5 @@ rootCA.key
 rootCA.pem
 crowdsorting/Reject_Logs
 crowdsorting/ACJ_Logs
-#crowdsorting/MC_Logs
+#_crowdsorting/MC_Logs
 default_landing_page.html
