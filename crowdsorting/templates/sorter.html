@@ -17,6 +17,8 @@
     });
 
 
+
+
   function safe_exit() {
     console.log("allowed to leave");
     stop_user = 0;
@@ -47,29 +49,7 @@
     submit_pair()
   }
 
-  function show_confirm_modal() {
-    document.getElementById('confirm_submit_modal').style.display = "block";
-  }
 
-  function hide_confirm_modal() {
-    document.getElementById('confirm_submit_modal').style.display = "none";
-  }
-
-  function show_hard_easy_modal() {
-    document.getElementById('confirm_hard_easy_modal').style.display = "block";
-  }
-
-  function hide_hard_easy_modal() {
-    document.getElementById('confirm_hard_easy_modal').style.display = "none";
-  }
-
-  function show_safe_exit_modal() {
-    document.getElementById('confirm_safe_exit_modal').style.display = "block";
-  }
-
-  function hide_safe_exit_modal() {
-    document.getElementById('confirm_safe_exit_modal').style.display = "none";
-  }
 
 
 </script>
@@ -198,8 +178,8 @@
           <div class="col-md-12 text-center">
           <h2>Confirm</h2>
           <h3>Would you like to judge another pair?</h3>
-          <button class="btn btn-success btn-lg" onclick="submit_pair()">New Pair</button>
-          <button class="btn btn-primary btn-lg" onclick="submit_pair_then_home()"> Home </button>
+          <button class="btn btn-success btn-lg left-button" onclick="submit_pair()">New Pair</button>
+          <button class="btn btn-primary btn-lg right-button" onclick="submit_pair_then_home()">Go Home</button>
           <h3>or</h3>
           <button class="btn btn-warning btn-lg" onclick="hide_confirm_modal()">Cancel</button>
           </div>
@@ -213,8 +193,8 @@
           <div class="col-md-12 text-center">
           <h2>Confirm</h2>
           <h3>Are you sure these are too hard/easy?</h3>
-          <button class="btn btn-success btn-lg" onclick="too_hard()">Hard</button>
-          <button class="btn btn-danger btn-lg" onclick="too_easy()">Easy</button><br/>
+          <button class="btn btn-success btn-lg left-button" onclick="too_hard()">Hard</button>
+          <button class="btn btn-danger btn-lg right-button" onclick="too_easy()">Easy</button><br/>
               <h3>or</h3>
           <button class="btn btn-warning btn-lg" onclick="hide_hard_easy_modal()">Cancel</button>
           </div>
@@ -293,6 +273,46 @@
 </div>
 
 <script>
+
+  var confirm_submit_modal = document.getElementById('confirm_submit_modal')
+  var confirm_hard_easy_modal = document.getElementById('confirm_hard_easy_modal')
+  var confirm_safe_exit_modal = document.getElementById('confirm_safe_exit_modal')
+
+  function show_confirm_modal() {
+    confirm_submit_modal.style.display = "block";
+  }
+
+  function hide_confirm_modal() {
+    confirm_submit_modal.style.display = "none";
+  }
+
+  function show_hard_easy_modal() {
+    confirm_hard_easy_modal.style.display = "block";
+  }
+
+  function hide_hard_easy_modal() {
+    confirm_hard_easy_modal.style.display = "none";
+  }
+
+  function show_safe_exit_modal() {
+    confirm_safe_exit_modal.style.display = "block";
+  }
+
+  function hide_safe_exit_modal() {
+    confirm_safe_exit_modal.style.display = "none";
+  }
+
+  window.onclick = function(event) {
+    if (event.target == confirm_safe_exit_modal) {
+      confirm_safe_exit_modal.style.display = "none";
+    }
+    else if (event.target == confirm_hard_easy_modal) {
+      confirm_hard_easy_modal.style.display = "none";
+    }
+    else if (event.target == confirm_submit_modal) {
+      confirm_submit_modal.style.display = "none";
+    }
+  }
 
     var modal = document.getElementById('timeout_modal')
 

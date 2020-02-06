@@ -339,8 +339,6 @@ def get_current_project():
 def check_current_project(project):
     if 'user' not in session:
         return False
-    if dbhandler.project_is_public(project):
-        return True
     all_projects = get_all_projects()
     if project not in [x.name for x in all_projects]:
         return False
@@ -561,9 +559,10 @@ def join_code():
     if dbhandler.check_join_code(project_name, join_code):
         user_id = dbhandler.get_user_id(session['user'].email)
         dbhandler.add_user_to_project(user_id, project_name)
-        flash(f'{project_name} added to My Projects', category='success')
+        # flash(f'{project_name} added to My Projects', category='success')
     else:
-        flash(f'Invalid project name or join code', category='danger')
+        pass
+        # flash(f'Invalid project name or join code', category='danger')
     return redirect(url_for('dashboard'))
 
 
@@ -705,7 +704,7 @@ def submitanswer():
     dbhandler.create_judgment(preferred, not_preferred, request.cookies.get('project'),
                               judge, floor(time.time()) - time_started)
     if isinstance(request.form.get('another_pair_checkbox'), type(None)):
-        flash('Judgment submitted', 'success')
+        # flash('Judgment submitted', 'success')
         return redirect(url_for('home'))
     else:
         return redirect(url_for('sorter'))

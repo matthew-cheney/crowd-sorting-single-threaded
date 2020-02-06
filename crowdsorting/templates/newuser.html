@@ -2,12 +2,16 @@
 
 {% block content %}
 
-Welcome new user!<br>
-Please enter your information below:<br>
-<form method="POST" action="newuser">
-<input name="firstName" type="text" placeholder="first name">
-<input name="lastName" type="text" placeholder="last name">
-<button type="submit" class="btn btn-lg btn-primary">Submit</button>
-</form>
+<div class="row">
+    <div class="col-lg-12 text-center">
+        <h1>Welcome to Crowd Sorting!</h1>
+        <h2>Please enter your name below:</h2>
+        <form method="POST" action="newuser">
+            <h3><input name="firstName" type="text" placeholder="first name"></h3>
+            <h3><input name="lastName" type="text" placeholder="last name" style="margin-bottom: 10px;"></h3>
+            <button type="submit" class="btn btn-lg btn-primary">Submit</button>
+        </form>
+    </div>
+</div>
 
 {% endblock content %}

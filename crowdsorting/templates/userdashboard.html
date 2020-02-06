@@ -14,18 +14,27 @@
     </div>
 </div>
 
-<hr/>
-
 {% if all_projects|length == 0 %}
-<h3>Looks like you don't have any projects yet. Select Add project, or check back later!</h3>
+<div class="row">
+    <div class="col-lg-12 text-center">
+        <hr/>
+        <h3>Looks like you don't have any projects yet. Select Add project, or check back later.</h3>
+    </div>
+</div>
 {% else %}
+<div class="row">
+    <div class="col-lg-12 text-center">
+        <h3>Select a project to work on.</h3>
+        <hr/>
+    </div>
+</div>
 {% for project in all_projects %}
 <div class="row">
   <div class="col-lg-12 text-center">
     <h2>{{ project.name }}</h2>
     <p>{{ project.description }}</p>
-    <button class="btn btn-primary btn-lg" onclick="set_current_project_user('{{ project.name }}')">Select</button> or
-    <button class="btn btn-danger btn-lg" onclick="remove_self_from_project('{{ project.name }}')">Leave</button>
+    <button class="btn btn-primary btn-lg" onclick="set_current_project_user('{{ project.name }}')" style="margin-right: 7px;">Select</button>
+    <button class="btn btn-danger btn-lg" onclick="confirm_leave('{{ project.name }}')" style="margin-left: 7px">Leave</button>
     <hr/>
   </div>
 </div>
@@ -37,37 +46,54 @@
   </div>
 </div>
 
-<div id="add_public_projects_modal" class="modal">
-  <div class="modal-content text-center">
-      <div class="row">
-          <div class="col-lg-12">
-              <h1>Enter a join code:</h1>
-              <form id="join_code_form" method="POST" action="/joincode">
-              <input type="text" name="project_name" placeholder="project name">
-              <input type="text" name="join_code" placeholder="join code">
-              <button type="submit" class="btn btn-primary btn-md">Submit</button>
-              </form>
-          </div>
-      </div>
-    {% if filtered_public_projects|length == 0 %}
-    {% else %}
-    <div class="row">
-        <div class="col-lg-12">
-            <h1>or</h1>
-        </div>
-    </div>
+<div id="confirm_leave_modal" class="modal">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content text-center">
       <div class="row">
           <div class="col-md-12 text-center">
-          <h1>Join a public project:</h1>
-          <hr/>
-          {% for pproject in filtered_public_projects %}
-            <div class="row">
-  <div class="col-lg-12 text-center">
-      <h2>{{ pproject.name }}</h2>
-    <p>{{ pproject.description }}</p>
-    <button class="btn btn-primary btn-lg" onclick="set_current_project_user_public('{{ pproject.name }}')">Join</button>
-    <hr/>
+          <h2>Confirm</h2>
+          <h3>Are you sure you want to leave <span id="leave_project_name_prompt">this project</span>?</h3>
+          <button class="btn btn-danger btn-lg" onclick="remove_self_from_project()" style="margin-right: 7px;">Leave</button>
+          <button class="btn btn-warning btn-lg" onclick="hide_leave_modal()" style="margin-left: 7px;">Cancel</button>
+          <input id="leave_model_project_name" value="" hidden>
+          </div>
+      </div>
+    </div>
   </div>
+</div>
+
+<div id="add_public_projects_modal" class="modal">
+  <div class="modal-dialog modal-lg">
+      <div class="modal-content text-center">
+          <div class="row">
+              <div class="col-lg-12">
+                  <h1>Enter a join code:</h1>
+                  <form id="join_code_form" method="POST" action="/joincode">
+                      <h3><input type="text" name="project_name" placeholder="project name"></h3>
+                      <h3><input type="text" name="join_code" placeholder="join code"></h3>
+                  <button type="submit" class="btn btn-primary btn-md">Submit</button>
+                  </form>
+              </div>
+          </div>
+        {% if filtered_public_projects|length == 0 %}
+        {% else %}
+        <div class="row">
+            <div class="col-lg-12">
+                <hr/>
+            </div>
+        </div>
+          <div class="row">
+              <div class="col-md-12 text-center">
+              <h1>Join a public project:</h1>
+              {% for pproject in filtered_public_projects %}
+                <div class="row">
+      <div class="col-lg-12 text-center">
+          <h2>{{ pproject.name }}</h2>
+        <p>{{ pproject.description }}</p>
+        <button class="btn btn-primary btn-lg" onclick="set_current_project_user_public('{{ pproject.name }}')">Join</button>
+        <hr/>
+      </div>
+    </div>
 </div>
           {% endfor %}
           </div>
@@ -76,9 +102,12 @@
   </div>
 </div>
 
+
+
 <script>
 
     public_projects_modal = document.getElementById('add_public_projects_modal');
+    var leave_modal = document.getElementById("confirm_leave_modal");
 
     function show_public_projects_modal() {
       public_projects_modal.style.display = "block";
@@ -87,6 +116,9 @@
     window.onclick = function(event) {
       if (event.target == public_projects_modal) {
         public_projects_modal.style.display = "none";
+      }
+      else if (event.target == leave_modal) {
+        leave_modal.style.display = "none";
       }
     }
 
@@ -121,7 +153,18 @@
           }
       }
 
-      function remove_self_from_project(project_name) {
+      function confirm_leave(project_name) {
+        document.getElementById('leave_model_project_name').value = project_name
+        document.getElementById('leave_project_name_prompt').innerHTML = project_name
+        leave_modal.style.display = "block";
+      }
+
+      function hide_leave_modal() {
+        leave_modal.style.display = "none";
+      }
+
+      function remove_self_from_project() {
+        project_name = document.getElementById('leave_model_project_name').value
         json_dict = {
                     user_email: '{{ current_user.email }}',
                     project_name: project_name

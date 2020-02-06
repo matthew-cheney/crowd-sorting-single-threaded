@@ -38,6 +38,7 @@
             <!-- Navbar Center -->
             <!-- Navbar Right Side -->
             <div class="navbar-nav">
+            {% if current_user.get_is_authenticated() %}
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown_project" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   <span id="displayed_project">{{ current_project }}</span>
@@ -48,6 +49,7 @@
                   {% endfor %}
                 </div>
               </li>
+              {% endif %}
               {% if current_user.get_is_authenticated() and current_user.get_is_admin() %}
               <a class="nav-item nav-link" href="{{ url_for('sorted') }}">Results</a>
               {% endif %}
@@ -65,8 +67,15 @@
               </li>
 
               {% else %}
-              <a class="nav-item nav-link" href="{{ url_for('login') }}">Login Google</a>
-              <a class="nav-item nav-link" href="{{ url_for('cas.login') }}">Login CAS</a>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <span id="">Login</span>
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                  <a class="dropdown-item" href="{{ url_for('login') }}">Login Google</a>
+                  <a class="dropdown-item" href="{{ url_for('cas.login') }}">Login CAS</a>
+                </div>
+              </li>
               {% endif %}
             </div>
           </div>
