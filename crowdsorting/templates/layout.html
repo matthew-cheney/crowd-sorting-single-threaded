@@ -44,10 +44,7 @@
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                   {% for proj in all_projects %}
-                    <a class="dropdown-item" href="#" onclick="set_current_project('{{ proj.name }}')">Group: {{ proj.name }}</a>
-                  {% endfor %}
-                  {% for proj in public_projects %}
-                    <a class="dropdown-item" href="#" onclick="set_current_project_public('{{ proj.name }}')">Public: {{ proj.name }}</a>
+                    <a class="dropdown-item" href="#" onclick="set_current_project('{{ proj.name }}')">{{ proj.name }}</a>
                   {% endfor %}
                 </div>
               </li>

@@ -216,9 +216,14 @@ def callback():
 @login_required
 def logout_master():
     print("in logout()")
+    email = ""
     if 'user' in session:
+        email = session['user'].email
         session.pop('user', None)
-    logout_user()
+    if email.endswith("@gmail.com"):  # Google user
+        logout_user()
+    elif email.endswith("@byu.edu"): # CAS user
+        return redirect(url_for("cas.logout"))
     return redirect(url_for("home"))
 
 
@@ -312,11 +317,14 @@ def dashboard():
                                current_project=get_current_project()
                                )
     elif 'user' in session:
+        all_projects = get_all_projects()
+        all_public_projects = dbhandler.get_public_projects()
+        filtered_public_projects = [x for x in all_public_projects if x not in all_projects]
         return render_template('userdashboard.html', title='Home',
                                current_user=session['user'],
-                               all_projects=get_all_projects(),
+                               all_projects=all_projects,
                                current_project=get_current_project(),
-                               public_projects=dbhandler.get_public_projects()
+                               filtered_public_projects=filtered_public_projects
                                )
     else:
         return redirect(url_for('home'))
@@ -347,16 +355,21 @@ def get_all_projects():
         return []
 
 @app.route("/selectproject/<project_name>", methods=["POST"])
+@login_required
 def selectproject(project_name):
     print("in selectproject with", project_name)
     if project_name == 'None':
         return redirect(url_for('dashboard'))
+    if check_select_project(session['user'].email, project_name):
     # response = make_response(redirect(url_for('home')))
-    response = make_response()
-    response.set_cookie('project', project_name)
-    return response
+        response = make_response()
+        response.set_cookie('project', project_name)
+        return response
+    else:
+        return make_response()
 
-@app.route("/selectpublicproject", methods=["POST"])
+@app.route("/addpublicproject", methods=["POST"])
+@login_required
 def selectpublicproject():
     req_body = request.json
     user_id = dbhandler.get_user_id(req_body['user_email'])
@@ -368,7 +381,6 @@ def selectpublicproject():
         return redirect(url_for('dashboard'))
     dbhandler.add_user_to_project(user_id, project_name)
     response = make_response()
-    response.set_cookie('project', project_name)
     return response
 
 
@@ -390,8 +402,8 @@ def check_project(current_request):
         return False
     else:
         project = current_request.cookies.get('project')
-        if dbhandler.project_is_public(project):
-            return True
+        # if dbhandler.project_is_public(project):
+        #     return True
         if isAdmin():
             all_projects = dbhandler.get_all_projects()
         else:
@@ -401,6 +413,11 @@ def check_project(current_request):
             return False
         return True
 
+def check_select_project(user_email, project_name):
+    all_projects = dbhandler.get_user_projects(user_email)
+    if project_name in [x.name for x in all_projects]:
+        return True
+    return False
 
 # Router to home page
 @app.route("/")
@@ -519,6 +536,35 @@ def signconsent():
 @app.route("/demo")
 def demo():
     pass
+
+@app.route("/removeself", methods=["POST"])
+@login_required
+def remove_self_from_project():
+    req_body = request.json
+    user_id = dbhandler.get_user_id(req_body['user_email'])
+    project_name = req_body['project_name']
+    if not user_id:
+        return redirect(url_for('home'))
+    print("in removeself with", project_name)
+    if project_name == 'None':
+        return make_response()
+    dbhandler.remove_user_from_project(user_id, project_name)
+    response = make_response()
+    response.set_cookie('project', '')
+    return response
+
+@app.route("/joincode", methods=["POST"])
+@login_required
+def join_code():
+    project_name = request.form.get("project_name")
+    join_code = request.form.get("join_code")
+    if dbhandler.check_join_code(project_name, join_code):
+        user_id = dbhandler.get_user_id(session['user'].email)
+        dbhandler.add_user_to_project(user_id, project_name)
+        flash(f'{project_name} added to My Projects', category='success')
+    else:
+        flash(f'Invalid project name or join code', category='danger')
+    return redirect(url_for('dashboard'))
 
 
 # Router to about page
@@ -734,7 +780,7 @@ def add_project():
     for algorithm in pairselector_options:
         if request.form.get('selector_algorithm') == algorithm.get_algorithm_name():
             algorithm_to_use = algorithm
-    message = dbhandler.create_project(request.form.get('project_name'), algorithm_to_use, request.form.get('description'), public=request.form.get('public'))
+    message = dbhandler.create_project(request.form.get('project_name'), algorithm_to_use, request.form.get('description'), public=request.form.get('public'), join_code=request.form.get('join_code'))
     print(message)
     if message == "unable to create project":
         flash(message, "warning")

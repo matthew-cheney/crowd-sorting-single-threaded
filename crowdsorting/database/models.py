@@ -43,6 +43,7 @@ class Project(db.Model):
     cjudges = db.relationship('Judge', secondary='cjudges', lazy='subquery', backref=db.backref('mycprojects', lazy=True))
     docs = db.relationship('Doc', cascade='all')
     judgments = db.relationship('Judgment', cascade='all')
+    join_code = db.Column(db.String(32), nullable=True)
 
     def __repr__(self):
         return f"{self.name}"
@@ -102,7 +103,18 @@ class Judgment(db.Model):
     project_name = db.Column(db.String(120), ForeignKey('project.name'))
 
     def __repr__(self):
-        return f"\nJudgment(Judge='{self.judge.email}', doc_harder='{self.doc_harder.name}', doc_easier='{self.doc_easier.name}')"
+        if self.judge is not None:
+            return f"\nJudgment(Judge='{self.judge.email}', doc_harder='{self.doc_harder.name}', doc_easier='{self.doc_easier.name}')"
+        return f"\nJudgment(Judge='DELETED', doc_harder='{self.doc_harder.name}', doc_easier='{self.doc_easier.name}')"
+
+class JoinRequest(db.Model):
+    __tablename__ = 'joinrequest'
+    id = db.Column(db.Integer, primary_key=True)
+    judge_id = db.Column(db.Integer, db.ForeignKey('judge.id'))
+    project_name = db.Column(db.String(DOC_NAME_LENGTH), db.ForeignKey('project.name'))
+
+    judge = db.relationship('Judge', foreign_keys=[judge_id])
+    project = db.relationship('Project', foreign_keys=[project_name])
 
 
 class Vote(db.Model):

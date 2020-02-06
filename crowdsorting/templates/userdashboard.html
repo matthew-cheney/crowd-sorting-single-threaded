@@ -1,32 +1,31 @@
 {% extends "layout.html" %}
 
 {% block content %}
-
+<br/>
 <div class="row">
-  <div class="col-lg-12 text-center">
-    <h1>Dashboard</h1>
-  </div>
+    <div class="col-lg-4">
+        <!-- Space holder -->
+    </div>
+    <div class="col-lg-4 text-center">
+        <h1>My Projects</h1>
+    </div>
+    <div class="col-lg-4 text-left">
+        <button type="button" class="btn btn-lg btn-primary" onclick="show_public_projects_modal()">Add project</button>
+    </div>
 </div>
 
-<div class="row">
-  <div class="col-lg-12 text-center">
-    <h2>Group Projects</h2>
-  </div>
-</div>
+<hr/>
 
 {% if all_projects|length == 0 %}
-Looks like you have no group projects to work on. Check back later!
+<h3>Looks like you don't have any projects yet. Select Add project, or check back later!</h3>
 {% else %}
-<div class="row">
-  <div class="col-lg-12 text-center">
-    <h2>Select a project</h2>
-  </div>
-</div>
 {% for project in all_projects %}
 <div class="row">
   <div class="col-lg-12 text-center">
-    <button class="btn btn-primary btn-lg" onclick="set_current_project_user('{{ project.name }}')">{{ project.name }}</button>
+    <h2>{{ project.name }}</h2>
     <p>{{ project.description }}</p>
+    <button class="btn btn-primary btn-lg" onclick="set_current_project_user('{{ project.name }}')">Select</button> or
+    <button class="btn btn-danger btn-lg" onclick="remove_self_from_project('{{ project.name }}')">Leave</button>
     <hr/>
   </div>
 </div>
@@ -35,30 +34,61 @@ Looks like you have no group projects to work on. Check back later!
 
 <div class="row">
   <div class="col-lg-12 text-center">
-    <h2>Public Projects</h2>
   </div>
 </div>
 
-{% if public_projects|length == 0 %}
-Looks like there are no public projects. Check back later!
-{% else %}
-<div class="row">
+<div id="add_public_projects_modal" class="modal">
+  <div class="modal-content text-center">
+      <div class="row">
+          <div class="col-lg-12">
+              <h1>Enter a join code:</h1>
+              <form id="join_code_form" method="POST" action="/joincode">
+              <input type="text" name="project_name" placeholder="project name">
+              <input type="text" name="join_code" placeholder="join code">
+              <button type="submit" class="btn btn-primary btn-md">Submit</button>
+              </form>
+          </div>
+      </div>
+    {% if filtered_public_projects|length == 0 %}
+    {% else %}
+    <div class="row">
+        <div class="col-lg-12">
+            <h1>or</h1>
+        </div>
+    </div>
+      <div class="row">
+          <div class="col-md-12 text-center">
+          <h1>Join a public project:</h1>
+          <hr/>
+          {% for pproject in filtered_public_projects %}
+            <div class="row">
   <div class="col-lg-12 text-center">
-    <h2>Select a project</h2>
-  </div>
-</div>
-{% for project in public_projects %}
-<div class="row">
-  <div class="col-lg-12 text-center">
-      <button class="btn btn-primary btn-lg" onclick="set_current_project_user_public('{{ project.name }}')">{{ project.name }}</button>
-    <p>{{ project.description }}</p>
+      <h2>{{ pproject.name }}</h2>
+    <p>{{ pproject.description }}</p>
+    <button class="btn btn-primary btn-lg" onclick="set_current_project_user_public('{{ pproject.name }}')">Join</button>
     <hr/>
   </div>
 </div>
-{% endfor %}
-{% endif %}
+          {% endfor %}
+          </div>
+      </div>
+      {% endif %}
+  </div>
+</div>
 
 <script>
+
+    public_projects_modal = document.getElementById('add_public_projects_modal');
+
+    function show_public_projects_modal() {
+      public_projects_modal.style.display = "block";
+    }
+
+    window.onclick = function(event) {
+      if (event.target == public_projects_modal) {
+        public_projects_modal.style.display = "none";
+      }
+    }
 
     function activate_user_project_submit() {
         document.getElementById("submit_button").disabled = false;
@@ -83,11 +113,26 @@ Looks like there are no public projects. Check back later!
                     };
 
           var http = new XMLHttpRequest();
-          http.open("POST", "/selectpublicproject", true);
+          http.open("POST", "/addpublicproject", true);
           http.setRequestHeader("Content-type","application/json");
           http.send(JSON.stringify(json_dict));
           http.onload = function() {
-              window.location.href = '/home';
+              location.reload();
+          }
+      }
+
+      function remove_self_from_project(project_name) {
+        json_dict = {
+                    user_email: '{{ current_user.email }}',
+                    project_name: project_name
+                    };
+
+          var http = new XMLHttpRequest();
+          http.open("POST", "/removeself", true);
+          http.setRequestHeader("Content-type","application/json");
+          http.send(JSON.stringify(json_dict));
+          http.onload = function() {
+              location.reload();
           }
       }
 

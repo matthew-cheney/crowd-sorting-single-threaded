@@ -276,8 +276,6 @@ class DBHandler:
             email=user_email).first().projects
         except AttributeError:
             return []
-        projects = [p for p in projects if not p.public]
-        print("projects:", projects)
         return projects
 
     def get_public_projects(self):
@@ -315,7 +313,7 @@ class DBHandler:
             return False
         return project.public
 
-    def create_project(self, project_name, selector_algorithm, description=None, selection_prompt=None, preferred_prompt=None, unpreferred_prompt=None, consent_form=None, public=None, landing_page=None):
+    def create_project(self, project_name, selector_algorithm, description=None, selection_prompt=None, preferred_prompt=None, unpreferred_prompt=None, consent_form=None, public=None, landing_page=None, join_code=None):
         if description is None:
             description = DEFAULT_DESCRIPTION
         if public is None:
@@ -336,7 +334,7 @@ class DBHandler:
             print(selector_algorithm)
             new_sorter = selector_algorithm(project_name)
             pairselectors[project_name] = new_sorter
-            project = Project(name=project_name, sorting_algorithm=selector_algorithm.get_algorithm_name(), description=description, public=public, selection_prompt=selection_prompt, preferred_prompt=preferred_prompt, unpreferred_prompt=unpreferred_prompt, consent_form=consent_form, landing_page=landing_page)
+            project = Project(name=project_name, sorting_algorithm=selector_algorithm.get_algorithm_name(), description=description, public=public, selection_prompt=selection_prompt, preferred_prompt=preferred_prompt, unpreferred_prompt=unpreferred_prompt, consent_form=consent_form, landing_page=landing_page, join_code=join_code)
             db.session.add(project)
             db.session.commit()
             message = f"project {project_name} successfully created"
@@ -434,6 +432,16 @@ class DBHandler:
         user.firstName = newFirstName
         user.lastName = newLastName
         db.session.commit()
+
+    def check_join_code(self, project_name, join_code):
+        project = db.session.query(Project).filter_by(name=project_name).first()
+        if project is None:
+            return False
+        if project.join_code is None:
+            return True
+        if project.join_code == join_code:
+            return True
+        return False
 
     def return_pair(self, pair, project, user=None):
         self.unpickle_pairs_being_processed()
