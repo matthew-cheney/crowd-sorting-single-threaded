@@ -46,7 +46,7 @@
                         Delete
                     </td>
                 </tr>
-                {% for project in all_projects|sort(attribute='name') %}
+                {% for project in all_group_projects|sort(attribute='name') %}
                 <tr>
                     <td>
                         {{ project.name }}
@@ -74,6 +74,9 @@
                             <input type="hidden" name="project_name_delete" value="{{ project.name }}">
                             <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                         </form>
+                    </td>
+                    <td>
+                      <button type="button" class="btn btn-primary btn-sm" onclick="edit_project_users('{{ project.name }}')">Users</button>
                     </td>
                 </tr>
                 {% endfor %}
@@ -106,6 +109,9 @@
                             <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                         </form>
                     </td>
+                    <td>
+                      <button type="button" class="btn btn-primary btn-sm" onclick="edit_project_users('{{ project.name }}')">Users</button>
+                    </td>
                 </tr>
                 {% endfor %}
             </table>
@@ -127,7 +133,7 @@
                 <td>
                     Last, First
                 </td>
-                {% for project in all_projects %}
+                {% for project in all_group_projects %}
                     <td>
                         {{ project.name }}
                     </td>
@@ -143,7 +149,7 @@
                     <td class="text-left">
                         {{ user.lastName }}, {{ user.firstName }}
                     </td>
-                    {% for project in all_projects %}
+                    {% for project in all_group_projects %}
                     <td>
                         {% if user in project.judges %}
                             <input type="checkbox", id="{{ user.id }}_{{ project.name }}" onclick="toggleProject('{{ user.id }}', '{{ project.name }}')" checked>
@@ -241,6 +247,22 @@
   </div>
 </div>
 
+<div id="project_users_modal" class="modal">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content text-center">
+      <h2>Project Users Modal</h2>
+      {% for project in all_projects %}
+      <div id="project_users_modal_{{ project.name }}" style="display: none;">
+      {{ project.name }}
+      <input type="text" id="add_user_search_{{ project.name|replace(" ", "__20__")|replace(",", "__21__") }}" oninput="filter_users('{{ project.name|replace(" ", "__20__")|replace(",", "__21__") }}')" placeholder="add user">
+      </div>
+      {% endfor %}
+      <div id="suggested_users">
+      </div>
+      <input id="project_users_current_project" value="" hidden><!-- Tracks which project is showing to hide when modal closes -->
+    </div>
+  </div>
+</div>
 
 <script>
     function activate_admin_project_submit() {
@@ -290,12 +312,18 @@
             }
 
             var modal = document.getElementById("create_project_modal");
+            var project_users_modal = document.getElementById('project_users_modal')
 
             // When the user clicks anywhere outside of the modal, close it
             window.onclick = function(event) {
               console.log("window.onclick")
               if (event.target == modal) {
                 modal.style.display = "none";
+              }
+              if (event.target == project_users_modal) {
+                project_users_modal.style.display = "none";
+                current_project = document.getElementById('project_users_current_project').value
+                document.getElementById(current_project).style.display = "none";
               }
             }
 
@@ -313,6 +341,75 @@
               document.getElementById('processing_modal').style.display = "block";
               document.getElementById('create_project_form').submit();
             }
+
+            function edit_project_users(project_name) {
+              document.getElementById('suggested_users').innerHTML = ""
+              document.getElementById('project_users_modal_' + project_name).style.display = "block";
+              project_users_modal.style.display = "block";
+              document.getElementById('project_users_current_project').value = 'project_users_modal_' + project_name
+            }
+
+            /* Each project needs:
+                list of current users
+
+                Need master lists of:
+                users by first-last name
+                users by email
+                users by id
+            */
+
+            /*
+            var master_name_dict = {
+            {% for user in all_users[:-1] %}
+                {{ user.firstName }}_{{ user.lastName }}: '{{ user.id }}',
+            {% endfor %}
+              {{ all_users[-1].firstName }}_{{ all_users[-1].lastName }}: '{{ all_users[-1].id }}'
+            }
+
+            var master_email_dict = {
+            {% for user in all_users %}
+                {{ user.email|replace("@", "__20__")|replace(".", "__21__") }}: '{{ user.id }}',
+            {% endfor %}
+            }
+            */
+
+            var master_id_dict = {
+              {% for user in all_users   %}
+                  {{ user.id }}: '{{ user.firstName }} {{ user.lastName }}, {{ user.email }}',
+              {% endfor %}
+            }
+
+
+            {% for project in all_projects %}
+            var _{{ project.name|replace(" ", "__20__")|replace(",", "__21__") }}_user_list = [{% for user in all_users %}{% if user in project.judges %}"{{ user.id }}",{% endif %}{% endfor %}]
+            {% endfor %}
+            function filter_users(project_name) {
+              query_string = document.getElementById('add_user_search_'+project_name).value
+              var return_list = get_suggested_users(project_name, query_string)
+              new_html = ""
+              for (var i = 0; i < return_list.length; i++) {
+                new_html += return_list[i] + "<br/>"
+              }
+              document.getElementById('suggested_users').innerHTML = new_html;
+            }
+
+            function get_suggested_users(project_name, query_string) {
+              toReturn = []
+              console.log(project_name, query_string)
+                for (var x in master_id_dict) {
+                  //if (x in window['_'+project_name+'_user_list']){
+                  if (window['_'+project_name+'_user_list'].includes(x)) {
+                    //console.log(x, 'already in project')
+                  }
+                  else if (master_id_dict[x].toUpperCase().includes(query_string.toUpperCase())) {
+                    //console.log("found substring", master_id_dict[x])
+                    toReturn.push(master_id_dict[x])
+                  }
+                }
+                console.log(toReturn);
+                return toReturn;
+            }
+
 
 </script>
 

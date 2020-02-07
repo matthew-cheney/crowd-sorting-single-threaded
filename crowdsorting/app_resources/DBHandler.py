@@ -350,9 +350,9 @@ class DBHandler:
 
     def get_all_project_data(self, project):
         project_result = db.session.query(Project).filter_by(name=project).first()
-        return project_result.name, project_result.description, project_result.selection_prompt, project_result.preferred_prompt, project_result.unpreferred_prompt, project_result.consent_form
+        return project_result.name, project_result.description, project_result.selection_prompt, project_result.preferred_prompt, project_result.unpreferred_prompt, project_result.consent_form, project_result.landing_page
 
-    def update_project_info(self, project, name, description, selection_prompt, preferred_prompt, unpreferred_prompt, consent_form):
+    def update_project_info(self, project, name, description, selection_prompt, preferred_prompt, unpreferred_prompt, consent_form, instruction_page):
         project_result = db.session.query(Project).filter_by(name=project).first()
         if project_result == None:
             return False
@@ -365,8 +365,13 @@ class DBHandler:
         if current_consent != consent_form:
             project_result.cjudges = []
             project_result.consent_form = consent_form
+        project_result.landing_page = instruction_page
         db.session.commit()
         return True
+
+    def get_project_users(self, project_name):
+        project_result = db.session.query(Project).filter_by(name=project_name).first()
+        return project_result.judges
 
     def get_landing_page(self, project_name):
         project = db.session.query(Project).filter_by(name=project_name).first()

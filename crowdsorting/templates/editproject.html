@@ -16,6 +16,7 @@
   </div>
   <div class="col-lg-4 text-center">
     <h1>Project Info</h1>
+      <h3><button type="button" class="btn btn-primary" id="submit_changes" onclick="submit_edit_form()">Save Changes</button></h3>
   </div>
   <div class="col-lg-4">
     <!-- Placeholder -->
@@ -40,7 +41,7 @@
                             Description:
                         </td>
                         <td>
-                            <textarea class="form-control" id="description" name="description" maxlength="588" onkeyup="editText()">{{ description }}</textarea>
+                            <textarea class="form-control" id="description" name="description" maxlength="588">{{ description }}</textarea>
                         </td>
                     </tr>
                     <tr>
@@ -48,50 +49,57 @@
                             Selection Prompt:
                         </td>
                         <td>
-                            <input type="text" name="selection_prompt" class="info_input" value="{{ selection_prompt }}" onkeyup="editText()">
+                            <input type="text" name="selection_prompt" class="info_input" value="{{ selection_prompt }}">
                         </td>
                     </tr>
                     <tr>
                         <td>
-                            Preferred Prompt:
+                            Preferred Label:
                         </td>
                         <td>
-                            <input type="text" name="preferred_prompt" class="info_input" value="{{ preferred_prompt }}" onkeyup="editText()">
+                            <input type="text" name="preferred_prompt" class="info_input" value="{{ preferred_prompt }}">
                         </td>
                     </tr>
                     <tr>
                         <td>
-                            Unpreferred Prompt:
+                            Unpreferred Label:
                         </td>
                         <td>
-                            <input type="text" name="unpreferred_prompt" class="info_input" value="{{ unpreferred_prompt }}" onkeyup="editText()">
+                            <input type="text" name="unpreferred_prompt" class="info_input" value="{{ unpreferred_prompt }}">
                         </td>
                     </tr>
-                    <tr>
-                        <td>
-                            Consent Form:
-                        </td>
-                        <td>
-                            <textarea class="form-control" id="consent_form" name="consent_form" maxlength="588" onkeyup="editText()">{{ consent_form }}</textarea>
-                        </td>
-                    </tr>
-                </table>
-                <div class="text-center">
-                    <button type="button" class="btn btn-primary" id="submit_changes" onclick="submit_edit_form()" disabled>Submit Changes</button>
-                </div>
+                  </table>
+                  Instruction Page:
+                  <div id="summernote_instruction">{{ instruction_page|safe }}</div>
+                  <input id="instruction_page_html" name="instruction_page" value="" hidden>
+                  Consent Form:
+                  <div id="summernote_consent">{{ consent_form|safe }}</div>
+                  <input id="consent_page_html" name="consent_page" value="" hidden>
+
             </div>
 
     </div>
 </div>
-<div class="row">
-    <div class="col-lg-12">
-        <div id="summernote"><p>Hello Summernote</p></div>
-          <script>
-            $(document).ready(function() {
-            });
-          </script>
-    </div>
-</div>
+
+<script>
+  $(document).ready(function() {
+      $('#summernote_instruction').summernote({minHeight: 300});
+      $('#summernote_consent').summernote({minHeight: 300});
+  });
+</script>
+
+<script>
+
+  function submit_edit_form() {
+    summernote_consent = $('#summernote_consent').summernote('code');
+    summernote_instruction = $('#summernote_instruction').summernote('code');
+
+    document.getElementById('consent_page_html').value = summernote_consent;
+    document.getElementById('instruction_page_html').value = summernote_instruction;
+    document.getElementById('edit_form').submit()
+  }
+
+</script>
 <!--<div class="row">
     <div class="col-lg-12">
         <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
@@ -115,17 +123,5 @@
         </script>
     </div>
 </div>-->
-    <input type="hidden" id="consent_page_input" name="consent_page" value="">
-        </form>
-
-<script>
-
-    function editText() {
-        document.getElementById("submit_changes").disabled = false;
-    }
-
-
-
-
-</script>
+</form>
 {% endblock content %}
