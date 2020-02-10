@@ -1,4 +1,5 @@
 **__pycache__
+.todo.txt.swp
 venv
 flask_session
 **.pyc
