@@ -69,13 +69,23 @@
                         </td>
                     </tr>
                   </table>
-                  Instruction Page:
+                <div class="text-center">
+                <h3><button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapse_instruction" aria-expanded="false" aria-controls="collapse_instruction">
+    Edit Instruction Page
+                </button></h3>
+                  <div class="collapse" id="collapse_instruction">
                   <div id="summernote_instruction">{{ instruction_page|safe }}</div>
                   <input id="instruction_page_html" name="instruction_page" value="" hidden>
-                  Consent Form:
-                  <div id="summernote_consent">{{ consent_form|safe }}</div>
-                  <input id="consent_page_html" name="consent_page" value="" hidden>
+                  </div>
 
+                  <h3><button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapse_consent" aria-expanded="false" aria-controls="collapse_consent">
+    Edit Consent Page
+                </button></h3>
+                  <div class="collapse" id="collapse_consent">
+                  <div id="summernote_consent" class="text-left">{{ consent_form|safe }}</div>
+                  <input id="consent_page_html" name="consent_page" value="" hidden>
+                  </div>
+            </div>
             </div>
 
     </div>

@@ -206,7 +206,7 @@
                     <td>
                         <h4>Select Files</h4>
                         <!--<form method="POST" action="/upload" enctype="multipart/form-data">-->
-                        <input type="file" id="file_uploader" name="file" autocomplete="off" multiple="" required>
+                        <input type="file" id="file_uploader" name="file" autocomplete="off" multiple required>
                         <!--<input type="submit" value="Submit" onclick="submit_project">-->
                     </td>
                 </tr>
@@ -253,11 +253,11 @@
       <h2>Project Users Modal</h2>
       {% for project in all_projects %}
       <div id="project_users_modal_{{ project.name }}" style="display: none;">
-      {{ project.name }}
+          <h3>{{ project.name }}</h3>
       <input type="text" id="add_user_search_{{ project.name|replace(" ", "__20__")|replace(",", "__21__") }}" oninput="filter_users('{{ project.name|replace(" ", "__20__")|replace(",", "__21__") }}')" placeholder="add user">
       </div>
       {% endfor %}
-      <div id="suggested_users">
+      <div id="suggested_users" class="text-left">
       </div>
       <input id="project_users_current_project" value="" hidden><!-- Tracks which project is showing to hide when modal closes -->
     </div>

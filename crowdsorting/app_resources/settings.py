@@ -17,6 +17,7 @@ DEFAULT_LANDING_PAGE = "<div class=\"text-center\">" \
                        "<h3>To begin, click on Sorter in the toolbar.</h3>" \
                        "</div>"
 DEFAULT_CONSENT_FORM = """
+<div class="text-center">
 Generic Terms and Conditions Template<br/>
 Please read these terms and conditions ("terms", "terms and conditions") carefully before using<br/>
 [website] website (the "service") operated by [name] ("us", 'we", "our").<br/>
@@ -64,4 +65,5 @@ confidentiality of your private user details (username and password). You are re
 activities that occur under your account or password.<br/>
 We reserve all rights to terminate accounts, edit or remove content and cancel orders in their<br/>
 sole discretion.
+<div>
 """
