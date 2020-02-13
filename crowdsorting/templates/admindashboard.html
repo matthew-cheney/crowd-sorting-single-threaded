@@ -147,7 +147,7 @@
             {% for user in all_users|sort(attribute='firstName')|sort(attribute='lastName') %}
                 <tr>
                     <td class="text-left">
-                        {{ user.lastName }}, {{ user.firstName }}
+                        {{ user.lastName }}, {{ user.firstName }}; {{ user.email }}
                     </td>
                     {% for project in all_group_projects %}
                     <td>

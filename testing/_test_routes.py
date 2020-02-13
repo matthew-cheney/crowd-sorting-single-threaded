@@ -6,9 +6,9 @@ class test_routes(unittest.TestCase):
 
     def setUp(self):
         crowdsorting.app.config[
-            'SQLALCHEMY_DATABASE_URI'] = 'sqlite:///testing/test_crowdsorting.db'
+            'SQLALCHEMY_DATABASE_URI'] = 'sqlite:///testing/_test_crowdsorting.db'
         crowdsorting.app.config[
-            'PAIRS_BEING_PROCESSED_PATH'] = 'test_pairsbeingprocessed.pkl'
+            'PAIRS_BEING_PROCESSED_PATH'] = '_test_pairsbeingprocessed.pkl'
         crowdsorting.db.create_all()
         self.c = crowdsorting.app.test_client()
 

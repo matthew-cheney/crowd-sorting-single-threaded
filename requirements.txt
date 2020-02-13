@@ -10,6 +10,7 @@ flask-session
 flask-admin
 flask-YAMLConfig
 flask-cas
+flask-testing
 numpy
 requests
 oauthlib

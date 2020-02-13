@@ -1,6 +1,8 @@
 import unittest
+import pytest
 from time import sleep
 
+import tempfile
 import crowdsorting
 from crowdsorting.app_resources.DBHandler import DBHandler
 from crowdsorting.app_resources.sorting_algorithms.ACJProxy import ACJProxy
@@ -11,9 +13,13 @@ class Create_Delete_Projects(unittest.TestCase):
 
     def setUp(self):
         crowdsorting.app.config[
-            'SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test_crowdsorting.db'
-        crowdsorting.app.config['PAIRS_BEING_PROCESSED_PATH'] = 'test_pairsbeingprocessed.pkl'
-        crowdsorting.db.create_all()
+            'SQLALCHEMY_DATABASE_URI'] = tempfile.mkstemp()
+        crowdsorting.app.config['PAIRS_BEING_PROCESSED_PATH'] = '_test_pairsbeingprocessed.pkl'
+        crowdsorting.app.config['TESTING'] = True
+        with crowdsorting.app.test_client() as client:
+            with crowdsorting.app.app_context():
+                crowdsorting.db.create_all()
+        # crowdsorting.db.create_all()
         self.dbhandler = DBHandler()
 
     def tearDown(self):

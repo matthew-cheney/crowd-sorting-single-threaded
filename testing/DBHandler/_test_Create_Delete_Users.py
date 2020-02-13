@@ -11,8 +11,8 @@ class Create_Delete_Projects(unittest.TestCase):
 
     def setUp(self):
         crowdsorting.app.config[
-            'SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test_crowdsorting.db'
-        crowdsorting.app.config['PAIRS_BEING_PROCESSED_PATH'] = 'test_pairsbeingprocessed.pkl'
+            'SQLALCHEMY_DATABASE_URI'] = 'sqlite:///_test_crowdsorting.db'
+        crowdsorting.app.config['PAIRS_BEING_PROCESSED_PATH'] = '_test_pairsbeingprocessed.pkl'
         crowdsorting.db.create_all()
         self.dbhandler = DBHandler()
         self.user1 = Dummy_User('Harry', 'Potter', 'hpotter@gmail.com', 'hp1')

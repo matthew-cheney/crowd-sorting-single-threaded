@@ -16,6 +16,7 @@ from flask import request
 from flask import make_response
 import os
 
+from . import Strings_List as StringList
 from .RejectLogger import RejectLogger
 from .settings import ADMIN_PATH, PM_PATH, DEFAULT_LANDING_PAGE
 from .user import User
@@ -92,6 +93,17 @@ def newuser():
     if 'user' in session and session['user'].get_is_authenticated():
         return redirect(url_for('dashboard'))
     if request.method == 'POST':
+        if 'user' not in session:
+            return redirect(url_for('home'))
+        # Validate first/last names
+        first_name = request.form.get('firstName')
+        if ' ' in first_name:
+            flash(StringList.space_in_first_name_error, 'danger')
+            return redirect(url_for('newuser'))
+        last_name = request.form.get('lastName')
+        if ' ' in last_name:
+            flash(StringList.space_in_last_name_error, 'danger')
+            return redirect(url_for('newuser'))
         current_user = session['user']  # Need to add user to session before this
         dbhandler.create_user(request.form.get('firstName'), request.form.get('lastName'),
                               current_user.email, None)
@@ -110,7 +122,17 @@ def newcasuser():
     if 'user' in session and session['user'].get_is_authenticated():
         return redirect(url_for('dashboard'))
     if request.method == 'POST':
-    # if request.method == 'POST':
+        if 'user' not in session:
+            return redirect(url_for('home'))
+        # Validate first/last names
+        first_name = request.form.get('firstName')
+        if ' ' in first_name:
+            flash(StringList.space_in_first_name_error, 'danger')
+            return redirect(url_for('newcasuser'))
+        last_name = request.form.get('lastName')
+        if ' ' in last_name:
+            flash(StringList.space_in_last_name_error, 'danger')
+            return redirect(url_for('newcasuser'))
         current_user = session['user']  # Need to add user to session before this
         print("creating cas user for", cas.username)
         if not dbhandler.create_cas_user(request.form.get('firstName'), request.form.get('lastName'),
@@ -315,7 +337,8 @@ def dashboard():
                                current_user=session['user'],
                                all_projects=get_all_group_projects(),
                                public_projects=dbhandler.get_public_projects(),
-                               current_project=get_current_project()
+                               current_project=get_current_project(),
+                               StringList=StringList
                                )
     elif 'user' in session:
         all_projects = get_all_group_projects()
@@ -325,7 +348,8 @@ def dashboard():
                                current_user=session['user'],
                                all_projects=all_projects,
                                current_project=get_current_project(),
-                               filtered_public_projects=filtered_public_projects
+                               filtered_public_projects=filtered_public_projects,
+                               StringList=StringList
                                )
     else:
         return redirect(url_for('home'))
