@@ -114,7 +114,7 @@ def newuser():
         return postLoadUser()
     if request.method == 'POST':
         flash('Failed to register user', 'danger')
-    return render_template('newuser.html', current_user=dummyUser)
+    return render_template('newuser.html', current_user=dummyUser, title='New User')
 
 
 @app.route('/newcasuser', methods=['GET', 'POST'])
@@ -138,13 +138,13 @@ def newcasuser():
         if not dbhandler.create_cas_user(request.form.get('firstName'), request.form.get('lastName'),
                               cas.username + '@byu.edu', cas.username):
             flash('Email already taken', 'danger')
-            return render_template('newcasuser.html', current_user=dummyUser)
+            return render_template('newcasuser.html', current_user=dummyUser, title='New User')
         session['user'] = User(True, isInAdminFile(current_user.email),
                                isInPMFile(current_user.email), dbhandler.get_user(cas.username + '@byu.edu'), request.form.get('firstName'),
                                request.form.get('lastName'), cas.username + '@byu.edu')
         print("admin:", session["user"].email, session['user'].is_admin)
         return postLoadUser()
-    return render_template('newcasuser.html', current_user=dummyUser)
+    return render_template('newcasuser.html', current_user=dummyUser, title='New User')
 
 
 
@@ -323,7 +323,7 @@ def dashboard():
     if 'user' in session and session[
             'user'].get_is_admin():  # This is bad - fix it
         print("returning admindashboard")
-        return render_template('admindashboard.html', title='Home',
+        return render_template('admindashboard.html', title='Dashboard',
                                current_user=session['user'],
                                all_users=dbhandler.get_all_users(),
                                selector_algorithms=pairselector_options,
@@ -333,7 +333,7 @@ def dashboard():
                                current_project=get_current_project()
                                )
     elif 'user' in session and session['user'].is_pm:
-        return render_template('userdashboard.html', title='Home',
+        return render_template('userdashboard.html', title='Dashboard',
                                current_user=session['user'],
                                all_projects=get_all_group_projects(),
                                public_projects=dbhandler.get_public_projects(),
@@ -344,7 +344,7 @@ def dashboard():
         all_projects = get_all_group_projects()
         all_public_projects = dbhandler.get_public_projects()
         filtered_public_projects = [x for x in all_public_projects if x not in all_projects]
-        return render_template('userdashboard.html', title='Home',
+        return render_template('userdashboard.html', title='Dashbaord',
                                current_user=session['user'],
                                all_projects=all_projects,
                                current_project=get_current_project(),
@@ -603,13 +603,15 @@ def about():
         return render_template('about.html', current_user=session['user'],
                                all_projects=get_all_group_projects(),
                                public_projects=dbhandler.get_public_projects(),
-                               current_project=get_current_project()
+                               current_project=get_current_project(),
+                               title='About'
                                )
     else:
         return render_template('about.html', current_user=dummyUser,
                                all_projects=get_all_group_projects(),
                                public_projects=dbhandler.get_public_projects(),
-                               current_project=get_current_project()
+                               current_project=get_current_project(),
+                               title='About'
                                )
 
 
@@ -842,7 +844,6 @@ def add_user_to_project():
 def update_user_info():
     newFirstName = request.form.get('firstName')
     newLastName = request.form.get('lastName')
-    email = request.form.get('email')
 
     if newFirstName == "":
         flash("First Name cannot be empty", 'warning')
@@ -850,12 +851,8 @@ def update_user_info():
     if newLastName == "":
         flash("Last Name cannot be empty", "warning")
         return redirect(url_for('accountinfo'))
-    if email == "":
-        flash("Email cannot be empty", "warning")
-        return redirect(url_for("accountinfo"))
-    if not check(email):
-        flash("Please enter a valid email", "warning")
-        return redirect(url_for("accountinfo"))
+
+    email = session['user'].email
 
     dbhandler.update_user_info(newFirstName, newLastName, email)
     return load_user(email)

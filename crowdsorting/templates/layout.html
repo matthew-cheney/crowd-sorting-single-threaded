@@ -29,7 +29,7 @@
     {% if title %}
     <title>{{ title }}</title>
     {% else %}
-    <title>ACJ Sorter</title>
+    <title>Crowd Sorting</title>
     {% endif %}
   </head>
   <body>
@@ -57,9 +57,13 @@
                   <span id="displayed_project">{{ current_project }}</span>
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                  {% if all_projects|length == 0 %}
+                    <div class="dropdown-item disabled" disabled>no projects</div>
+                  {% else %}
                   {% for proj in all_projects %}
                     <a class="dropdown-item" href="#" onclick="set_current_project('{{ proj.name }}')">{{ proj.name }}</a>
                   {% endfor %}
+                  {% endif %}
                 </div>
               </li>
               {% endif %}
@@ -85,8 +89,8 @@
                   <span id="">Login</span>
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                  <a class="dropdown-item" href="{{ url_for('login') }}">Login Google</a>
-                  <a class="dropdown-item" href="{{ url_for('cas.login') }}">Login CAS</a>
+                  <a class="dropdown-item" href="{{ url_for('login') }}">Login with Google</a>
+                  <a class="dropdown-item" href="{{ url_for('cas.login') }}">Login with CAS</a>
                 </div>
               </li>
               {% endif %}

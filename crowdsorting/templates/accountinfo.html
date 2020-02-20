@@ -27,15 +27,7 @@
                         Email:
                     </td>
                     <td>
-                        <input type="text" name="email" class="info_input" value="{{ current_user.get_email() }}" onkeyup="editText()">
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        Is admin:
-                    </td>
-                    <td>
-                        {{ current_user.get_is_admin() }}
+                        <div>{{ current_user.get_email() }}</div>
                     </td>
                 </tr>
             </table>
