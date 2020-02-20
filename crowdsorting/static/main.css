@@ -108,6 +108,14 @@ body {
     font-weight: bold;
 }
 
+.sorter_box:hover {
+    background-color: #e8e8e8;
+}
+
+.sorter_text:hover {
+    background-color: #e8e8e8;
+}
+
 .left-button {
   margin-right: 7px;
 }

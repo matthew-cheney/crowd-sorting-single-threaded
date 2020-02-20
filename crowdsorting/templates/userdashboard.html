@@ -87,15 +87,15 @@
               <h1>{{ StringList.join_public_prompt }}</h1>
               {% for pproject in filtered_public_projects %}
                 <div class="row">
-      <div class="col-lg-12 text-center">
-          <h2>{{ pproject.name }}</h2>
-        <p>{{ pproject.description }}</p>
-        <button class="btn btn-primary btn-lg" onclick="set_current_project_user_public('{{ pproject.name }}')">{{ StringList.join_button }}</button>
-        <hr/>
-      </div>
-    </div>
+                  <div class="col-lg-12 text-center">
+                      <h2>{{ pproject.name }}</h2>
+                    <p>{{ pproject.description }}</p>
+                    <button class="btn btn-primary btn-lg" onclick="set_current_project_user_public('{{ pproject.name }}')">{{ StringList.join_button }}</button>
+                    <hr/>
+                  </div>
+                </div>
           {% endfor %}
-</div>
+              </div>
           </div>
       </div>
       {% endif %}
