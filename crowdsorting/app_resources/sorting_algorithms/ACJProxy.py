@@ -23,19 +23,25 @@ class ACJProxy:
         return "Adaptive Comparative Judgment"
 
     def initialize_selector(self, data, rounds=15, maxRounds=10, noOfChoices=1,
-                   logPath=None, optionNames=None):
+                   logPath=None, optionNames=None, fossilIncrement=10):
         if optionNames is None:
             optionNames = ["Choice"]
         if not logPath is None:
             self.logPath = logPath
         if not os.path.isdir(self.logPath):
             os.mkdir(self.logPath)
+        if not os.path.isdir(f'{self.logPath}/logs'):
+            os.mkdir(f'{self.logPath}/logs')
+        if not os.path.isdir(f'{self.logPath}/fossils'):
+            os.mkdir(f'{self.logPath}/fossils')
         print("creating acj")
+        self.fossilIncrement = fossilIncrement
+        self.fossilIncrementCounter = 0
         self.number_of_docs = len(data)
         self.rounds = rounds
         dat = np.asarray(data)
         np.random.shuffle(dat)
-        self.acj = ACJ(dat, maxRounds, noOfChoices, self.logPath, optionNames)
+        self.acj = ACJ(dat, maxRounds, noOfChoices, f'{self.logPath}/logs', optionNames)
         self.no_more_pairs = False
         with open(f"crowdsorting/app_resources/sorter_instances/{self.project_name}.pkl", "wb") as output_file:  # noqa: E501
             pickle.dump(self, output_file)
@@ -84,12 +90,16 @@ class ACJProxy:
         pair = (easier_doc_id, harder_doc_id)
         self.acj.IDComp(pair, False, reviewer=judge_name, time=duration)
         self.pickle_acj()
+        self.fossilIncrementCounter += 1
+        if self.fossilIncrementCounter == self.fossilIncrement:
+            self.fossilize_self()
+            self.fossilIncrementCounter = 0
 
     def get_sorted(self, allDocs, allJudgments):
-        if isinstance(self.acj, type(None)):
-            self.unpickle_acj(len(allDocs))
-        if len(allDocs) < 1:
-            return "No files in database"
+        # if isinstance(self.acj, type(None)):
+        #     self.unpickle_acj(len(allDocs))
+        # if len(allDocs) < 1:
+        #     return "No files in database"
         sortedFiles = [x[0] for x in self.acj.results()[0]]
         return sortedFiles
 
@@ -108,6 +118,10 @@ class ACJProxy:
 
     def unpickle_acj(self, param):
         pass
+
+    def fossilize_self(self):
+        with open(f'{self.logPath}/fossils/{self.project_name}-{datetime.now()}', 'wb') as f:
+            pickle.dump(self, f)
 
     def delete_self(self):
         print(f"deleting {self.acj} pickles")

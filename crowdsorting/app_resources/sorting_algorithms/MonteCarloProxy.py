@@ -23,19 +23,23 @@ class MonteCarloProxy:
         return "Monte Carlo Sorting"
 
     def initialize_selector(self, data, rounds=15, maxRounds=10, noOfChoices=1,
-                  logPath=None, optionNames=None):
+                  logPath=None, optionNames=None, fossilIncrement=10):
         if optionNames is None:
             optionNames = ["Choice"]
         if not logPath is None:
             self.logPath = logPath
         if not os.path.isdir(self.logPath):
                 os.mkdir(self.logPath)
+        if not os.path.isdir(f'{self.logPath}/logs'):
+            os.mkdir(f'{self.logPath}/logs')
         print("creating mc")
+        self.fossilIncrement = fossilIncrement
+        self.fossilIncrementCounter = 0
         self.number_of_docs = len(data)
         self.rounds = rounds
         dat = np.asarray(data)
         np.random.shuffle(dat)
-        self.mc = MC(dat, epsilon=10, logPath=self.logPath)
+        self.mc = MC(dat, epsilon=10, logPath=f'{self.logPath}/logs')
         self.no_more_pairs = False
         with open(f"crowdsorting/app_resources/sorter_instances/{self.project_name}.pkl", "wb") as output_file:  # noqa: E501
             pickle.dump(self, output_file)
@@ -86,12 +90,16 @@ class MonteCarloProxy:
         pair = (easier_doc_id, harder_doc_id)
         self.mc.compare_id(pair, False, reviewer=judge_name, time=duration)  #, reviewer=judge_name, time=datetime.now())
         self.pickle_mc()
+        self.fossilIncrementCounter += 1
+        if self.fossilIncrementCounter == self.fossilIncrement:
+            self.fossilize_self()
+            self.fossilIncrementCounter = 0
 
     def get_sorted(self, allDocs, allJudgments):
-        if isinstance(self.mc, type(None)):
-            self.unpickle_mc(len(allDocs))
-        if len(allDocs) < 1:
-            return "No files in database"
+        # if isinstance(self.mc, type(None)):
+        #     self.unpickle_mc(len(allDocs))
+        # if len(allDocs) < 1:
+        #     return "No files in database"
         # Built sorted more intelligently averages all N candidate lists
         # sortedFiles = self.mc.get_sorted()
         builtSorted = self.mc.get_sorted_builder()
@@ -112,6 +120,9 @@ class MonteCarloProxy:
     def unpickle_mc(self, param):
         pass
 
+    def fossilize_self(self):
+        with open(f'{self.logPath}/fossils/{self.project_name}-{datetime.now()}', 'wb') as f:
+            pickle.dump(self, f)
 
     def delete_self(self):
         print(f"deleting {self.mc} pickles")
