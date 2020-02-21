@@ -8,8 +8,8 @@ from crowdsorting.app_resources.DBHandler import DBHandler
 class Create_Delete_Docs(unittest.TestCase):
 
     def setUp(self):
-        crowdsorting.app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///_test_crowdsorting.db'
-        crowdsorting.app.config['PAIRS_BEING_PROCESSED_PATH'] = '_test_pairsbeingprocessed.pkl'
+        crowdsorting.app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///testing/_test_crowdsorting.db'
+        crowdsorting.app.config['PAIRS_BEING_PROCESSED_PATH'] = 'test_pairsbeingprocessed.pkl'
         crowdsorting.db.create_all()
         self.dbhandler = DBHandler()
         self.doc1 = DB_Doc("doc_1.txt", "one one one", "Numbers")

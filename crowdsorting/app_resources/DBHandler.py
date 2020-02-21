@@ -330,6 +330,10 @@ class DBHandler:
             consent_form = DEFAULT_CONSENT_FORM
         if landing_page is None:
             landing_page = DEFAULT_LANDING_PAGE
+        if public == 'test_True':
+            public = True
+        elif public == 'test_False':
+            public = False
         try:
             print(selector_algorithm)
             new_sorter = selector_algorithm(project_name)
