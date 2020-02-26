@@ -140,7 +140,7 @@ class ACJProxy:
             shutil.rmtree(self.logPath)
 
     def get_round_list(self):
-        return self.acj.roundList
+        return self.acj.unservedRoundList
 
     def finished(self):
         return self.no_more_pairs

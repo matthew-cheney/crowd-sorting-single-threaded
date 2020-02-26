@@ -516,7 +516,7 @@ def sorter():
                                )
     try:
         user_email = session['user'].email
-        docPair = dbhandler.get_pair(request.cookies.get('project'), session['user'].email)
+        docPair = dbhandler.get_pair(request.cookies.get('project'), user_email)
     except KeyError:
         flash('Looks like your selected project has been deleted!', 'warning')
         return redirect(url_for('dashboard'))
@@ -711,6 +711,7 @@ def tower():
                            public_projects=dbhandler.get_public_projects(),
                            current_project=get_current_project(),
                            roundList=dbhandler.get_round_list(request.cookies.get('project')),
+                           pairsCheckedOut=dbhandler.get_pairs_currently_checked_out(request.cookies.get('project')),
                            pairsReadyForRecheckout=dbhandler.get_pairs_waiting_for_recheckout(request.cookies.get('project'))
                            )
 

@@ -15,11 +15,16 @@
     <div class="col-lg-4">
         <h3 class="text-center">RoundList</h3>
         {% for pair in roundList %}
-        {{ pair }}
+        {{ pair[0]|truncate(25) }}<br/>
+        {{ pair[1]|truncate(25) }}
+        <hr/>
         {% endfor %}
     </div>
     <div class="col-lg-4">
         <h3 class="text-center">Users and Pairs</h3>
+        {% for pair in pairsCheckedOut %}
+        {{ pair }}
+        {% endfor %}
     </div>
     <div class="col-lg-4">
         <h3 class="text-center">Pairs Waiting for Recheckout</h3>

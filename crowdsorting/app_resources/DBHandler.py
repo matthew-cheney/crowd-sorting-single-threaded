@@ -68,6 +68,7 @@ class DBHandler:
                 print(f"pair timestamp set to {pair.get_timestamp()}")
                 print(f"serving stored pair {pair}")
                 pair.checked_out = True
+                pair.user_checked_out_by = user
                 self.pickle_pairs_being_processed()
                 return pair
         allDocs = db.session.query(Doc).filter_by(project_name=project,
@@ -93,6 +94,7 @@ class DBHandler:
         pair.lifeSeconds = (lifeSeconds if lifeSeconds > 90 else 90)
         print(f"lifeSeconds: {lifeSeconds}")
 
+        pair.user_checked_out_by = user
         self.pairsBeingProcessed[project].append(pair)
         self.pickle_pairs_being_processed()
 
@@ -458,6 +460,7 @@ class DBHandler:
             if (pair[0] == out_pair.doc1.name and pair[1] == out_pair.doc2.name) or \
                (pair[1] == out_pair.doc1.name and pair[0] == out_pair.doc2.name):
                 out_pair.checked_out = False
+                out_pair.user_checked_out_by = None
                 if user is not None:
                     out_pair.users_opted_out.append(user)
                 self.pickle_pairs_being_processed()
@@ -501,7 +504,8 @@ class DBHandler:
 
     def get_round_list(self, project_name):
         project_proxy = pairselectors[project_name]
-        return project_proxy.get_round_list()
+        all_round_list = project_proxy.get_round_list()
+        return [x for x in all_round_list if x is not None]
 
     def get_pairs_waiting_for_recheckout(self, project_name):
         self.unpickle_pairs_being_processed()
@@ -512,5 +516,16 @@ class DBHandler:
         for pair in all_pbp:
             if ((pair.get_timestamp() < (datetime.now() - timedelta(seconds=pair.lifeSeconds))) or \
                     (pair.checked_out == False)):
+                filtered_pbp.append(pair)
+        return filtered_pbp
+
+    def get_pairs_currently_checked_out(self, project_name):
+        self.unpickle_pairs_being_processed()
+        if project_name not in self.pairsBeingProcessed:
+            return []
+        all_pbp = self.pairsBeingProcessed[project_name]
+        filtered_pbp = []
+        for pair in all_pbp:
+            if not pair.get_user_checked_out_by() == None:
                 filtered_pbp.append(pair)
         return filtered_pbp

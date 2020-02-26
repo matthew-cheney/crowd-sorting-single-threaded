@@ -1,4 +1,6 @@
 from datetime import datetime
+from datetime import timedelta
+
 from crowdsorting.app_resources.settings import DEFAULT_TIMEOUT
 
 class DocPair:
@@ -15,6 +17,7 @@ class DocPair:
         self.checked_out = True
         self.users_opted_out = list()
         self.id = id
+        self.user_checked_out_by = None
 
     def equals(self, other):
         if self.doc1.id == other.doc1.id and self.doc2.id == other.doc2.id:
@@ -51,3 +54,10 @@ class DocPair:
 
     def get_second_contents(self):
         return self.doc2.contents
+
+    def get_user_checked_out_by(self):
+        if ((self.get_timestamp() < (
+                datetime.now() - timedelta(seconds=self.lifeSeconds)))):
+            return None
+        else:
+            return self.user_checked_out_by

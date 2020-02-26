@@ -202,6 +202,7 @@ class UniACJ(object):
         self.n = len(data)
         self.swis = 5
         self.roundList = []
+        self.unservedRoundList = []
         self.step = -1
         self.decay = 1
         self.returned = []
@@ -223,6 +224,7 @@ class UniACJ(object):
             self.roundList = self.infoPairs()
         else:
             self.roundList = extRoundList
+        self.unservedRoundList = self.roundList.copy()
         self.returned = [False for i in range(len(self.roundList))]
         return self.roundList
 
@@ -267,7 +269,7 @@ class UniACJ(object):
                 o = [p for p in self.roundList if
                      not self.returned[self.roundList.index(p)]]
                 return random.choice(o)
-
+        self.unservedRoundList[self.step] = None
         return self.roundList[self.step]
 
     def nextIDPair(self, startNext=True):
