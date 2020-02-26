@@ -505,6 +505,8 @@ class DBHandler:
 
     def get_pairs_waiting_for_recheckout(self, project_name):
         self.unpickle_pairs_being_processed()
+        if project_name not in self.pairsBeingProcessed:
+            return []
         all_pbp = self.pairsBeingProcessed[project_name]
         filtered_pbp = []
         for pair in all_pbp:

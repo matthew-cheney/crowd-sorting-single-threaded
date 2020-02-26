@@ -328,6 +328,10 @@ def dashboard():
     if 'user' in session and session[
             'user'].get_is_admin():  # This is bad - fix it
         print("returning admindashboard")
+        userID = dbhandler.get_user_id(session['user'].email)
+        for project in dbhandler.get_all_projects():
+            dbhandler.add_user_to_project(userID,
+                                          project.name)
         return render_template('admindashboard.html', title='Dashboard',
                                current_user=session['user'],
                                all_users=dbhandler.get_all_users(),
@@ -340,18 +344,18 @@ def dashboard():
     elif 'user' in session and session['user'].is_pm:
         return render_template('userdashboard.html', title='Dashboard',
                                current_user=session['user'],
-                               all_projects=get_all_group_projects(),
+                               all_projects=get_all_user_projects(),
                                public_projects=dbhandler.get_public_projects(),
                                current_project=get_current_project(),
                                StringList=StringList
                                )
     elif 'user' in session:
-        all_projects = get_all_group_projects()
+        all_projects = get_all_user_projects()
         all_public_projects = dbhandler.get_public_projects()
         filtered_public_projects = [x for x in all_public_projects if x not in all_projects]
         return render_template('userdashboard.html', title='Dashbaord',
                                current_user=session['user'],
-                               all_projects=all_projects,
+                               all_projects=get_all_user_projects(),
                                current_project=get_current_project(),
                                filtered_public_projects=filtered_public_projects,
                                StringList=StringList
@@ -375,16 +379,21 @@ def check_current_project(project):
         return False
     return True
 
+
+
 def get_all_group_projects():
-    if isAdmin():
-        return dbhandler.get_user_projects(session['user'].email)
     if 'user' in session:
-        return dbhandler.get_user_projects(session['user'].email)
+        return dbhandler.get_all_group_projects()
     else:
         return []
 
 def get_all_projects():
     return dbhandler.get_all_projects()
+
+def get_all_user_projects():
+    if 'user' not in session:
+        return []
+    return dbhandler.get_user_projects(session['user'].email)
 
 @app.route("/selectproject/<project_name>", methods=["POST"])
 @login_required
@@ -464,7 +473,7 @@ def home():
         current_project = get_current_project()
         return render_template('home.html', title='Home',
                                current_user=session['user'],
-                               all_projects=get_all_group_projects(),
+                               all_projects=get_all_user_projects(),
                                public_projects=dbhandler.get_public_projects(),
                                current_project=current_project,
                                landing_page=dbhandler.get_landing_page(current_project))
@@ -492,7 +501,7 @@ def sorter():
     if not dbhandler.user_consented(session['user'], request.cookies.get('project')):
         return render_template('consentform.html', title='Consent Form',
                                current_user=session['user'],
-                               all_projects=get_all_group_projects(),
+                               all_projects=get_all_user_projects(),
                                public_projects=dbhandler.get_public_projects(),
                                current_project=get_current_project(),
                                consent_form_text=dbhandler.get_consent_form(request.cookies.get('project'))
@@ -501,7 +510,7 @@ def sorter():
         return render_template('nopairs.html', title='Check later',
                                message="No project selected",
                                current_user=session['user'],
-                               all_projects=get_all_group_projects(),
+                               all_projects=get_all_user_projects(),
                                public_projects=dbhandler.get_public_projects(),
                                current_project=get_current_project()
                                )
@@ -517,7 +526,7 @@ def sorter():
     if type(docPair) == type(""):
         return render_template('nopairs.html', title='Check later',
                                message=docPair, current_user=session['user'],
-                               all_projects=get_all_group_projects(),
+                               all_projects=get_all_user_projects(),
                                public_projects=dbhandler.get_public_projects(),
                                current_project=get_current_project()
                                )
@@ -538,7 +547,7 @@ def sorter():
                            file_two_name=docPair.get_second(),
                            current_user=session['user'],
                            time_started=floor(time.time()),
-                           all_projects=get_all_group_projects(),
+                           all_projects=get_all_user_projects(),
                            public_projects=dbhandler.get_public_projects(),
                            current_project=get_current_project(),
                            timeout=docPair.lifeSeconds * 1000,
@@ -609,14 +618,14 @@ def about():
         if not check_project(request):
             return redirect(url_for('dashboard'))
         return render_template('about.html', current_user=session['user'],
-                               all_projects=get_all_group_projects(),
+                               all_projects=get_all_user_projects(),
                                public_projects=dbhandler.get_public_projects(),
                                current_project=get_current_project(),
                                title='About'
                                )
     else:
         return render_template('about.html', current_user=dummyUser,
-                               all_projects=get_all_group_projects(),
+                               all_projects=get_all_user_projects(),
                                public_projects=dbhandler.get_public_projects(),
                                current_project=get_current_project(),
                                title='About'
@@ -649,7 +658,7 @@ def sorted():
         return render_template('nopairs.html', title='Check later',
                                message='No project selected',
                                current_user=session['user'],
-                               all_projects=get_all_group_projects(),
+                               all_projects=get_all_user_projects(),
                                public_projects=dbhandler.get_public_projects(),
                                current_project=get_current_project()
                                )
@@ -657,7 +666,7 @@ def sorted():
         return render_template('nopairs.html', title='Check later',
                                message='No docs in this project',
                                current_user=session['user'],
-                               all_projects=get_all_group_projects(),
+                               all_projects=get_all_user_projects(),
                                public_projects=dbhandler.get_public_projects(),
                                current_project=get_current_project()
                                )
@@ -684,7 +693,7 @@ def sorted():
                            number_of_docs=number_of_docs,
                            possible_judgments=possible_judgments,
                            success=success,
-                           all_projects=get_all_group_projects(),
+                           all_projects=get_all_user_projects(),
                            public_projects=dbhandler.get_public_projects(),
                            current_project=get_current_project(),
                            preferred_prompt=preferred_prompt,
@@ -695,8 +704,10 @@ def sorted():
 @login_required
 @admin_required
 def tower():
+    if not check_project(request):
+        return redirect(url_for('dashboard'))
     return render_template('tower.html', current_user=session['user'],
-                           all_projects=get_all_group_projects(),
+                           all_projects=get_all_user_projects(),
                            public_projects=dbhandler.get_public_projects(),
                            current_project=get_current_project(),
                            roundList=dbhandler.get_round_list(request.cookies.get('project')),
@@ -707,7 +718,7 @@ def tower():
 @login_required
 def accountinfo():
     return render_template('accountinfo.html', current_user=session['user'],
-                           all_projects=get_all_group_projects(),
+                           all_projects=get_all_user_projects(),
                            public_projects=dbhandler.get_public_projects(),
                            current_project=get_current_project()
                            )
@@ -883,7 +894,7 @@ def edit_project():
     project = request.form.get('project_name_edit')
     name, description, selection_prompt, preferred_prompt, unpreferred_prompt, consent_form, instruction_page = dbhandler.get_all_project_data(project)
     return render_template('editproject.html', current_user=session['user'],
-                           all_projects=get_all_group_projects(),
+                           all_projects=get_all_user_projects(),
                            public_projects=dbhandler.get_public_projects(),
                            current_project=get_current_project(),
                            name=name,
