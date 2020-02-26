@@ -17,6 +17,9 @@ class ACJProxy:
         self.no_more_pairs = False
         self.project_name = project_name
         self.logPath = f"crowdsorting/ACJ_Logs/{self.project_name}"
+        self.remaining_in_round = []
+        self.served_not_returned = []
+        self.finished = False
 
     @staticmethod
     def get_algorithm_name():
@@ -82,6 +85,7 @@ class ACJProxy:
         doc_pair = DocPair(doc_one, doc_two)
         if not doc_one or not doc_two:
             return "no pair available"
+        self.served_not_returned.append([doc_one, doc_two])
         return doc_pair
 
     def make_judgment(self, easier_doc_name, harder_doc_name, duration,
@@ -90,6 +94,10 @@ class ACJProxy:
         harder_doc_id = self.acj.getID(harder_doc_name.name)
         pair = (easier_doc_id, harder_doc_id)
         self.acj.IDComp(pair, False, reviewer=judge_name, time=duration)
+        if [easier_doc_name, harder_doc_name] in self.served_not_returned:
+            self.served_not_returned.remove([easier_doc_name, harder_doc_name])
+        elif [harder_doc_name, easier_doc_name] in self.served_not_returned:
+            self.served_not_returned.remove([harder_doc_name, easier_doc_name])
         self.pickle_acj()
         self.fossilIncrementCounter += 1
         if self.fossilIncrementCounter == self.fossilIncrement:
@@ -130,3 +138,9 @@ class ACJProxy:
             os.remove(f"crowdsorting/app_resources/sorter_instances/{self.project_name}.pkl")
         if os.path.exists(self.logPath):
             shutil.rmtree(self.logPath)
+
+    def get_round_list(self):
+        return self.acj.roundList
+
+    def finished(self):
+        return self.no_more_pairs

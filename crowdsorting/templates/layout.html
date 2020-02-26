@@ -47,6 +47,9 @@
               {% if current_user.get_is_authenticated() and current_user.get_is_authenticated() %}
               <a class="nav-item nav-link" href="{{ url_for('sorter') }}">Sorter</a>
               {% endif %}
+              {% if current_user.get_is_admin() %}
+              <a class="nav-item nav-link" href="{{ url_for('tower') }}">Control Tower</a>
+              {% endif %}
             </div>
             <!-- Navbar Center -->
             <!-- Navbar Right Side -->

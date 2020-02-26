@@ -498,3 +498,17 @@ class DBHandler:
         db.session.commit()
 
         return True
+
+    def get_round_list(self, project_name):
+        project_proxy = pairselectors[project_name]
+        return project_proxy.get_round_list()
+
+    def get_pairs_waiting_for_recheckout(self, project_name):
+        self.unpickle_pairs_being_processed()
+        all_pbp = self.pairsBeingProcessed[project_name]
+        filtered_pbp = []
+        for pair in all_pbp:
+            if ((pair.get_timestamp() < (datetime.now() - timedelta(seconds=pair.lifeSeconds))) or \
+                    (pair.checked_out == False)):
+                filtered_pbp.append(pair)
+        return filtered_pbp

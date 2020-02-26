@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-12 text-center">
+        <h3>Control Tower</h3>
+        <h2>{{ current_project }}</h2>
+    </div>
+</div>
+<hr/>
+<div class="row">
+    <div class="col-lg-4">
+        <h3 class="text-center">RoundList</h3>
+        {% for pair in roundList %}
+        {{ pair }}
+        {% endfor %}
+    </div>
+    <div class="col-lg-4">
+        <h3 class="text-center">Users and Pairs</h3>
+    </div>
+    <div class="col-lg-4">
+        <h3 class="text-center">Pairs Waiting for Recheckout</h3>
+        {% for pair in pairsReadyForRecheckout %}
+        {{ pair }}
+        {% endfor %}
+    </div>
+</div>
+{% endblock content %}

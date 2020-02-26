@@ -691,6 +691,17 @@ def sorted():
                            unpreferred_prompt=unpreferred_prompt
                            )
 
+@app.route("/tower")
+@login_required
+@admin_required
+def tower():
+    return render_template('tower.html', current_user=session['user'],
+                           all_projects=get_all_group_projects(),
+                           public_projects=dbhandler.get_public_projects(),
+                           current_project=get_current_project(),
+                           roundList=dbhandler.get_round_list(request.cookies.get('project')),
+                           pairsReadyForRecheckout=dbhandler.get_pairs_waiting_for_recheckout(request.cookies.get('project'))
+                           )
 
 @app.route("/accountinfo", methods=['GET'])
 @login_required
