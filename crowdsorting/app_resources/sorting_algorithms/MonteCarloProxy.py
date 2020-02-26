@@ -121,7 +121,8 @@ class MonteCarloProxy:
         pass
 
     def fossilize_self(self):
-        with open(f'{self.logPath}/fossils/{self.project_name}-{datetime.now()}', 'wb') as f:
+        timestamp = datetime.now().strftime('_%Y_%m_%d_%H_%M_%S_%f')
+        with open(f'{self.logPath}/fossils/{self.project_name}{timestamp}', 'wb') as f:
             pickle.dump(self, f)
 
     def delete_self(self):
@@ -130,3 +131,9 @@ class MonteCarloProxy:
             os.remove(f"crowdsorting/app_resources/sorter_instances/{self.project_name}.pkl")
         if os.path.exists(self.logPath):
             shutil.rmtree(self.logPath)
+
+    def get_round_list(self):
+        return []
+
+    def finished(self):
+        return self.no_more_pairs

@@ -129,7 +129,8 @@ class ACJProxy:
         pass
 
     def fossilize_self(self):
-        with open(f'{self.logPath}/fossils/{self.project_name}-{datetime.now()}.pkl', 'wb') as f:
+        timestamp = datetime.now().strftime('_%Y_%m_%d_%H_%M_%S_%f')
+        with open(f'{self.logPath}/fossils/{self.project_name}{timestamp}.pkl', 'wb') as f:
             pickle.dump(self, f)
 
     def delete_self(self):

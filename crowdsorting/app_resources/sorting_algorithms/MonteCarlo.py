@@ -26,7 +26,7 @@ class MonteCarlo:
         self.original_data = data  # Data (scripts to be sorted) as entered
         self.data_dictionary = dict(zip(range(len(data)), data))
         self.data = list(self.data_dictionary.keys())  # Keys are now ids
-        data = data
+        data = data  # Not sure what this line is for....?
         if p <= 0:
             p = .001
         self.p = p
