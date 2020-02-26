@@ -45,6 +45,7 @@ class ACJProxy:
         self.no_more_pairs = False
         with open(f"crowdsorting/app_resources/sorter_instances/{self.project_name}.pkl", "wb") as output_file:  # noqa: E501
             pickle.dump(self, output_file)
+        self.fossilize_self()
 
     def pickle_acj(self):
         print("pickling acj")
@@ -120,7 +121,7 @@ class ACJProxy:
         pass
 
     def fossilize_self(self):
-        with open(f'{self.logPath}/fossils/{self.project_name}-{datetime.now()}', 'wb') as f:
+        with open(f'{self.logPath}/fossils/{self.project_name}-{datetime.now()}.pkl', 'wb') as f:
             pickle.dump(self, f)
 
     def delete_self(self):

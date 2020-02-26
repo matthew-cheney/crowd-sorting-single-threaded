@@ -291,6 +291,11 @@ def isInAdminFile(email):
         if admin == email:
             adminBool = True
             break
+    if adminBool:
+        userID = dbhandler.get_user_id(email)
+        for project in dbhandler.get_all_projects():
+            dbhandler.add_user_to_project(userID,
+                                          project.name)
     return adminBool
 
 def isInPMFile(email):
@@ -364,14 +369,15 @@ def get_current_project():
 def check_current_project(project):
     if 'user' not in session:
         return False
-    all_projects = get_all_group_projects()
+    # all_projects = get_all_group_projects()
+    all_projects = dbhandler.get_user_projects(session['user'].email)
     if project not in [x.name for x in all_projects]:
         return False
     return True
 
 def get_all_group_projects():
     if isAdmin():
-        return dbhandler.get_all_group_projects()
+        return dbhandler.get_user_projects(session['user'].email)
     if 'user' in session:
         return dbhandler.get_user_projects(session['user'].email)
     else:
@@ -440,6 +446,8 @@ def check_project(current_request):
         return True
 
 def check_select_project(user_email, project_name):
+    if isAdmin():
+        return True
     all_projects = dbhandler.get_user_projects(user_email)
     if project_name in [x.name for x in all_projects]:
         return True

@@ -1,5 +1,5 @@
 from datetime import datetime
-
+from crowdsorting.app_resources.settings import DEFAULT_TIMEOUT
 
 class DocPair:
     doc1 = ""
@@ -7,7 +7,7 @@ class DocPair:
     timestamp = ""
     lifeSeconds = 0
 
-    def __init__(self, doc1, doc2, id=None, lifeSeconds=120):
+    def __init__(self, doc1, doc2, id=None, lifeSeconds=DEFAULT_TIMEOUT):
         self.doc1 = doc1
         self.doc2 = doc2
         self.timestamp = datetime.now()

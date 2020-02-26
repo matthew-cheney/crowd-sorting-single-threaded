@@ -1,6 +1,7 @@
 import io
 import os
 from glob import glob
+import re
 
 import crowdsorting
 
@@ -33,7 +34,7 @@ def create_user(client, firstName, lastName, email=None, username=None, admin=Fa
         res = client.post('/newcasuser', data=data, follow_redirects=True)
     return res
 
-def create_project(client, project_name, number_of_docs=0, selector_algorithm=None, description=None, public=False, join_code=None, src_file_path='testing/dummy_files'):
+def create_project(client, project_name, number_of_docs, selector_algorithm=None, description=None, public=False, join_code=None, src_file_path='testing/dummy_files'):
 
     if selector_algorithm is None:
         selector_algorithm = 'Adaptive Comparative Judgment'
@@ -61,23 +62,52 @@ def create_project(client, project_name, number_of_docs=0, selector_algorithm=No
 
         fpaths = glob(f'{src_file_path}/*.txt')
 
-        files = [open(fpath, 'rb') for fpath in fpaths]
-
-        # files = [file1, file2, file3, file4, file5, file6, file7, file8, file9, file10]
+        files = [open(fpath, 'rb') for fpath in fpaths[:10]]
 
         data = {'project_name': project_name,
                 'selector_algorithm': selector_algorithm,
                 'description': description,
                 'public': public,
-                'join_code': join_code,
-                'file': files
+                'join_code': join_code
                 }
+
+        data['file'] = files
 
         res = client.post('/addproject', data=data, follow_redirects=True)
         return res
     finally:
         for f in files:
             f.close()
+
+def extract_docs(data):
+    docs = re.findall('document\.getElementById\("preferred_hidden"\)\.value = "(.*)"', data)
+    if len(docs) == 1:
+        return docs[0], 'no file'
+    if len(docs) == 0:
+        return 'no file', 'no file'
+    return docs[0], docs[1]
+
+def new_project_to_sorter(client, project_name, firstName, lastName, email, number_of_docs):
+    # Set up user and project
+    create_user(client, firstName, lastName, email, admin=True)
+    create_project(client, project_name, number_of_docs=10)
+
+    # Select project
+    res = client.post(f'/selectproject/{project_name}',
+                           follow_redirects=True)
+
+    # Open the sorter page
+    client.set_cookie('test1', 'project', project_name)
+    res = client.get('/sorter', follow_redirects=True)
+
+    # "Press" the agree button and get pair to judge
+    data = {
+        'user_email': email,
+        'current_project': project_name
+    }
+    res = client.post('/signconsent', data=data, follow_redirects=True)
+
+    return res
 
 
 class mock_user():

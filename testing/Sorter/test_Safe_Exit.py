@@ -1,6 +1,7 @@
 import unittest
 from time import sleep
 import os
+import re
 
 import crowdsorting
 from crowdsorting.app_resources.DBHandler import DBHandler
@@ -33,7 +34,6 @@ class Safe_Exit(unittest.TestCase):
         crowdsorting.db.drop_all()
 
     def test_safe_exit_basic(self):
-
         project_name = 'test_one'
         firstName = 'Obi-wan'
         lastName = 'Kenobi'
@@ -60,43 +60,28 @@ class Safe_Exit(unittest.TestCase):
         res = self.client.post('/signconsent', data=data, follow_redirects=True)
         self.assertTrue(DEFAULT_SELECTION_PROMPT.encode('utf-8') in res.data)
 
-        pass
+        # Find which two docs were served
+        doc1, doc2 = extract_docs(res.data.decode('utf-8'))
+        self.assertTrue(doc1.endswith('.txt'))
+        self.assertTrue(doc2.endswith('.txt'))
 
+        # Safe Exit
+        res = self.client.post('/safeexit', data={
+            'file_one_name': doc1,
+            'file_two_name': doc2
+        }, follow_redirects=True)
+        self.assertTrue(DEFAULT_LANDING_PAGE.encode('utf-8') in res.data)
 
-class Dummy_User:
-    def __init__(self, firstName, lastName, email, username):
-        self.firstName = firstName
-        self.lastName = lastName
-        self.email = email
-        self.username = username
+        # Go to sorter again
+        res = self.client.get('/sorter', follow_redirects=True)
+        self.assertTrue(DEFAULT_SELECTION_PROMPT.encode('utf-8') in res.data)
 
+        # Check if got same docs back
+        doc1_new, doc2_new = extract_docs(res.data.decode('utf-8'))
+        self.assertTrue(doc1 in [doc1_new, doc2_new])
+        self.assertTrue(doc2 in [doc1_new, doc2_new])
 
-class Dummy_Project:
-    def __init__(self, project_name, sorting_algorithm):
-        self.project_name = project_name
-        self.sorting_algorithm = sorting_algorithm
-
-class Dummy_Doc:
-    def __init__(self, filename, contents, project):
-        self.filename = filename
-        self.contents = contents
-        self.project = project
-
-class Dummy_File:
-    def __init__(self, filename, file):
-        self.filename = filename
-        self.file = file
-        self.contents = file.read()
-
-    def read(self):
-        return self.contents
-
-    def close(self):
-        self.file.close()
-
-user1 = Dummy_User('Harry', 'Potter', 'hpotter@gmail.com', 'hp1')
-user2 = Dummy_User('Ron', 'Weasley', 'rweasley@gmail.com', 'rw1')
-user3 = Dummy_User('Hermione', 'Granger', 'hgranger@gmail.com', 'hg1')
-
-project1 = Dummy_Project('Numbers', ACJProxy)
-project2 = Dummy_Project('More Numbers', MonteCarloProxy)
+        # Delete project
+        self.assertTrue(os.path.isdir(f'crowdsorting/ACJ_Logs/{project_name}'))
+        self.client.post('/deleteProject', data={'project_name_delete': project_name}, follow_redirects=True)
+        self.assertFalse(os.path.isdir(f'crowdsorting/ACJ_Logs/{project_name}'))

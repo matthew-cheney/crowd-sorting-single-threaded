@@ -1,0 +1,4 @@
+To avoid bugs while Crowd Sorting is still in development, I recommend taking the following precautions:
+
+1. Pick either underscores or spaces, and stick to that across all project names.
+2. Do not begin any project name with 'test-21', as this prefix is used for unit testing.
