@@ -1,5 +1,6 @@
 from datetime import datetime
 from datetime import timedelta
+from math import floor
 
 from crowdsorting.app_resources.settings import DEFAULT_TIMEOUT
 
@@ -61,3 +62,9 @@ class DocPair:
             return None
         else:
             return self.user_checked_out_by
+
+    def get_time_remaining(self):
+        all_seconds = self.lifeSeconds - (datetime.now() - self.timestamp).total_seconds()
+        minutes = all_seconds / 60
+        seconds = (minutes % 1) * 60
+        return f'{floor(minutes)} minutes, {floor(seconds)} seconds'

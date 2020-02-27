@@ -23,13 +23,20 @@
     <div class="col-lg-4">
         <h3 class="text-center">Users and Pairs</h3>
         {% for pair in pairsCheckedOut %}
-        {{ pair }}
+        {{ pair.doc1.name|truncate(25) }}<br/>
+        {{ pair.doc2.name|truncate(25) }}<br/>
+        Opted out: {{ pair.users_opted_out|length }}
+        Time remaining (s): {{ pair.get_time_remaining() }}
+        <hr/>
         {% endfor %}
     </div>
     <div class="col-lg-4">
         <h3 class="text-center">Pairs Waiting for Recheckout</h3>
         {% for pair in pairsReadyForRecheckout %}
-        {{ pair }}
+        {{ pair.doc1.name|truncate(25) }}<br/>
+        {{ pair.doc2.name|truncate(25) }}<br/>
+        Opted out: {{ pair.users_opted_out|length }}
+        <hr/>
         {% endfor %}
     </div>
 </div>
