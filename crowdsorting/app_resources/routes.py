@@ -762,9 +762,10 @@ def submitanswer():
         not_preferred = request.form.get("file_one_name")
     judge = session['user']
     print(f'judge: {judge.email}')
-    time_started = int(request.form.get("time_started"))
-    dbhandler.create_judgment(preferred, not_preferred, request.cookies.get('project'),
-                              judge, floor(time.time()) - time_started)
+    if dbhandler.check_user_has_pair([preferred, not_preferred], judge, request.cookies.get('project')):
+        time_started = int(request.form.get("time_started"))
+        dbhandler.create_judgment(preferred, not_preferred, request.cookies.get('project'),
+                                  judge, floor(time.time()) - time_started)
     if isinstance(request.form.get('another_pair_checkbox'), type(None)):
         # flash('Judgment submitted', 'success')
         return redirect(url_for('home'))
@@ -778,8 +779,8 @@ def safeexit():
     doc1 = request.form.get('file_one_name')
     doc2 = request.form.get('file_two_name')
     project = request.cookies.get('project')
-    print(doc1)
-    dbhandler.return_pair((doc1, doc2), project)
+    if dbhandler.check_user_has_pair([doc1, doc2], session['user'], project):
+        dbhandler.return_pair((doc1, doc2), project)
     return redirect(url_for('home'))
 
 @app.route("/hardeasy", methods=['POST'])
@@ -794,8 +795,9 @@ def hardeasy():
     else:
         too_hard = False
     project = request.cookies.get('project')
-    dbhandler.return_pair((doc1, doc2), project, session['user'].email)
-    rejectLogger.log_reject(project, session['user'].email, doc1, doc2, too_hard)
+    if dbhandler.check_user_has_pair([doc1, doc2], session['user'], project):
+        dbhandler.return_pair((doc1, doc2), project, session['user'].email)
+        rejectLogger.log_reject(project, session['user'].email, doc1, doc2, too_hard)
     return redirect(url_for('sorter'))
 
 
@@ -968,3 +970,14 @@ def downloadDatabase():
             attachment_filename='crowdsorting.db')
     except Exception as e:
         return str(e)
+
+@app.route("/forcereturn", methods=["POST"])
+@login_required
+@admin_required
+def force_return():
+    doc_one = request.form.get('doc_one')
+    doc_two = request.form.get('doc_two')
+    project = request.form.get('project_name')
+    user_email = request.form.get('user_email')
+    dbhandler.return_pair([doc_one, doc_two], project)
+    return redirect(url_for('tower'))

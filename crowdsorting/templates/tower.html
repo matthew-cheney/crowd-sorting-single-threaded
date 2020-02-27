@@ -39,6 +39,13 @@
         {{ pair.doc1.name|truncate(25) }}<br/>
         {{ pair.doc2.name|truncate(25) }}<br/>
         Opted out: {{ pair.users_opted_out|length }}
+        <form method="POST" action="/forcereturn">
+            <input type="hidden" value="{{ pair.doc1.name }}" name="doc_one">
+            <input type="hidden" value="{{ pair.doc2.name }}" name="doc_two">
+            <input type="hidden" value="{{ current_project }}" name="project_name">
+            <input type="hidden" value="{{ pair.user_checked_out_by }}" name="user_email">
+            <button type="submit" class="btn btn-md btn-primary">Force Return</button>
+        </form>
         <hr/>
         {% endfor %}
     </div>

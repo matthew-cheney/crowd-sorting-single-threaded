@@ -467,6 +467,21 @@ class DBHandler:
                 return
         print("pair not found in pairsBeingProcessed")
 
+    def check_user_has_pair(self, pair, user, project):
+        if None in [pair, user, project]:
+            return False
+        self.unpickle_pairs_being_processed()
+        if project not in self.pairsBeingProcessed:
+            return False
+        for out_pair in self.pairsBeingProcessed[project]:
+            if (pair[0] == out_pair.doc1.name and pair[1] == out_pair.doc2.name) or \
+                    (pair[1] == out_pair.doc1.name and pair[0] == out_pair.doc2.name):
+                if out_pair.user_checked_out_by == user.email:
+                    return True
+                else:
+                    return False
+        return False
+
     def log_rejected_pair(self, pair, project, user=None):
         self.unpickle_pairs_being_processed()
 
