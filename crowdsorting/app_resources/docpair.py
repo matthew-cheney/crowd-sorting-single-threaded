@@ -47,8 +47,11 @@ class DocPair:
     def get_life_seconds(self):
         return self.lifeSeconds
 
-    def update_time_stamp(self):
+    def update_timestamp(self):
         self.timestamp = datetime.now()
+
+    def update_time_stamp(self):
+        self.update_timestamp()
 
     def get_first_contents(self):
         return self.doc1.contents

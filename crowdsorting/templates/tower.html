@@ -35,10 +35,10 @@
         <h3 class="text-center">Users and Pairs</h3>
         {% for pair in pairsCheckedOut %}
         <strong>{{ pair.user_checked_out_by }}</strong><br/>
+        <i>Time left (s): {{ pair.get_time_remaining() }}</i><br/>
         {{ pair.doc1.name|truncate(25) }}<br/>
         {{ pair.doc2.name|truncate(25) }}<br/>
-        Opted out: {{ pair.users_opted_out|length }}<br/>
-        Time left (s): {{ pair.get_time_remaining() }}
+        Opted out: {{ pair.users_opted_out|length }}
         <hr/>
         {% endfor %}
     </div>

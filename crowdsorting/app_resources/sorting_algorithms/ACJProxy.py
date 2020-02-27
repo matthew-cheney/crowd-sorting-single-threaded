@@ -117,11 +117,12 @@ class ACJProxy:
         return sortedFiles
 
     def get_possible_judgments_count(self):
-        total = int(self.rounds * (self.number_of_docs / 2))
+        return self.get_total_comparisons_left() + self.get_number_comparisons_made()
+        """total = int(self.rounds * (self.number_of_docs / 2))
         if total < 1:
             total = 1
         print(f'returning number of pairs: {total}')
-        return total
+        return total"""
 
     def get_confidence(self):
         return self.acj.reliability()[0]

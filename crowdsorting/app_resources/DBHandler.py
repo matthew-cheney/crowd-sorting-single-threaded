@@ -145,7 +145,7 @@ class DBHandler:
     def reset_timestamp(self, project_name, pair_id):
         self.unpickle_pairs_being_processed()
         for each_pair in self.pairsBeingProcessed[project_name]:
-            if each_pair.id == pair_id:
+            if str(each_pair.id) == pair_id:
                 each_pair.update_timestamp()
                 self.pickle_pairs_being_processed()
                 return True  # Updated timestamp
