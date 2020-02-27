@@ -493,7 +493,7 @@ def home():
 # Router to sorting page
 @app.route("/sorter")
 @login_required
-def sorter():
+def sorter(admin_docpair=None):
     if 'user' not in session:
         return redirect(url_for('home'))
     if not check_project(request):
@@ -516,7 +516,12 @@ def sorter():
                                )
     try:
         user_email = session['user'].email
-        docPair = dbhandler.get_pair(request.cookies.get('project'), user_email)
+        if admin_docpair is None:
+            docPair = dbhandler.get_pair(request.cookies.get('project'), user_email)
+            admin = False
+        else:
+            docPair = dbhandler.get_docpair_by_names(admin_docpair[0], admin_docpair[1], request.cookies.get('project'), session['user'].email)
+            admin = True
     except KeyError:
         flash('Looks like your selected project has been deleted!', 'warning')
         return redirect(url_for('dashboard'))
@@ -555,7 +560,8 @@ def sorter():
                            preferred_prompt=preferred_prompt,
                            unpreferred_prompt=unpreferred_prompt,
                            pair_id=docPair.id,
-                           project_name=request.cookies.get('project')
+                           project_name=request.cookies.get('project'),
+                           admin=admin
                            )
 
 @app.route("/moretime", methods=['POST'])
@@ -766,6 +772,8 @@ def submitanswer():
         time_started = int(request.form.get("time_started"))
         dbhandler.create_judgment(preferred, not_preferred, request.cookies.get('project'),
                                   judge, floor(time.time()) - time_started)
+    if request.form.get('admin') == 'True':
+        return redirect(url_for('tower'))
     if isinstance(request.form.get('another_pair_checkbox'), type(None)):
         # flash('Judgment submitted', 'success')
         return redirect(url_for('home'))
@@ -981,3 +989,12 @@ def force_return():
     user_email = request.form.get('user_email')
     dbhandler.return_pair([doc_one, doc_two], project)
     return redirect(url_for('tower'))
+
+@app.route("/adminsorter", methods=["POST"])
+@login_required
+@admin_required
+def admin_sorter():
+    doc_one = request.form.get('doc_one')
+    doc_two = request.form.get('doc_two')
+    project = request.form.get('project_name')
+    return sorter(admin_docpair=[doc_one, doc_two])

@@ -547,3 +547,19 @@ class DBHandler:
 
     def get_proxy(self, project_name):
         return pairselectors[project_name]
+
+    def get_docpair_by_names(self, doc_one, doc_two, project, user):
+        self.unpickle_pairs_being_processed()
+        if project not in self.pairsBeingProcessed:
+            return 'project not found'
+        for pair in self.pairsBeingProcessed[project]:
+            if ((doc_one == pair.doc1.name and doc_two == pair.doc2.name) or
+                (doc_one == pair.doc2.name and doc_two == pair.doc1.name)):
+                pair.update_time_stamp()
+                print(f"pair timestamp set to {pair.get_timestamp()}")
+                print(f"serving stored pair {pair}")
+                pair.checked_out = True
+                pair.user_checked_out_by = user
+                self.pickle_pairs_being_processed()
+                return pair
+        return 'pair not found'

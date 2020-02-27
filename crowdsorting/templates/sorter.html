@@ -86,6 +86,7 @@
     </div>
 </div>
 <form id="submit_answer_form" method="POST" action="/submitAnswer">
+    <input type="hidden" value="{{ admin }}" name="admin">
     <div class="row">
         <div class="col-md-12 text-center">
             <h3>{{ selection_prompt }}</h3>
@@ -177,9 +178,13 @@
       <div class="row">
           <div class="col-md-12 text-center">
           <h2>Confirm</h2>
+          {% if admin %}
+          <button class="btn btn-success btn-lg left-button" onclick="submit_pair()">Submit</button>
+          {% else %}
           <h3>Would you like to judge another pair?</h3>
           <button class="btn btn-success btn-lg left-button" onclick="submit_pair()">New Pair</button>
           <button class="btn btn-primary btn-lg right-button" onclick="submit_pair_then_home()">Go Home</button>
+          {% endif %}
           <h3>or</h3>
           <button class="btn btn-warning btn-lg" onclick="hide_confirm_modal()">Cancel</button>
           </div>
