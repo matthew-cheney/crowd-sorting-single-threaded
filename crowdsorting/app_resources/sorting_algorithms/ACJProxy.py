@@ -8,6 +8,8 @@ from datetime import datetime
 from crowdsorting.app_resources.docpair import DocPair
 from crowdsorting.app_resources.sorting_algorithms.ACJ import ACJ
 
+# Note - this algorithm takes 0.5*n^2 - 5*(x/10) comparisons to complete,
+# where n is the number of documents in data
 
 class ACJProxy:
     def __init__(self, project_name):
@@ -20,6 +22,7 @@ class ACJProxy:
         self.remaining_in_round = []
         self.served_not_returned = []
         self.finished = False
+        self.total_comparisons = 0
 
     @staticmethod
     def get_algorithm_name():
@@ -41,6 +44,7 @@ class ACJProxy:
         self.fossilIncrement = fossilIncrement
         self.fossilIncrementCounter = 0
         self.number_of_docs = len(data)
+        self.total_comparisons = 0.5*(self.number_of_docs**2) - 5*(self.number_of_docs / 10)
         self.rounds = rounds
         dat = np.asarray(data)
         np.random.shuffle(dat)
@@ -51,7 +55,7 @@ class ACJProxy:
         self.fossilize_self()
 
     def pickle_acj(self):
-        print("pickling acj")
+        # print("pickling acj")
         with open(f"crowdsorting/app_resources/sorter_instances/{self.project_name}.pkl", "wb") as f:  # noqa: E501
             pickle.dump(self, f)
 
@@ -124,6 +128,9 @@ class ACJProxy:
 
     def get_number_comparisons_made(self):
         return self.acj.getComparisonsMade()
+
+    def get_total_comparisons_left(self):
+        return self.total_comparisons - self.acj.getComparisonsMade()
 
     def unpickle_acj(self, param):
         pass

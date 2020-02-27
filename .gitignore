@@ -21,3 +21,6 @@ default_landing_page.html
 todo.txt
 crowdsorting/app_resources/admins.txt
 crowdsorting/app_resources/sorting_algorithms/acj_testing.py
+crowdsorting/app_resources/sorting_algorithms/test.csv
+acjproxy_testing.py
+acjp_test.csv

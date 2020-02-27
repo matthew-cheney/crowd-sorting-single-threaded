@@ -212,7 +212,7 @@ class UniACJ(object):
 
     def nextRound(self, extRoundList=None):
         '''Returns next round of pairs'''
-        print(f"Round: {self.round}")
+        # print(f"Round: {self.round}")
         self.round = self.round + 1
         self.step = 0
         if self.round > self.maxRounds:
