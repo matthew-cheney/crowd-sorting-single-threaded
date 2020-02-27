@@ -504,7 +504,8 @@ def sorter(admin_docpair=None):
                                all_projects=get_all_user_projects(),
                                public_projects=dbhandler.get_public_projects(),
                                current_project=get_current_project(),
-                               consent_form_text=dbhandler.get_consent_form(request.cookies.get('project'))
+                               consent_form_text=dbhandler.get_consent_form(request.cookies.get('project')),
+                               admin=False
                                )
     if isinstance(request.cookies.get('project'), type(None)):
         return render_template('nopairs.html', title='Check later',
@@ -578,7 +579,10 @@ def moretime():
 def signconsent():
     user_email = request.form.get('user_email')
     current_project = request.form.get('current_project')
+    admin = request.form.get('admin')
     dbhandler.add_consent_judge(user_email, current_project)
+    if admin == 'True':
+        return redirect(url_for('tower'))
     return redirect(url_for('sorter'))
 
 # Router to demo page
@@ -712,6 +716,15 @@ def sorted():
 def tower():
     if not check_project(request):
         return redirect(url_for('dashboard'))
+    if not dbhandler.user_consented(session['user'], request.cookies.get('project')):
+        return render_template('consentform.html', title='Consent Form',
+                               current_user=session['user'],
+                               all_projects=get_all_user_projects(),
+                               public_projects=dbhandler.get_public_projects(),
+                               current_project=get_current_project(),
+                               consent_form_text=dbhandler.get_consent_form(request.cookies.get('project')),
+                               admin=True
+                               )
     return render_template('tower.html', current_user=session['user'],
                            all_projects=get_all_user_projects(),
                            public_projects=dbhandler.get_public_projects(),
