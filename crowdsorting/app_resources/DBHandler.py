@@ -563,3 +563,12 @@ class DBHandler:
                 self.pickle_pairs_being_processed()
                 return pair
         return 'pair not found'
+    def get_active_judges(self, project):
+        self.unpickle_pairs_being_processed()
+        if project not in self.pairsBeingProcessed:
+            return []
+        judges = set()
+        for pair in self.pairsBeingProcessed[project]:
+            if pair.checked_out:
+                judges.add(pair.user_checked_out_by)
+        return judges
