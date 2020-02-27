@@ -712,7 +712,8 @@ def tower():
                            current_project=get_current_project(),
                            roundList=dbhandler.get_round_list(request.cookies.get('project')),
                            pairsCheckedOut=dbhandler.get_pairs_currently_checked_out(request.cookies.get('project')),
-                           pairsReadyForRecheckout=dbhandler.get_pairs_waiting_for_recheckout(request.cookies.get('project'))
+                           pairsReadyForRecheckout=dbhandler.get_pairs_waiting_for_recheckout(request.cookies.get('project')),
+                           project_proxy=dbhandler.get_proxy(request.cookies.get('project'))
                            )
 
 @app.route("/accountinfo", methods=['GET'])

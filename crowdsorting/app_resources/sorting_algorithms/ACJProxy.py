@@ -44,7 +44,7 @@ class ACJProxy:
         self.fossilIncrement = fossilIncrement
         self.fossilIncrementCounter = 0
         self.number_of_docs = len(data)
-        self.total_comparisons = 0.5*(self.number_of_docs**2) - 5*(self.number_of_docs / 10)
+        self.total_comparisons = int(0.5*(self.number_of_docs**2) - 5*(self.number_of_docs / 10))
         self.rounds = rounds
         dat = np.asarray(data)
         np.random.shuffle(dat)

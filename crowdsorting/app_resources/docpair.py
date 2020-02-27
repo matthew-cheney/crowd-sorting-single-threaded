@@ -67,4 +67,4 @@ class DocPair:
         all_seconds = self.lifeSeconds - (datetime.now() - self.timestamp).total_seconds()
         minutes = all_seconds / 60
         seconds = (minutes % 1) * 60
-        return f'{floor(minutes)} minutes, {floor(seconds)} seconds'
+        return f'{floor(minutes)} min, {floor(seconds)} sec'

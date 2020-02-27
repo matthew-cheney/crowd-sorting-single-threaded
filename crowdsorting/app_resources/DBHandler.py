@@ -529,3 +529,6 @@ class DBHandler:
             if not pair.get_user_checked_out_by() == None:
                 filtered_pbp.append(pair)
         return filtered_pbp
+
+    def get_proxy(self, project_name):
+        return pairselectors[project_name]
