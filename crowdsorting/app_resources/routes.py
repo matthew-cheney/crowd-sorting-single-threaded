@@ -787,9 +787,12 @@ def safeexit():
     print("in safe exit")
     doc1 = request.form.get('file_one_name')
     doc2 = request.form.get('file_two_name')
+    admin = request.form.get('admin')
     project = request.cookies.get('project')
     if dbhandler.check_user_has_pair([doc1, doc2], session['user'], project):
         dbhandler.return_pair((doc1, doc2), project)
+    if admin == 'True':
+        return redirect(url_for('tower'))
     return redirect(url_for('home'))
 
 @app.route("/hardeasy", methods=['POST'])

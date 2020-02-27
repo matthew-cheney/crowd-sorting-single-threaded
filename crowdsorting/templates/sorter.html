@@ -60,8 +60,9 @@
         <form id="safe_exit_form" method="POST" action="/safeexit">
             <div class="row">
                 <div class="col-md-12 text-left">
-                    <button type="button" class="btn btn-danger btn-lg" onclick="show_safe_exit_modal()">Exit Without Submitting</button>
+                    <button type="button" class="btn btn-danger btn-lg" onclick="show_safe_exit_modal()">{% if admin %}Return to Tower{% else %}Exit Without Submitting{% endif %}</button>
                 </div>
+                <input type="hidden", name="admin", value="{{ admin }}">
                 <input type="hidden" name="file_one_name"
                            value="{{ file_one_name }}">
                 <input type="hidden" name="file_two_name"
@@ -69,6 +70,7 @@
             </div>
         </form>
     </div>
+    {% if not admin %}
     <div class="col-lg-6">
         <form id="hard_easy_form" method="POST" action="/hardeasy">
             <div class="row">
@@ -84,6 +86,7 @@
             </div>
         </form>
     </div>
+    {% endif %}
 </div>
 <form id="submit_answer_form" method="POST" action="/submitAnswer">
     <input type="hidden" value="{{ admin }}" name="admin">
