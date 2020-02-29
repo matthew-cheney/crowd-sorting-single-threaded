@@ -24,3 +24,4 @@ crowdsorting/app_resources/sorting_algorithms/acj_testing.py
 crowdsorting/app_resources/sorting_algorithms/test.csv
 acjproxy_testing.py
 acjp_test.csv
+local_testing/
