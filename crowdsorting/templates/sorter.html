@@ -185,11 +185,11 @@
           <button class="btn btn-success btn-lg left-button" onclick="submit_pair()">Submit</button>
           {% else %}
           <h3>Would you like to judge another pair?</h3>
-          <button class="btn btn-success btn-lg left-button" onclick="submit_pair()">New Pair</button>
-          <button class="btn btn-primary btn-lg right-button" onclick="submit_pair_then_home()">Go Home</button>
+          <button class="btn btn-success btn-lg left-button" id="sorter_confirm_submit_button" onclick="submit_pair()">New Pair</button>
+          <button class="btn btn-primary btn-lg right-button" id="sorter_confirm_home_submit_button" onclick="submit_pair_then_home()">Go Home</button>
           {% endif %}
           <h3>or</h3>
-          <button class="btn btn-warning btn-lg" onclick="hide_confirm_modal()">Cancel</button>
+          <button class="btn btn-warning btn-lg" id="sorter_cancel_submit_button" onclick="hide_confirm_modal()">Cancel</button>
           </div>
       </div>
   </div>

@@ -45,7 +45,7 @@
               <a class="nav-item nav-link" href="{{ url_for('home') }}">Home</a>
               <a class="nav-item nav-link" href="{{ url_for('about') }}">About</a>
               {% if current_user.get_is_authenticated() and current_user.get_is_authenticated() %}
-              <a class="nav-item nav-link" href="{{ url_for('sorter') }}">Sorter</a>
+              <a class="nav-item nav-link" id="layout_sorter_link" href="{{ url_for('sorter') }}">Sorter</a>
               {% endif %}
               {% if current_user.get_is_admin() %}
               <a class="nav-item nav-link" href="{{ url_for('tower') }}">Control Tower</a>
@@ -75,11 +75,11 @@
               {% endif %}
               {% if current_user.get_is_authenticated() %}
               <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <a class="nav-link dropdown-toggle" name="account_dropdown_link" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   {{ current_user.get_email() }}
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                  <a class="dropdown-item" href="{{ url_for('dashboard') }}">Dashboard</a>
+                  <a class="dropdown-item" id="layout_dashboard_link" href="{{ url_for('dashboard') }}">Dashboard</a>
                   <a class="dropdown-item" href="{{ url_for('accountinfo') }}">Account Info</a>
                   <div class="dropdown-divider"></div>
                   <a class="dropdown-item" href="{{ url_for('logout_master') }}">Logout</a>
