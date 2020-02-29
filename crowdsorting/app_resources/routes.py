@@ -26,6 +26,8 @@ import time
 
 from functools import wraps
 
+SUB_ROOT = app.config['SUBDIRECTORY_ROOT']
+
 from crowdsorting.app_resources.forms import NewUserForm, NewProjectForm
 from flask_cas import login as cas_login
 
@@ -339,7 +341,8 @@ def dashboard():
                                all_group_projects=get_all_group_projects(),
                                all_projects=get_all_projects(),
                                public_projects=dbhandler.get_public_projects(),
-                               current_project=get_current_project()
+                               current_project=get_current_project(),
+                               subroot=SUB_ROOT
                                )
     elif 'user' in session and session['user'].is_pm:
         return render_template('userdashboard.html', title='Dashboard',

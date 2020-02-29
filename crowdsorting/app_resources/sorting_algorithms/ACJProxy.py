@@ -8,7 +8,7 @@ from datetime import datetime
 from crowdsorting.app_resources.docpair import DocPair
 from crowdsorting.app_resources.sorting_algorithms.ACJ import ACJ
 
-# Note - this algorithm takes 0.5*n^2 - 5*(x/10) comparisons to complete,
+# Note - this algorithm takes 0.5*n^2 - 5*(n/10) comparisons to complete,
 # where n is the number of documents in data
 
 class ACJProxy:

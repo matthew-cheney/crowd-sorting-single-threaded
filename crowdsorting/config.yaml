@@ -10,3 +10,4 @@
   FLASK_ADMIN_SWATCH: 'cerulean'
   SELECTION_ALGORITHM: pairall()
   PAIRS_BEING_PROCESSED_PATH: 'crowdsorting/app_resources/pairs_being_processed/pairsBeingProcessed.pkl'
+  SUBDIRECTORY_ROOT: 'crowd-sorting'
