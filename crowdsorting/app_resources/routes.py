@@ -139,7 +139,7 @@ def newcasuser():
                               cas.username + '@byu.edu', cas.username):
             flash('Email already taken', 'danger')
             return render_template('newcasuser.html', current_user=dummyUser, title='New User')
-        session['user'] = User(True, isInAdminFile(current_user.email),
+        session['user'] = User(True, isInAdminFile(cas.username + '@byu.edu'),
                                isInPMFile(current_user.email), dbhandler.get_user(cas.username + '@byu.edu'), request.form.get('firstName'),
                                request.form.get('lastName'), cas.username + '@byu.edu')
         print("admin:", session["user"].email, session['user'].is_admin)
