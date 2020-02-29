@@ -68,7 +68,7 @@
           <div class="row">
               <div class="col-lg-12">
                   <h1>{{ StringList.join_code_prompt }}</h1>
-                  <form id="join_code_form" method="POST" action="/joincode">
+                  <form id="join_code_form" method="POST" action="joincode">
                       <h3><input type="text" name="project_name" placeholder="{{ StringList.add_project_name_field }}"></h3>
                       <h3><input type="text" name="join_code" placeholder="{{ StringList.add_project_join_field }}"></h3>
                   <button type="submit" class="btn btn-primary btn-md">{{ StringList.submit_button }}</button>
@@ -128,7 +128,7 @@
 
     function set_current_project_user(project_name) {
           var http = new XMLHttpRequest();
-          http.open("POST", "/selectproject/" + project_name, true);
+          http.open("POST", "selectproject/" + project_name, true);
           http.setRequestHeader("Content-type","application/x-www-form-urlencoded");
           var params = "search=" + project_name; // probably use document.getElementById(...).value
           http.send(params);
@@ -145,7 +145,7 @@
                     };
 
           var http = new XMLHttpRequest();
-          http.open("POST", "/addpublicproject", true);
+          http.open("POST", "addpublicproject", true);
           http.setRequestHeader("Content-type","application/json");
           http.send(JSON.stringify(json_dict));
           http.onload = function() {
@@ -171,7 +171,7 @@
                     };
 
           var http = new XMLHttpRequest();
-          http.open("POST", "/removeself", true);
+          http.open("POST", "removeself", true);
           http.setRequestHeader("Content-type","application/json");
           http.send(JSON.stringify(json_dict));
           http.onload = function() {

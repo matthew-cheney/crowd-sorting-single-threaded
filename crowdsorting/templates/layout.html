@@ -120,7 +120,7 @@
       <script>
         function set_current_project(project_name) {
           var http = new XMLHttpRequest();
-          http.open("POST", "/selectproject/" + project_name, true);
+          http.open("POST", "selectproject/" + project_name, true);
           http.setRequestHeader("Content-type","application/x-www-form-urlencoded");
           var params = "search=" + project_name; // probably use document.getElementById(...).value
           http.send(params);
@@ -138,7 +138,7 @@
                     };
 
           var http = new XMLHttpRequest();
-          http.open("POST", "/selectpublicproject", true);
+          http.open("POST", "selectpublicproject", true);
           http.setRequestHeader("Content-type","application/json");
           http.send(JSON.stringify(json_dict));
           http.onload = function() {

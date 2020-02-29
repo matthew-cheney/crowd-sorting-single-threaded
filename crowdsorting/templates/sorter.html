@@ -57,7 +57,7 @@
 
 <div class="row">
     <div class="col-lg-6">
-        <form id="safe_exit_form" method="POST" action="/safeexit">
+        <form id="safe_exit_form" method="POST" action="safeexit">
             <div class="row">
                 <div class="col-md-12 text-left">
                     <button type="button" class="btn btn-danger btn-lg" onclick="show_safe_exit_modal()">{% if admin %}Return to Tower{% else %}Exit Without Submitting{% endif %}</button>
@@ -72,7 +72,7 @@
     </div>
     {% if not admin %}
     <div class="col-lg-6">
-        <form id="hard_easy_form" method="POST" action="/hardeasy">
+        <form id="hard_easy_form" method="POST" action="hardeasy">
             <div class="row">
                 <div class="col-md-12 text-right">
                     <button type="button" class="btn btn-lg btn-warning text-white" onclick="show_hard_easy_modal()">Too Hard / Too Easy</button>
@@ -88,7 +88,7 @@
     </div>
     {% endif %}
 </div>
-<form id="submit_answer_form" method="POST" action="/submitAnswer">
+<form id="submit_answer_form" method="POST" action="submitAnswer">
     <input type="hidden" value="{{ admin }}" name="admin">
     <div class="row">
         <div class="col-md-12 text-center">
@@ -343,7 +343,7 @@
                     };
 
           var http = new XMLHttpRequest();
-          http.open("POST", "/moretime", true);
+          http.open("POST", "moretime", true);
           http.setRequestHeader("Content-type","application/json");
           http.send(JSON.stringify(json_dict));
           http.onload = function() {

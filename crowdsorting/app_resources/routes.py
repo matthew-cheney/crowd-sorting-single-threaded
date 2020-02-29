@@ -116,7 +116,8 @@ def newuser():
         return postLoadUser()
     if request.method == 'POST':
         flash('Failed to register user', 'danger')
-    return render_template('newuser.html', current_user=dummyUser, title='New User')
+    return render_template('newuser.html', current_user=dummyUser, title='New User',
+                               subroot=SUB_ROOT)
 
 
 @app.route('/newcasuser', methods=['GET', 'POST'])

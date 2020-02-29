@@ -40,7 +40,7 @@
         {{ pair.doc1.name|truncate(25) }}<br/>
         {{ pair.doc2.name|truncate(25) }}<br/>
         Opted out: {{ pair.users_opted_out|length }}
-        <form method="POST" action="/forcereturn">
+        <form method="POST" action="forcereturn">
             <input type="hidden" value="{{ pair.doc1.name }}" name="doc_one">
             <input type="hidden" value="{{ pair.doc2.name }}" name="doc_two">
             <input type="hidden" value="{{ current_project }}" name="project_name">
@@ -56,7 +56,7 @@
         {{ pair.doc1.name|truncate(25) }}<br/>
         {{ pair.doc2.name|truncate(25) }}<br/>
         Opted out: {{ pair.users_opted_out|length }}
-        <form method="POST" action="/adminsorter">
+        <form method="POST" action="adminsorter">
             <input type="hidden" value="{{ pair.doc1.name }}" name="doc_one">
             <input type="hidden" value="{{ pair.doc2.name }}" name="doc_two">
             <input type="hidden" value="{{ current_project }}" name="project_name">

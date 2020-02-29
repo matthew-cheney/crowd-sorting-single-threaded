@@ -64,13 +64,13 @@
                         {{ project.sorting_algorithm }}
                     </td>
                     <td>
-                        <form method="POST" action="/editproject">
+                        <form method="POST" action="editproject">
                             <input type="hidden" name="project_name_edit" value="{{ project.name }}">
                             <button type="submit" class="btn btn-primary btn-sm">Edit</button>
                         </form>
                     </td>
                     <td>
-                        <form method="POST" action="/deleteProject">
+                        <form method="POST" action="deleteProject">
                             <input type="hidden" name="project_name_delete" value="{{ project.name }}">
                             <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                         </form>
@@ -98,13 +98,13 @@
                         {{ project.sorting_algorithm }}
                     </td>
                     <td>
-                        <form method="POST" action="/editproject">
+                        <form method="POST" action="editproject">
                             <input type="hidden" name="project_name_edit" value="{{ project.name }}">
                             <button type="submit" class="btn btn-primary btn-sm">Edit</button>
                         </form>
                     </td>
                     <td>
-                        <form method="POST" action="/deleteProject">
+                        <form method="POST" action="deleteProject">
                             <input type="hidden" name="project_name_delete" value="{{ project.name }}">
                             <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                         </form>
@@ -168,7 +168,7 @@
                     </td>
                     {% endfor %}
                     <td>
-                        <form method="POST" action="/deleteuser">
+                        <form method="POST" action="deleteuser">
                             <input type="hidden" name="email" value="{{ user.email }}">
                             <button type="submit" class="btn btn-danger btn-sm"><img src="{{ url_for('static', filename='trash.svg') }}"> </button>
                         </form>
@@ -184,7 +184,7 @@
       <div class="modal-content text-center">
           <h3>Create New Project</h3>
 
-            <form method="POST" id="create_project_form" action="/{{ subroot }}/addproject" enctype="multipart/form-data">
+            <form method="POST" id="create_project_form" action="addproject" enctype="multipart/form-data">
             <table class="table borderless">
                 <tr>
                     <td>
@@ -205,7 +205,7 @@
                 <tr>
                     <td>
                         <h4>Select Files</h4>
-                        <!--<form method="POST" action="/upload" enctype="multipart/form-data">-->
+                        <!--<form method="POST" action="upload" enctype="multipart/form-data">-->
                         <input type="file" id="file_uploader" name="file" autocomplete="off" multiple required>
                         <!--<input type="submit" value="Submit" onclick="submit_project">-->
                     </td>
@@ -305,7 +305,7 @@
             }
 
             var xhr = new XMLHttpRequest();
-            xhr.open("POST", "/addusertoproject", true);
+            xhr.open("POST", "addusertoproject", true);
             xhr.setRequestHeader('Content-Type', 'application/json');
             xhr.send(JSON.stringify(json_dict));
 
