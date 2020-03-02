@@ -58,7 +58,7 @@ class DBHandler:
 
     # Function to get next pair of docs
     def get_pair(self, project, user):
-        self.unpickle_pairs_being_processed()
+        # self.unpickle_pairs_being_processed()
         if project not in self.pairsBeingProcessed:
             self.add_pairs_being_processed(project)
         for pair in self.pairsBeingProcessed[project]:
@@ -132,7 +132,7 @@ class DBHandler:
         db.session.commit()
         pairselectors[project].make_judgment(easier_doc, harder_doc, duration,
                                              judge.email)
-        self.unpickle_pairs_being_processed()
+        # self.unpickle_pairs_being_processed()
         if project not in self.pairsBeingProcessed:
             self.add_pairs_being_processed(project)
         for pair in self.pairsBeingProcessed[project]:
@@ -143,7 +143,7 @@ class DBHandler:
         self.pickle_pairs_being_processed()
 
     def reset_timestamp(self, project_name, pair_id):
-        self.unpickle_pairs_being_processed()
+        # self.unpickle_pairs_being_processed()
         for each_pair in self.pairsBeingProcessed[project_name]:
             if str(each_pair.id) == pair_id:
                 each_pair.update_timestamp()
@@ -455,7 +455,7 @@ class DBHandler:
         return False
 
     def return_pair(self, pair, project, user=None):
-        self.unpickle_pairs_being_processed()
+        # self.unpickle_pairs_being_processed()
         for out_pair in self.pairsBeingProcessed[project]:
             if (pair[0] == out_pair.doc1.name and pair[1] == out_pair.doc2.name) or \
                (pair[1] == out_pair.doc1.name and pair[0] == out_pair.doc2.name):
@@ -470,7 +470,7 @@ class DBHandler:
     def check_user_has_pair(self, pair, user, project):
         if None in [pair, user, project]:
             return False
-        self.unpickle_pairs_being_processed()
+        # self.unpickle_pairs_being_processed()
         if project not in self.pairsBeingProcessed:
             return False
         for out_pair in self.pairsBeingProcessed[project]:
@@ -483,13 +483,13 @@ class DBHandler:
         return False
 
     def log_rejected_pair(self, pair, project, user=None):
-        self.unpickle_pairs_being_processed()
-
+        # self.unpickle_pairs_being_processed()
+        pass
 
     def delete_project(self, project_name):
 
         # Remove project from pairs_being_processed
-        self.unpickle_pairs_being_processed()
+        # self.unpickle_pairs_being_processed()
         if project_name in self.pairsBeingProcessed:
             del self.pairsBeingProcessed[project_name]
         self.pickle_pairs_being_processed()
@@ -523,7 +523,7 @@ class DBHandler:
         return [x for x in all_round_list if x is not None]
 
     def get_pairs_waiting_for_recheckout(self, project_name):
-        self.unpickle_pairs_being_processed()
+        # self.unpickle_pairs_being_processed()
         if project_name not in self.pairsBeingProcessed:
             return []
         all_pbp = self.pairsBeingProcessed[project_name]
@@ -535,7 +535,7 @@ class DBHandler:
         return filtered_pbp
 
     def get_pairs_currently_checked_out(self, project_name):
-        self.unpickle_pairs_being_processed()
+        # self.unpickle_pairs_being_processed()
         if project_name not in self.pairsBeingProcessed:
             return []
         all_pbp = self.pairsBeingProcessed[project_name]
@@ -549,7 +549,7 @@ class DBHandler:
         return pairselectors[project_name]
 
     def get_docpair_by_names(self, doc_one, doc_two, project, user):
-        self.unpickle_pairs_being_processed()
+        # self.unpickle_pairs_being_processed()
         if project not in self.pairsBeingProcessed:
             return 'project not found'
         for pair in self.pairsBeingProcessed[project]:
@@ -564,7 +564,7 @@ class DBHandler:
                 return pair
         return 'pair not found'
     def get_active_judges(self, project):
-        self.unpickle_pairs_being_processed()
+        # self.unpickle_pairs_being_processed()
         if project not in self.pairsBeingProcessed:
             return []
         judges = set()
