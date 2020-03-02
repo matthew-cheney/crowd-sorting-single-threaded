@@ -1,4 +1,6 @@
 **__pycache__
+RedKalinka_NoAccents/
+plan_b.txt
 .todo.txt.swp
 venv
 flask_session
