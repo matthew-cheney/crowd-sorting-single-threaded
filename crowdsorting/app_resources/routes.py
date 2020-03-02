@@ -44,10 +44,8 @@ def login_required(fn):
     def wrapper(*args, **kwargs):
         print("checking login ..............................................................")
         try:
-            if not dbhandler.check_user(session['user'].email):
-                print("someone trying to get in!")
-                del session['user']
-                return "This page is only accessible to users", 403
+            if not session['user'].is_authenticated:
+                return "This page is solely accessible to users", 403
             else:
                 print("you're ok")
                 return fn(*args, **kwargs)
