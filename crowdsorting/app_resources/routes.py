@@ -877,6 +877,9 @@ def add_project():
     for algorithm in pairselector_options:
         if request.form.get('selector_algorithm') == algorithm.get_algorithm_name():
             algorithm_to_use = algorithm
+    if ' ' in request.form.get('project_name'):
+        flash('project name may not contain spaces', 'danger')
+        return redirect(url_for('dashboard'))
     message = dbhandler.create_project(request.form.get('project_name'), algorithm_to_use, request.form.get('description'), public=request.form.get('public'), join_code=request.form.get('join_code'))
     print(message)
     if message == "unable to create project":
