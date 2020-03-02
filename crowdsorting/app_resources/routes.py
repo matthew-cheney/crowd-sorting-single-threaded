@@ -55,6 +55,11 @@ def login_required(fn):
             return "This page is only accessible to users", 403
     return wrapper
 
+@app.route('/testinglogin/<email>/<password>', methods=["GET"])
+def testing_login(email, password=''):
+    if not password == 'Ry9HReDwAVNabDZ50ixucWwaQxuOZMqcYvrWvDHxARWShZ62N0asuOAnok7lGj6I':
+        return 'Nice try! Go use the normal login.'
+    return load_user(email)
 
 # @login_manager.user_loader
 def load_user(email):

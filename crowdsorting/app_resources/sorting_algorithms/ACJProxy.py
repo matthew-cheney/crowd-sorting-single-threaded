@@ -61,7 +61,7 @@ class ACJProxy:
 
     def get_pair(self, number_of_docs, allDocs):
         if self.no_more_pairs:
-            return "no good pair found"
+            return "project is over"
         try:
             if isinstance(self.acj, type(None)):
                 # self.unpickle_acj(number_of_docs)
