@@ -182,6 +182,27 @@
     </div>
 </form>
 
+<div class="row">
+    <div class="col-lg-12">
+        <h3>Help Section</h3>
+        <h4><strong>What am I supposed to do?</strong></h4>
+        <h5>&emsp;Read both texts, and click directly on whichever one is easier. Then, press Submit Answer.</h5>
+        <hr/>
+        <h4><strong>These texts are the same difficulty.</strong></h4>
+        <h5>&emsp;Still read them both carefully, and try your best to choose which is easier. It's ok if the difference is small.</h5>
+        <hr/>
+        <h4><strong>I can't read either of these.</strong></h4>
+        <h5>&emsp;It is possible to have two texts so far above your level that you cannot tell which is easier. If this is the case, click on the Too Hard button in the upper right corner. However, please use this button sparingly. You don't have to understand two texts entirely to tell which one is easier.</h5>
+        <hr/>
+        <h4><strong>How do I exit this page?</strong></h4>
+        <h5>&emsp;The best way to exit the page is by clicking Go Home after submitting your pair. Otherwise, click Exit Without Submitting in the upper left corner. <strong>DO NOT</strong> simply close your browser or use the back button.</h5>
+        <hr/>
+        <h4><strong>The page keeps telling me I'm running out of time.</strong></h4>
+        <h5>&emsp;CrowdSorting enables many judges to work simultaneously. In order to avoid overlap, you are given a set amount of time to judge each pair. If you are prompted for more time, don't worry. Simply click more time and keep working on your pair. If you let the timer run down, your pair will be returned and served to another judge.</h5>
+        <br/><br/>
+    </div>
+</div>
+
 <div id="confirm_submit_modal" class="modal">
   <div class="modal-content text-center">
       <div class="row">
@@ -264,7 +285,7 @@
           <div class="col-md-12 text-center">
           <h3>Timeout</h3>
           <p>Your time to submit this pair will expire in <span id="time_left_countdown">60</span> seconds.</p>
-          <button class="btn btn-primary btn-lg" onclick="more_time()">More time</button>
+          <button class="btn btn-primary btn-lg" id="more_time_button" onclick="more_time()">More time</button>
               <h3>or</h3>
           <button class="btn btn-success btn-lg" onclick="safe_exit()">Exit</button>
           </div>
@@ -358,6 +379,7 @@
     }
 
     function more_time() {
+        document.getElementById("more_time_button").disabled=true
         json_dict = {
                     pair_id: '{{ pair_id }}',
                     project_name: '{{ project_name }}'
@@ -371,6 +393,7 @@
             console.log("more time added");
             set_timeout();
             hide_timeout_countdown_modal();
+            document.getElementById("more_time_button").disabled=false
         }
     }
 
