@@ -41,12 +41,12 @@ class DBHandler:
 
     # Function to add new files to db
     def add_docs(self, validFiles, project):
-        # print("in addDocs function")
+        print("in addDocs function")
         filenamesInDatabase = self.db_file_names(project)
         newFile = False
         for file in validFiles:
             if not file.filename in filenamesInDatabase:
-                # print(f"{file} is not in the database yet")
+                print(f"{file} is not in the database yet")
                 self.create_doc(file.filename, file.read(), project)
                 newFile = True
         if newFile:
@@ -65,8 +65,8 @@ class DBHandler:
             if ((pair.get_timestamp() < (datetime.now() - timedelta(seconds=pair.lifeSeconds))) or \
                     (pair.checked_out == False)) and (user not in pair.users_opted_out):
                 pair.update_time_stamp()
-                # print(f"pair timestamp set to {pair.get_timestamp()}")
-                # print(f"serving stored pair {pair}")
+                print(f"pair timestamp set to {pair.get_timestamp()}")
+                print(f"serving stored pair {pair}")
                 pair.checked_out = True
                 pair.user_checked_out_by = user
                 self.pickle_pairs_being_processed()
@@ -80,8 +80,8 @@ class DBHandler:
         if not pair:
             return pair
         if type(pair) == type(""):
-            # print(pair)
-            # print('no more pairs')
+            print(pair)
+            print('no more pairs')
             return pair
 
         if pair.id is None:
@@ -92,7 +92,7 @@ class DBHandler:
         total_length = len(doc1_contents) + len(doc2_contents)
         lifeSeconds = total_length / 2
         pair.lifeSeconds = (lifeSeconds if lifeSeconds > 90 else 90)
-        # print(f"lifeSeconds: {lifeSeconds}")
+        print(f"lifeSeconds: {lifeSeconds}")
 
         pair.user_checked_out_by = user
         self.pairsBeingProcessed[project].append(pair)
@@ -107,15 +107,14 @@ class DBHandler:
         db.session.commit()
 
 
-        # for pair in self.pairsBeingProcessed[project]:
-        #     print(pair)
-            # print(pair)
+        for pair in self.pairsBeingProcessed[project]:
+            print(pair)
         return pair
 
     # Function to create new judgment
     def create_judgment(self, harder, easier, project, judge, duration):
-        # print(f"The winner is {harder}")
-        # print(f"The loser is {easier}")
+        print(f"The winner is {harder}")
+        print(f"The loser is {easier}")
         harder_doc = \
             db.session.query(Doc).filter_by(name=harder,
                                             project_name=project).first()
@@ -213,7 +212,7 @@ class DBHandler:
         user = db.session.query(Judge).filter_by(
             email=email).first()
         if user is not None:
-            # print('no email user:', user)
+            print('no email user:', user)
             return False
 
         # Email not taken, create user and return true
@@ -291,8 +290,8 @@ class DBHandler:
             projects.append(
                 models.Project(p.name, p.sorting_algorithm, p.date_created,
                                p.judges, p.docs, p.judgments, p.public))
-        # print("in get_all_projects")
-        # print(projects)
+        print("in get_all_projects")
+        print(projects)
         if projects is None:
             return []
         return projects
@@ -304,8 +303,8 @@ class DBHandler:
                 projects.append(
                     models.Project(p.name, p.sorting_algorithm, p.date_created,
                                    p.judges, p.docs, p.judgments, p.public))
-        # print("in get_all_group_projects")
-        # print(projects)
+        print("in get_all_group_projects")
+        print(projects)
         if projects is None:
             return []
         return projects
@@ -338,7 +337,7 @@ class DBHandler:
         elif public == 'test_False':
             public = False
         try:
-            # print(selector_algorithm)
+            print(selector_algorithm)
             new_sorter = selector_algorithm(project_name)
             pairselectors[project_name] = new_sorter
             project = Project(name=project_name, sorting_algorithm=selector_algorithm.get_algorithm_name(), description=description, public=public, selection_prompt=selection_prompt, preferred_prompt=preferred_prompt, unpreferred_prompt=unpreferred_prompt, consent_form=consent_form, landing_page=landing_page, join_code=join_code)
@@ -466,7 +465,7 @@ class DBHandler:
                     out_pair.users_opted_out.append(user)
                 self.pickle_pairs_being_processed()
                 return
-        # print("pair not found in pairsBeingProcessed")
+        print("pair not found in pairsBeingProcessed")
 
     def check_user_has_pair(self, pair, user, project):
         if None in [pair, user, project]:
@@ -557,8 +556,8 @@ class DBHandler:
             if ((doc_one == pair.doc1.name and doc_two == pair.doc2.name) or
                 (doc_one == pair.doc2.name and doc_two == pair.doc1.name)):
                 pair.update_time_stamp()
-                # print(f"pair timestamp set to {pair.get_timestamp()}")
-                # print(f"serving stored pair {pair}")
+                print(f"pair timestamp set to {pair.get_timestamp()}")
+                print(f"serving stored pair {pair}")
                 pair.checked_out = True
                 pair.user_checked_out_by = user
                 self.pickle_pairs_being_processed()

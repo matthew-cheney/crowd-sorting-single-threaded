@@ -9,7 +9,7 @@ class yamlReader():
             with open(filename, "r") as config:
                 data_loaded = yaml.safe_load(config)
         except yaml.YAMLError as exc:
-            # print(exc)
+            print(exc)
             return
         app.config['APP_ROOT'] = os.path.dirname(os.path.abspath(__file__))
         for key in data_loaded:
@@ -17,7 +17,7 @@ class yamlReader():
                 app.config[key] = os.path.join(app.config['APP_ROOT'], data_loaded[key])
             else:
                 app.config[key] = data_loaded[key]
-                # print("read in", key, ";", data_loaded[key])
+                print("read in", key, ";", data_loaded[key])
         # SQLALCHEMY_BINDS from db
 
 
