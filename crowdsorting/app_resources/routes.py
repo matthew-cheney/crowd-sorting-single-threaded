@@ -39,6 +39,7 @@ rejectLogger = RejectLogger()
 dummyUser = User("", False, False, 0, "", "", "")
 
 
+
 def login_required(fn):
     @wraps(fn)
     def wrapper(*args, **kwargs):
