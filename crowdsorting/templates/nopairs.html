@@ -5,4 +5,11 @@
     <h1 class="text-center">Sorry!</h1>
     <h2 class="text-center">{{ message }}</h2>
 </div>
+
+<script>
+
+    {% if refresh %}
+    setTimeout(function(){ document.getElementById("layout_sorter_link").click(); }, 5000);
+    {% endif %}
+</script>
 {% endblock content %}

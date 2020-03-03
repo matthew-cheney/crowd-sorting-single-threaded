@@ -537,11 +537,18 @@ def sorter(admin_docpair=None):
         flash('Project not ready', 'warning')
         return redirect(url_for('home'))
     if type(docPair) == type(""):
+        if docPair == "project is over":
+            message = "This project is complete. Thank you for your help!"
+            refresh = False
+        else:
+            message = "No pair currently available. Please wait..."
+            refresh = True
         return render_template('nopairs.html', title='Check later',
-                               message=docPair, current_user=session['user'],
+                               message=message, current_user=session['user'],
                                all_projects=get_all_user_projects(),
                                public_projects=dbhandler.get_public_projects(),
-                               current_project=get_current_project()
+                               current_project=get_current_project(),
+                               refresh=refresh
                                )
     try:
         file_one = docPair.get_first_contents().decode("utf-8")

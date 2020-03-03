@@ -76,7 +76,7 @@ class ACJProxy:
         doc_one_name = self.acj.getScript(acj_pair[0])
         doc_two_name = self.acj.getScript(acj_pair[1])
         if acj_pair is None:
-            return "no good pair found"
+            return "no pair available"
         doc_one = False
         doc_two = False
         for doc in allDocs:
