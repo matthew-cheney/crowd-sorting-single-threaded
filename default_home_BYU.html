@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <!-- Required meta tags -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+
+    <!-- Bootstrap CSS -->
+
+
+
+    <!--<link rel="stylesheet" href="/static/bootstrap-4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    -->
+
+    <script src="default_home_BYU_files/jquery-3.js" crossorigin="anonymous"></script>
+    <script src="default_home_BYU_files/popper.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="default_home_BYU_files/bootstrap.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <script src="default_home_BYU_files/bootstrap.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+    <link href="default_home_BYU_files/summernote-bs4.css" rel="stylesheet">
+    <script src="default_home_BYU_files/summernote-bs4.js"></script>
+    
+    <link rel="stylesheet" type="text/css" href="default_home_BYU_files/main.css">
+
+
+    
+    <title>Home</title>
+    
+  </head>
+  <body>
+    <header class="site-header" id="header_bar">
+      <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand mr-4" href="https://localhost:5000/home">Crowd Sorting</a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarToggle">
+            <div class="navbar-nav mr-auto">
+              <a class="nav-item nav-link" href="https://localhost:5000/home">Home</a>
+              <a class="nav-item nav-link" href="https://localhost:5000/about">About</a>
+              
+              <a class="nav-item nav-link" id="layout_sorter_link" href="https://localhost:5000/sorter">Sorter</a>
+              
+              
+              <a class="nav-item nav-link" href="https://localhost:5000/tower">Control Tower</a>
+              
+            </div>
+            <!-- Navbar Center -->
+            <!-- Navbar Right Side -->
+            <div class="navbar-nav">
+            
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown_project" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <span id="displayed_project">custom_instructions_and_consent</span>
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                  
+                  
+                    <a class="dropdown-item" href="#" onclick="set_current_project('wertew')">wertew</a>
+                  
+                    <a class="dropdown-item" href="#" onclick="set_current_project('small')">small</a>
+                  
+                    <a class="dropdown-item" href="#" onclick="set_current_project('asdf')">asdf</a>
+                  
+                    <a class="dropdown-item" href="#" onclick="set_current_project('a;sldkfj')">a;sldkfj</a>
+                  
+                    <a class="dropdown-item" href="#" onclick="set_current_project('a_1')">a_1</a>
+                  
+                    <a class="dropdown-item" href="#" onclick="set_current_project('custom_instructions_and_consent')">custom_instructions_and_consent</a>
+                  
+                  
+                </div>
+              </li>
+              
+              
+              <a class="nav-item nav-link" href="https://localhost:5000/sorted">Results</a>
+              
+              
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" name="account_dropdown_link" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  mchen95@byu.edu
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                  <a class="dropdown-item" id="layout_dashboard_link" href="https://localhost:5000/dashboard">Dashboard</a>
+                  <a class="dropdown-item" href="https://localhost:5000/accountinfo">Account Info</a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item" href="https://localhost:5000/logout_master">Logout</a>
+                </div>
+              </li>
+
+              
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main role="main" class="container">
+      <div class="row">
+        <div class="col-md-12">
+          
+            
+          
+        </div>
+      </div>
+      <script>
+        function set_current_project(project_name) {
+          var http = new XMLHttpRequest();
+          http.open("POST", "selectproject/" + project_name, true);
+          http.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+          var params = "search=" + project_name; // probably use document.getElementById(...).value
+          http.send(params);
+          http.onload = function() {
+              document.getElementById('displayed_project').innerHTML = project_name;
+              location.reload();
+          }
+        }
+
+        function set_current_project_public(project_name) {
+
+          json_dict = {
+                    user_email: 'mchen95@byu.edu',
+                    project_name: project_name
+                    };
+
+          var http = new XMLHttpRequest();
+          http.open("POST", "selectpublicproject", true);
+          http.setRequestHeader("Content-type","application/json");
+          http.send(JSON.stringify(json_dict));
+          http.onload = function() {
+            document.getElementById('displayed_project').innerHTML = project_name;
+            location.reload();
+          }
+        }
+      </script>
+
+
+
+          
+
+
+    <div class="text-center"><h1>Crowd Sorting</h1><h2>with the BYU Department of Digital Humanities</h2><p><br></p><h2>Please read the following instructions carefully.</h2><p>The
+ purpose of this project is to sort roughly 100 Russian texts by 
+difficulty. This is typically done by a language professional or 
+teacher, who reads each text and arbitrarily assigns a difficulty. 
+However, this often does not reflect the actual difficulty language 
+learners experience. With your help, we are removing the language 
+professional from the equation and annotating this corpus of texts with 
+nothing but actual feedback from Russian learners.</p><p>In order to 
+accomplish this, we are using pairwise comparisons. Rather than ask you 
+to read a text and guess its difficulty, we are simply asking you to 
+compare two texts. You will be presented with two relatively short texts
+ in Russian. Your task is to read each one and indicate which of the two
+ is easier. To be clear - <b>simply pick which of the two texts is easier for you to read.</b><br></p><p>Below are some guidelines for this process. Please read them thoroughly and keep them in mind as you judge text pairs.</p><p><b>1. Read each text carefully.</b><br></p><p>In
+ order for us to get valid feedback, you must read both texts. You can 
+read one after the other, or switch between them at paragraph or 
+sentence breaks. Find a system that works for you, as long as you are 
+engaging with both texts.</p><p><b>2. Do not judge on length alone.</b></p><p>Some
+ texts are very long, and others are short. This does not necessarily 
+indicate difficulty. Think of comparing a short scientific paper to a 
+children's chapter book. The book is obviously easier, but it is also 
+longer. Do not simply pick the shorter text as the easier one.</p><p><b>3. You do not have to read the entire text.</b></p><p>As
+ stated above, some of the texts are very long. For these, you do not 
+have to read them entirely. Read enough to get a feel for their 
+difficulty, perhaps reading portions from the beginning, middle, and 
+end. As long as you give an honest effort to understand each text and 
+feel how difficult it is to read, that is enough.</p><p><b>4. Do not take too long or think too much.</b></p><p>We
+ are most interested in your first impression. For most pairs, it should
+ be apparent after reading several lines which is easier to understand. 
+Do not spend a lot of time debating which is harder, or overthinking 
+your answer. If two texts seem very close in difficulty, then select 
+whichever is easier to read (even marginally) and move on.</p><p><b>5. Use the Too Hard button sparingly.</b></p><p>In
+ the upper right corner will be a button labeled "Too Hard." This should
+ only be used if you encounter two texts which you flat out cannot 
+understand. Think of trying to judge between two texts in Chinese (or 
+another language you don't know). You have no way of telling which is 
+easier to read, because both are so far above your level. This is the 
+only case in which you should use the Too Hard button. <b>DO NOT </b>use this button if two texts are just very close to each other in difficulty.</p><p>Keep
+ in mind that you do not have to understand both texts perfectly to tell
+ which is harder. This is the advantage of our sorting algorithm. Even 
+beginning language learners can often tell which of two texts is easier 
+for them to read, without understanding every word. Don't be afraid to 
+use the Too Hard button if needed, but try your best to judge between 
+every pair.<br></p><p><br></p><p>If you have questions, refer to the Help Section below the sorter or ask your proctor.<br></p><p><br></p><p>You
+ will be prompted to agree to our Terms and Conditions on the next page.
+ After agreeing once, you will only be asked again if your proctor 
+updates them.<br></p><p><br></p><p>Thank you for your participation! 
+Once you have read the instructions above, click on Begin Sorting below.
+ You may return to the sorter at any time by clicking Sorter in the 
+toolbar.<br></p></div>
+    <div class="row">
+        <div class="col-lg-12 text-center">
+    <a class="nav-item nav-link" id="layout_sorter_link" href="https://localhost:5000/sorter"><button type="button" class="btn btn-lg btn-primary">Begin Sorting</button></a>
+            <br><br>
+        </div>
+    </div>
+
+
+
+
+    </main>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+
+
+
+  
+</body></html>
