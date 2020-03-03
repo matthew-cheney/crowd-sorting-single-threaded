@@ -62,13 +62,13 @@ def testing_login(email, password=''):
 
 # @login_manager.user_loader
 def load_user(email):
-    print('In the login route!')
+    # print('In the login route!')
     # username = user.username
-    print("user:", email)
+    # print("user:", email)
     user_id = dbhandler.get_user(email)
-    print("userID", user_id)
+    # print("userID", user_id)
     if type(user_id) == type(""):
-        print("new user detected")
+        # print("new user detected")
         session['user'] = User(False, False,
                                False, "", "",
                                "", email)
@@ -78,13 +78,13 @@ def load_user(email):
 
 
 def load_cas_user(username):
-    print('In the login route!')
+    # print('In the login route!')
     # username = user.username
-    print("cas_user:", username)
+    # print("cas_user:", username)
     user_id = dbhandler.get_cas_user(username)
-    print("userID", user_id)
+    # print("userID", user_id)
     if type(user_id) == type(""):
-        print("new user detected")
+        # print("new user detected")
         session['user'] = User(False, False,
                                False, "", "",
                                "", "")
@@ -116,7 +116,7 @@ def newuser():
         session['user'] = User(True, isInAdminFile(current_user.email),
                                isInPMFile(current_user.email), dbhandler.get_user(current_user.email), request.form.get('firstName'),
                                request.form.get('lastName'), current_user.email)
-        print("admin:", session["user"].email, session['user'].is_admin)
+        # print("admin:", session["user"].email, session['user'].is_admin)
         return postLoadUser()
     if request.method == 'POST':
         flash('Failed to register user', 'danger')
@@ -141,7 +141,7 @@ def newcasuser():
             flash(StringList.space_in_last_name_error, 'danger')
             return redirect(url_for('newcasuser'))
         current_user = session['user']  # Need to add user to session before this
-        print("creating cas user for", cas.username)
+        # print("creating cas user for", cas.username)
         if not dbhandler.create_cas_user(request.form.get('firstName'), request.form.get('lastName'),
                               cas.username + '@byu.edu', cas.username):
             flash('Email already taken', 'danger')
@@ -149,7 +149,7 @@ def newcasuser():
         session['user'] = User(True, isInAdminFile(cas.username + '@byu.edu'),
                                isInPMFile(current_user.email), dbhandler.get_user(cas.username + '@byu.edu'), request.form.get('firstName'),
                                request.form.get('lastName'), cas.username + '@byu.edu')
-        print("admin:", session["user"].email, session['user'].is_admin)
+        # print("admin:", session["user"].email, session['user'].is_admin)
         return postLoadUser()
     return render_template('newcasuser.html', current_user=dummyUser, title='New User')
 
@@ -244,7 +244,7 @@ def callback():
 @app.route("/logout_master")
 @login_required
 def logout_master():
-    print("in logout()")
+    # print("in logout()")
     email = ""
     if 'user' in session:
         email = session['user'].email
@@ -271,8 +271,8 @@ def admin_required(fn):
 
 @app.route("/cas_login")
 def cas_login(other_dest=""):
-    print('In the login route!')
-    print(cas.username)
+    # print('In the login route!')
+    # print(cas.username)
     return load_cas_user(cas.username)
 
     """user_id = dbhandler.get_user(cas.username)
@@ -325,7 +325,7 @@ def isAdmin():
 
 @app.route('/old_logout')
 def _logout_old():
-    print("in old logout")
+    # print("in old logout")
     session.clear()
     return redirect(url_for('cas.logout'))
 
@@ -334,7 +334,7 @@ def _logout_old():
 def dashboard():
     if 'user' in session and session[
             'user'].get_is_admin():  # This is bad - fix it
-        print("returning admindashboard")
+        # print("returning admindashboard")
         userID = dbhandler.get_user_id(session['user'].email)
         for project in dbhandler.get_all_projects():
             dbhandler.add_user_to_project(userID,
@@ -406,7 +406,7 @@ def get_all_user_projects():
 @app.route("/selectproject/<project_name>", methods=["POST"])
 @login_required
 def selectproject(project_name):
-    print("in selectproject with", project_name)
+    # print("in selectproject with", project_name)
     if project_name == 'None':
         return redirect(url_for('dashboard'))
     if check_select_project(session['user'].email, project_name):
@@ -425,7 +425,7 @@ def selectpublicproject():
     project_name = req_body['project_name']
     if not user_id:
         return redirect(url_for('home'))
-    print("in selectproject with", project_name)
+    # print("in selectproject with", project_name)
     if project_name == 'None':
         return redirect(url_for('dashboard'))
     dbhandler.add_user_to_project(user_id, project_name)
@@ -440,14 +440,14 @@ def temp():
 
 @app.route("/temp_two")
 def temp_two():
-    print("in temp_two!")
+    # print("in temp_two!")
     return 'Hello, World!'
 
 
 def check_project(current_request):
     if isinstance(current_request.cookies.get('project'), type(None)):
         flash("Please select a project", "warning")
-        print("User has not selected project")
+        # print("User has not selected project")
         return False
     else:
         project = current_request.cookies.get('project')
@@ -458,7 +458,7 @@ def check_project(current_request):
         else:
             all_projects = dbhandler.get_user_projects(session['user'].email)
         if project not in [x.name for x in all_projects]:
-            print("User not given access to project")
+            # print("User not given access to project")
             return False
         return True
 
@@ -613,7 +613,7 @@ def remove_self_from_project():
     project_name = req_body['project_name']
     if not user_id:
         return redirect(url_for('home'))
-    print("in removeself with", project_name)
+    # print("in removeself with", project_name)
     if project_name == 'None':
         return make_response()
     dbhandler.remove_user_from_project(user_id, project_name)
@@ -761,34 +761,13 @@ def accountinfo():
                            )
 
 
-"""# Delete file route   - This route is obselete?
-@app.route("/deleteFile", methods=['POST'])
-@login_required
-@admin_required
-def deleteFile():
-    print("in deleteFile route with", request.form.get('id'))
-    os.remove((app.config['APP_DOCS'] + '/' + request.form.get('id')))
-    dbhandler.delete_file(request.form.get('id'),
-                          request.cookies.get('project'))
-    return redirect(url_for('myadmin'))"""
-
-
-"""@app.route("/detectFiles", methods=['POST'])
-@login_required
-@admin_required
-def detectFiles():  # This route is obselete?
-    print("in detectFiles route")
-    dbhandler.detectFiles(request.cookies.get('project'))
-    return redirect(url_for('myadmin'))"""
-
-
 @app.route("/submitAnswer", methods=['POST'])
 @login_required
 def submitanswer():
-    print("in submitAnswer route")
+    # print("in submitAnswer route")
     if not check_project(request):
         redirect(url_for('home'))
-    print(request.form.get("preferred"))
+    # print(request.form.get("preferred"))
     preferred = request.form.get("preferred")
     not_preferred = ""
     if preferred == request.form.get("file_one_name"):
@@ -796,7 +775,7 @@ def submitanswer():
     else:
         not_preferred = request.form.get("file_one_name")
     judge = session['user']
-    print(f'judge: {judge.email}')
+    # print(f'judge: {judge.email}')
     if dbhandler.check_user_has_pair([preferred, not_preferred], judge, request.cookies.get('project')):
         time_started = int(request.form.get("time_started"))
         dbhandler.create_judgment(preferred, not_preferred, request.cookies.get('project'),
@@ -812,7 +791,7 @@ def submitanswer():
 @app.route("/safeexit", methods=['POST'])
 @login_required
 def safeexit():
-    print("in safe exit")
+    # print("in safe exit")
     doc1 = request.form.get('file_one_name')
     doc2 = request.form.get('file_two_name')
     admin = request.form.get('admin')
@@ -826,7 +805,7 @@ def safeexit():
 @app.route("/hardeasy", methods=['POST'])
 @login_required
 def hardeasy():
-    print(f"in hardeasy for {session['user'].email}")
+    # print(f"in hardeasy for {session['user'].email}")
     doc1 = request.form.get('file_one_name')
     doc2 = request.form.get('file_two_name')
     too_hard = request.form.get('too_hard')
@@ -862,7 +841,7 @@ def uploadFile(files, project):
     # files = request.files.getlist("file")
     for file in files:
         if file.filename == '':
-            print("No file selected for uploading")
+            # print("No file selected for uploading")
             return "Error: No file selected for uploading"
         if file and allowed_file(file.filename):
             validFiles.append(file)
@@ -887,7 +866,7 @@ def add_project():
         flash('project name may not contain spaces', 'danger')
         return redirect(url_for('dashboard'))
     message = dbhandler.create_project(request.form.get('project_name'), algorithm_to_use, request.form.get('description'), public=request.form.get('public'), join_code=request.form.get('join_code'))
-    print(message)
+    # print(message)
     if message == "unable to create project":
         flash(message, "warning")
     filenames = uploadFile(request.files.getlist("file"), request.form.get('project_name'))
@@ -904,13 +883,13 @@ def add_project():
 @login_required
 @admin_required
 def add_user_to_project():
-    print(f"in add_user_to_project at {datetime.datetime.now()}")
+    # print(f"in add_user_to_project at {datetime.datetime.now()}")
     req_body = request.json
     if req_body['action'] == 'add':
-        print(f"adding {req_body['project']} to {req_body['user']}")
+        # print(f"adding {req_body['project']} to {req_body['user']}")
         dbhandler.add_user_to_project(req_body['user'], req_body['project'])
     else:
-        print(f"remove {req_body['project']} from {req_body['user']}")
+        # print(f"remove {req_body['project']} from {req_body['user']}")
         dbhandler.remove_user_from_project(req_body['user'],
                                            req_body['project'])
     return ""

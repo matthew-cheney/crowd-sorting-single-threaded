@@ -137,7 +137,7 @@ class ACJProxy:
             pickle.dump(self, f)
 
     def delete_self(self):
-        print(f"deleting {self.acj} pickles")
+        # print(f"deleting {self.acj} pickles")
         if os.path.exists(f"crowdsorting/app_resources/sorter_instances/{self.project_name}.pkl"):
             os.remove(f"crowdsorting/app_resources/sorter_instances/{self.project_name}.pkl")
         if os.path.exists(self.logPath):
