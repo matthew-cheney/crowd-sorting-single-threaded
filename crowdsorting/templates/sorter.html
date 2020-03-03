@@ -20,12 +20,14 @@
 
 
   function safe_exit() {
+    freeze_all_buttons();
     console.log("allowed to leave");
     stop_user = 0;
     document.getElementById('safe_exit_form').submit();
   }
 
   function too_hard() {
+    freeze_all_buttons();
     console.log("allowed to leave");
     stop_user = 0;
     document.getElementById('too_hard_input').value = "1";
@@ -33,6 +35,7 @@
   }
 
   function too_easy() {
+    freeze_all_buttons();
     console.log("allowed to leave");
     stop_user = 0;
     document.getElementById('too_hard_input').value = "0";
@@ -40,11 +43,13 @@
   }
 
   function submit_pair() {
+    freeze_all_buttons();
     stop_user = 0;
     document.getElementById('submit_answer_form').submit();
   }
 
   function submit_pair_then_home() {
+    freeze_all_buttons();
     document.getElementById('another_pair').checked = false;
     submit_pair()
   }
@@ -267,6 +272,13 @@
   </div>
 </div>
 
+<div id="processing_modal" class="modal">
+  <div class="text-center loading_modal">
+      <h3>processing</h3>
+    <img src="{{ url_for('static', filename='loading_wheel_lg.gif')}}" class="loading_gif">
+      <h4 style="padding-top: 5px;">please wait...</h4>
+  </div>
+</div>
 
 <div id="timeout_modal" class="modal">
   <div class="modal-content text-center">
@@ -286,6 +298,14 @@
   var confirm_submit_modal = document.getElementById('confirm_submit_modal')
   var confirm_hard_easy_modal = document.getElementById('confirm_hard_easy_modal')
   var confirm_safe_exit_modal = document.getElementById('confirm_safe_exit_modal')
+
+  function freeze_all_buttons() {
+    document.getElementById('processing_modal').style.display = "block";
+    btns = document.getElementsByClassName("btn")
+    for (var j = 0; j < btns.length; j++) {
+        btns[j].disabled = true;
+    }
+  }
 
   function show_confirm_modal() {
     confirm_submit_modal.style.display = "block";
