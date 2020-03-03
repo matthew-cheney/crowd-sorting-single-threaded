@@ -126,9 +126,9 @@ class DBHandler:
         harder_doc.num_compares += 1
         easier_doc.num_compares += 1
         judge_id = session['user'].get_judge_id()
-        db.session.add(
-            Judgment(doc_harder_id=harder_doc.id, doc_easier_id=easier_doc.id,
-                     judge_id=judge_id, project_name=project))
+        # db.session.add(
+        #     Judgment(doc_harder_id=harder_doc.id, doc_easier_id=easier_doc.id,
+        #              judge_id=judge_id, project_name=project))
         db.session.commit()
         pairselectors[project].make_judgment(easier_doc, harder_doc, duration,
                                              judge.email)
