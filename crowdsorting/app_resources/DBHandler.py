@@ -75,7 +75,7 @@ class DBHandler:
                                                   checked_out=False).all()
         allJudgments = db.session.query(Judgment).filter_by(
             project_name=project).all()
-        print('allJudgments:', allJudgments)
+        # print('allJudgments:', allJudgments)
         pair = pairselectors[project].get_pair(len(allDocs), allDocs)
         if not pair:
             return pair
