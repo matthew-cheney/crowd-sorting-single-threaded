@@ -21,8 +21,9 @@ class DBHandler:
         self.unpickle_pairs_being_processed()
 
     def pickle_pairs_being_processed(self):
-        with open(self.PBP_Path, "wb") as f:
-            pickle.dump(self.pairsBeingProcessed, f)
+        # with open(self.PBP_Path, "wb") as f:
+            # pickle.dump(self.pairsBeingProcessed, f)
+        pass
 
     def unpickle_pairs_being_processed(self):
         try:
@@ -135,11 +136,18 @@ class DBHandler:
         # self.unpickle_pairs_being_processed()
         if project not in self.pairsBeingProcessed:
             self.add_pairs_being_processed(project)
+            print("CREATING PROJECT IN PAIRSBEINGPROCESSED -------------------------------------------------------------------")
+        print(f'removing {harder}, {easier} from pbp')
+        removed = False
         for pair in self.pairsBeingProcessed[project]:
             if (pair.doc1.name == harder and pair.doc2.name == easier) or (
                     pair.doc1.name == easier and pair.doc2.name == harder):
                 self.pairsBeingProcessed[project].remove(pair)
+                removed = True
                 break
+        if not removed:
+            print('pairsBeingProcessed',self.pairsBeingProcessed, harder, easier)
+            exit(1)
         self.pickle_pairs_being_processed()
 
     def reset_timestamp(self, project_name, pair_id):

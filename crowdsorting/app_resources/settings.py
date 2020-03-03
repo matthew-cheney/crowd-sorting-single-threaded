@@ -14,7 +14,7 @@ DEFAULT_SELECTION_PROMPT = "Select the better text"
 DEFAULT_PREFERRED_PROMPT = "Better"
 DEFAULT_UNPREFERRED_PROMPT = "Worse"
 DEFAULT_LANDING_PAGE = """<div class="text-center"><h1>Crowd Sorting</h1><h2>with the BYU Department of Digital Humanities</h2><p><br></p><h2>Please read the following instructions carefully.</h2><p>The
- purpose of this project is to sort roughly 100 Russian texts by 
+ purpose of this project is to sort Russian texts by 
 difficulty. This is typically done by a language professional or 
 teacher, who reads each text and arbitrarily assigns a difficulty. 
 However, this often does not reflect the actual difficulty language 
