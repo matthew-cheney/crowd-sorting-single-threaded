@@ -147,7 +147,7 @@ class DBHandler:
                 break
         if not removed:
             print('pairsBeingProcessed',self.pairsBeingProcessed, harder, easier)
-            exit(1)
+            # exit(1)
         self.pickle_pairs_being_processed()
 
     def reset_timestamp(self, project_name, pair_id):
