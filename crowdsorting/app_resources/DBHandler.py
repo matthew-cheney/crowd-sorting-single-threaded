@@ -107,8 +107,8 @@ class DBHandler:
         db.session.commit()
 
 
-        for pair in self.pairsBeingProcessed[project]:
-            print(pair)
+        # for pair in self.pairsBeingProcessed[project]:
+        #     print(pair)
         return pair
 
     # Function to create new judgment

@@ -80,7 +80,7 @@
         <form id="hard_easy_form" method="POST" action="hardeasy">
             <div class="row">
                 <div class="col-md-12 text-right">
-                    <button type="button" class="btn btn-lg btn-warning text-white" onclick="show_hard_easy_modal()">Too Hard / Too Easy</button>
+                    <button type="button" class="btn btn-lg btn-warning text-white" onclick="show_hard_easy_modal()">Too Hard</button>
                 </div>
                 <input type="hidden" name="file_one_name"
                            value="{{ file_one_name }}">
@@ -227,9 +227,9 @@
       <div class="row">
           <div class="col-md-12 text-center">
           <h2>Confirm</h2>
-          <h3>Are you sure these are too hard/easy?</h3>
-          <button class="btn btn-danger btn-lg left-button" onclick="too_hard()">Hard</button>
-          <button class="btn btn-success btn-lg right-button" onclick="too_easy()">Easy</button><br/>
+          <h3>Are you sure these are too hard?</h3>
+          <button class="btn btn-primary btn-lg" onclick="too_hard()">Yes</button>
+          <!--<button class="btn btn-success btn-lg right-button" onclick="too_easy()">Easy</button><br/>-->
               <h3>or</h3>
           <button class="btn btn-warning btn-lg" onclick="hide_hard_easy_modal()">Cancel</button>
           </div>

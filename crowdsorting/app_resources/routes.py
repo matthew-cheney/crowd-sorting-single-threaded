@@ -43,12 +43,12 @@ dummyUser = User("", False, False, 0, "", "", "")
 def login_required(fn):
     @wraps(fn)
     def wrapper(*args, **kwargs):
-        print("checking login ..............................................................")
+        # print("checking login ..............................................................")
         try:
             if not session['user'].is_authenticated:
                 return "This page is solely accessible to users", 403
             else:
-                print("you're ok")
+                # print("you're ok")
                 return fn(*args, **kwargs)
         except KeyError:
             return "This page is only accessible to users", 403

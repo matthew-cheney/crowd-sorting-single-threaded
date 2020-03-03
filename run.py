@@ -15,4 +15,4 @@ if __name__ == '__main__':
     # )
 
     # run_simple('0.0.0.0', 5000, application, use_reloader=True, ssl_context='adhoc')
-    app.run(debug=False, ssl_context='adhoc')
+    app.run(debug=True, ssl_context='adhoc')

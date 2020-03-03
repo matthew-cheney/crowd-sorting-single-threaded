@@ -40,7 +40,7 @@ class ACJProxy:
             os.mkdir(f'{self.logPath}/logs')
         if not os.path.isdir(f'{self.logPath}/fossils'):
             os.mkdir(f'{self.logPath}/fossils')
-        print("creating acj")
+        # print("creating acj")
         self.fossilIncrement = fossilIncrement
         self.fossilIncrementCounter = 0
         self.number_of_docs = len(data)
@@ -118,11 +118,6 @@ class ACJProxy:
 
     def get_possible_judgments_count(self):
         return self.get_total_comparisons_left() + self.get_number_comparisons_made()
-        """total = int(self.rounds * (self.number_of_docs / 2))
-        if total < 1:
-            total = 1
-        print(f'returning number of pairs: {total}')
-        return total"""
 
     def get_confidence(self):
         return self.acj.reliability()[0]
