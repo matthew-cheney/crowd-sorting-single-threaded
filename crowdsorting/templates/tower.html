@@ -45,6 +45,7 @@
             <input type="hidden" value="{{ pair.doc2.name }}" name="doc_two">
             <input type="hidden" value="{{ current_project }}" name="project_name">
             <input type="hidden" value="{{ pair.user_checked_out_by }}" name="user_email">
+            <input type="hidden" value="{{ pair.pair_id }}" name="pair_id">
             <button type="submit" class="btn btn-md btn-primary">Force Return</button>
         </form>
         <hr/>
@@ -61,6 +62,7 @@
             <input type="hidden" value="{{ pair.doc2.name }}" name="doc_two">
             <input type="hidden" value="{{ current_project }}" name="project_name">
             <input type="hidden" value="{{ pair.user_checked_out_by }}" name="user_email">
+            <input type="hidden" value="{{ pair.pair_id }}" name="pair_id">
             <button type="submit" class="btn btn-md btn-primary">Sort Now</button>
         </form>
         <hr/>

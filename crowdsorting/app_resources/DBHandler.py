@@ -3,6 +3,7 @@ import uuid
 
 from crowdsorting import session, pairselectors
 from crowdsorting import db
+from crowdsorting.app_resources.docpair import DocPair
 from crowdsorting.database.models import Project, Doc, Judge, Judgment
 from crowdsorting import models
 from crowdsorting import app
@@ -21,9 +22,8 @@ class DBHandler:
         self.unpickle_pairs_being_processed()
 
     def pickle_pairs_being_processed(self):
-        # with open(self.PBP_Path, "wb") as f:
-            # pickle.dump(self.pairsBeingProcessed, f)
-        pass
+        with open(self.PBP_Path, "wb") as f:
+            pickle.dump(self.pairsBeingProcessed, f)
 
     def unpickle_pairs_being_processed(self):
         try:
@@ -54,7 +54,7 @@ class DBHandler:
             db.session.commit()
 
     def add_pairs_being_processed(self, project):
-        self.pairsBeingProcessed[project] = []
+        self.pairsBeingProcessed[project] = dict()
         self.pickle_pairs_being_processed()
 
     # Function to get next pair of docs
@@ -62,7 +62,7 @@ class DBHandler:
         # self.unpickle_pairs_being_processed()
         if project not in self.pairsBeingProcessed:
             self.add_pairs_being_processed(project)
-        for pair in self.pairsBeingProcessed[project]:
+        for pair in self.pairsBeingProcessed[project].values():
             if ((pair.get_timestamp() < (datetime.now() - timedelta(seconds=pair.lifeSeconds))) or \
                     (pair.checked_out == False)) and (user not in pair.users_opted_out):
                 pair.update_time_stamp()
@@ -77,16 +77,34 @@ class DBHandler:
         # allJudgments = db.session.query(Judgment).filter_by(
         #     project_name=project).all()
         # print('allJudgments:', allJudgments)
-        pair = pairselectors[project].get_pair(len(allDocs), allDocs)
-        if not pair:
-            return pair
-        if type(pair) == type(""):
-            print(pair)
-            print('no more pairs')
-            return pair
 
-        if pair.id is None:
-            pair.id = uuid.uuid4()
+        values = pairselectors[project].get_pair()
+        if type(values) == str:
+            print(values)
+            return values
+        doc_one_name = values[0]
+        doc_two_name = values[1]
+        pair_id = values[2]
+
+        doc_one = db.session.query(Doc).filter_by(project_name=project,
+                                                  name=doc_one_name).first()
+        doc_two = db.session.query(Doc).filter_by(project_name=project,
+                                                  name=doc_two_name).first()
+
+        if doc_one is None or doc_two is None:
+            raise Exception('doc not found in database')
+
+        pair = DocPair(doc_one, doc_two, pair_id=pair_id)
+
+        # if not pair:
+        #     return pair
+        # if type(pair) == type(""):
+        #     print(pair)
+        #     print('no more pairs')
+        #     return pair
+
+        # if pair.id is None:
+        #     pair.id = uuid.uuid4()
 
         doc1_contents = re.split(' |\n', pair.doc1.contents.decode('utf-8'))
         doc2_contents = re.split(' |\n', pair.doc2.contents.decode('utf-8'))
@@ -96,24 +114,24 @@ class DBHandler:
         print(f"lifeSeconds: {lifeSeconds}")
 
         pair.user_checked_out_by = user
-        self.pairsBeingProcessed[project].append(pair)
+        self.pairsBeingProcessed[project][pair.pair_id] = pair
         self.pickle_pairs_being_processed()
 
-        doc1 = db.session.query(Doc).filter_by(name=pair.get_first(),
-                                               project_name=project).first()
-        doc2 = db.session.query(Doc).filter_by(name=pair.get_second(),
-                                               project_name=project).first()
-        doc1.checked_out = True
-        doc2.checked_out = True
-        db.session.commit()
+        # doc1 = db.session.query(Doc).filter_by(name=pair.get_first(),
+        #                                        project_name=project).first()
+        # doc2 = db.session.query(Doc).filter_by(name=pair.get_second(),
+        #                                        project_name=project).first()
+        # doc1.checked_out = True
+        # doc2.checked_out = True
+        # db.session.commit()
 
 
-        for pair in self.pairsBeingProcessed[project]:
-            print(pair)
+        # for pair in self.pairsBeingProcessed[project]:
+        #     print(pair)
         return pair
 
     # Function to create new judgment
-    def create_judgment(self, harder, easier, project, judge, duration):
+    def create_judgment(self, pair_id, harder, easier, project, judge, duration):
         print(f"The winner is {harder}")
         print(f"The loser is {easier}")
         harder_doc = \
@@ -122,16 +140,16 @@ class DBHandler:
         easier_doc = \
             db.session.query(Doc).filter_by(name=easier,
                                             project_name=project).first()
-        harder_doc.checked_out = False
-        easier_doc.checked_out = False
-        harder_doc.num_compares += 1
-        easier_doc.num_compares += 1
+        # harder_doc.checked_out = False
+        # easier_doc.checked_out = False
+        # harder_doc.num_compares += 1
+        # easier_doc.num_compares += 1
         judge_id = session['user'].get_judge_id()
         # db.session.add(
         #     Judgment(doc_harder_id=harder_doc.id, doc_easier_id=easier_doc.id,
         #              judge_id=judge_id, project_name=project))
-        db.session.commit()
-        pairselectors[project].make_judgment(easier_doc, harder_doc, duration,
+        # db.session.commit()
+        pairselectors[project].make_judgment(pair_id, easier_doc, harder_doc, duration,
                                              judge.email)
         # self.unpickle_pairs_being_processed()
         if project not in self.pairsBeingProcessed:
@@ -139,24 +157,27 @@ class DBHandler:
             print("CREATING PROJECT IN PAIRSBEINGPROCESSED -------------------------------------------------------------------")
         print(f'removing {harder}, {easier} from pbp')
         removed = False
-        for pair in self.pairsBeingProcessed[project]:
+        del self.pairsBeingProcessed[project][pair_id]
+        removed = True
+        """for pair in self.pairsBeingProcessed[project]:
             if (pair.doc1.name == harder and pair.doc2.name == easier) or (
                     pair.doc1.name == easier and pair.doc2.name == harder):
                 self.pairsBeingProcessed[project].remove(pair)
                 removed = True
-                break
+                break"""
         if not removed:
-            print('pairsBeingProcessed',self.pairsBeingProcessed, harder, easier)
+            print('TRIED TO REMOVE NONEXISTENT PAIR FROM pairsBeingProcessed',self.pairsBeingProcessed, harder, easier)
             # exit(1)
         self.pickle_pairs_being_processed()
 
     def reset_timestamp(self, project_name, pair_id):
         # self.unpickle_pairs_being_processed()
-        for each_pair in self.pairsBeingProcessed[project_name]:
+        self.pairsBeingProcessed[project_name][pair_id].update_timestamp()
+        """for each_pair in self.pairsBeingProcessed[project_name]:
             if str(each_pair.id) == pair_id:
                 each_pair.update_timestamp()
                 self.pickle_pairs_being_processed()
-                return True  # Updated timestamp
+                return True  # Updated timestamp"""
         self.pickle_pairs_being_processed()
         return False  # Pair not found
 
@@ -462,9 +483,17 @@ class DBHandler:
             return True
         return False
 
-    def return_pair(self, pair, project, user=None):
+    def return_pair(self, pair_id, pair, project, user=None):
         # self.unpickle_pairs_being_processed()
-        for out_pair in self.pairsBeingProcessed[project]:
+        try:
+            self.pairsBeingProcessed[project][pair_id].checked_out = False
+            self.pairsBeingProcessed[project][pair_id].user_checked_out_by = None
+            self.pairsBeingProcessed[project][pair_id].users_opted_out.append(user)
+            self.pickle_pairs_being_processed()
+            return
+        except KeyError:
+            print("pair not found in pairsBeingProcessed")
+        """for out_pair in self.pairsBeingProcessed[project]:
             if (pair[0] == out_pair.doc1.name and pair[1] == out_pair.doc2.name) or \
                (pair[1] == out_pair.doc1.name and pair[0] == out_pair.doc2.name):
                 out_pair.checked_out = False
@@ -472,8 +501,7 @@ class DBHandler:
                 if user is not None:
                     out_pair.users_opted_out.append(user)
                 self.pickle_pairs_being_processed()
-                return
-        print("pair not found in pairsBeingProcessed")
+                return"""
 
     def check_user_has_pair(self, pair, user, project):
         if None in [pair, user, project]:
@@ -481,7 +509,7 @@ class DBHandler:
         # self.unpickle_pairs_being_processed()
         if project not in self.pairsBeingProcessed:
             return False
-        for out_pair in self.pairsBeingProcessed[project]:
+        for out_pair in self.pairsBeingProcessed[project].values():
             if (pair[0] == out_pair.doc1.name and pair[1] == out_pair.doc2.name) or \
                     (pair[1] == out_pair.doc1.name and pair[0] == out_pair.doc2.name):
                 if out_pair.user_checked_out_by == user.email:
@@ -534,7 +562,7 @@ class DBHandler:
         # self.unpickle_pairs_being_processed()
         if project_name not in self.pairsBeingProcessed:
             return []
-        all_pbp = self.pairsBeingProcessed[project_name]
+        all_pbp = self.pairsBeingProcessed[project_name].values()
         filtered_pbp = []
         for pair in all_pbp:
             if ((pair.get_timestamp() < (datetime.now() - timedelta(seconds=pair.lifeSeconds))) or \
@@ -546,7 +574,7 @@ class DBHandler:
         # self.unpickle_pairs_being_processed()
         if project_name not in self.pairsBeingProcessed:
             return []
-        all_pbp = self.pairsBeingProcessed[project_name]
+        all_pbp = self.pairsBeingProcessed[project_name].values()
         filtered_pbp = []
         for pair in all_pbp:
             if not pair.get_user_checked_out_by() == None:
@@ -560,7 +588,7 @@ class DBHandler:
         # self.unpickle_pairs_being_processed()
         if project not in self.pairsBeingProcessed:
             return 'project not found'
-        for pair in self.pairsBeingProcessed[project]:
+        for pair in self.pairsBeingProcessed[project].values():
             if ((doc_one == pair.doc1.name and doc_two == pair.doc2.name) or
                 (doc_one == pair.doc2.name and doc_two == pair.doc1.name)):
                 pair.update_time_stamp()
@@ -576,7 +604,7 @@ class DBHandler:
         if project not in self.pairsBeingProcessed:
             return []
         judges = set()
-        for pair in self.pairsBeingProcessed[project]:
+        for pair in self.pairsBeingProcessed[project].values():
             if pair.checked_out:
                 judges.add(pair.user_checked_out_by)
         return judges

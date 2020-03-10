@@ -4,6 +4,7 @@ import shutil
 
 import numpy as np
 from datetime import datetime
+import uuid
 
 from crowdsorting.app_resources.docpair import DocPair
 from crowdsorting.app_resources.sorting_algorithms.ACJ import ACJ
@@ -20,7 +21,7 @@ class ACJProxy:
         self.project_name = project_name
         self.logPath = f"crowdsorting/ACJ_Logs/{self.project_name}"
         self.remaining_in_round = []
-        self.served_not_returned = []
+        self.served_not_returned = dict()
         self.finished = False
         self.total_comparisons = 0
 
@@ -49,6 +50,8 @@ class ACJProxy:
         dat = np.asarray(data)
         np.random.shuffle(dat)
         self.acj = ACJ(dat, maxRounds, noOfChoices, f'{self.logPath}/logs', optionNames)
+        self.acj.nextIDPair()
+        self.roundList = self.acj.roundList[:]
         self.no_more_pairs = False
         with open(f"crowdsorting/app_resources/sorter_instances/{self.project_name}.pkl", "wb") as output_file:  # noqa: E501
             pickle.dump(self, output_file)
@@ -59,7 +62,8 @@ class ACJProxy:
         with open(f"crowdsorting/app_resources/sorter_instances/{self.project_name}.pkl", "wb") as f:  # noqa: E501
             pickle.dump(self, f)
 
-    def get_pair(self, number_of_docs, allDocs):
+    # def get_pair(self, number_of_docs, allDocs):
+    def get_pair(self):
         if self.no_more_pairs:
             return "project is over"
         try:
@@ -69,44 +73,61 @@ class ACJProxy:
         except FileNotFoundError:
             return False
 
-        acj_pair = self.acj.nextIDPair()
+        if len(self.roundList) == 0:
+            return "waiting for round to turn over"
+
+        acj_pair = self.roundList.pop()
         if isinstance(acj_pair, type(None)):
             self.no_more_pairs = True
             return "no pair available"
-        doc_one_name = self.acj.getScript(acj_pair[0])
-        doc_two_name = self.acj.getScript(acj_pair[1])
-        if acj_pair is None:
-            return "no pair available"
-        doc_one = False
-        doc_two = False
-        for doc in allDocs:
-            if doc.name == doc_one_name:
-                doc_one = doc
-            if doc.name == doc_two_name:
-                doc_two = doc
-            if doc_one and doc_two:
-                break
-        doc_pair = DocPair(doc_one, doc_two)
-        if not doc_one or not doc_two:
-            return "no pair available"
-        self.served_not_returned.append([doc_one, doc_two])
-        return doc_pair
+        # doc_one_name = self.acj.getScript(acj_pair[0])
+        # doc_two_name = self.acj.getScript(acj_pair[1])
+        pair_id = uuid.uuid4().hex
+        # if acj_pair is None:
+        #     return "no pair available"
+        # doc_one = False
+        # doc_two = False
+        # for doc in allDocs:
+        #     if doc.name == doc_one_name:
+        #         doc_one = doc
+        #     if doc.name == doc_two_name:
+        #         doc_two = doc
+        #     if doc_one and doc_two:
+        #         break
+        # doc_pair = DocPair(doc_one, doc_two)
+        # if not doc_one or not doc_two:
+        #     return "no pair available"
+        self.served_not_returned[pair_id] = acj_pair
+        return (acj_pair[0], acj_pair[1], pair_id)
 
-    def make_judgment(self, easier_doc_name, harder_doc_name, duration,
+    def make_judgment(self, pair_id, easier_doc_name, harder_doc_name, duration,
                       judge_name='Unknown'):
+        try:
+            acj_pair = self.served_not_returned[pair_id]
+        except KeyError:
+            return "pair not found"
+
         easier_doc_id = self.acj.getID(easier_doc_name.name)
         harder_doc_id = self.acj.getID(harder_doc_name.name)
-        pair = (easier_doc_id, harder_doc_id)
-        self.acj.IDComp(pair, False, reviewer=judge_name, time=duration)
-        if [easier_doc_name, harder_doc_name] in self.served_not_returned:
-            self.served_not_returned.remove([easier_doc_name, harder_doc_name])
-        elif [harder_doc_name, easier_doc_name] in self.served_not_returned:
-            self.served_not_returned.remove([harder_doc_name, easier_doc_name])
+
+        if acj_pair[0] == easier_doc_name.name:
+            outcome = False
+        elif acj_pair[0] == harder_doc_name.name:
+            outcome = True
+        else:
+            return "pair id maps to wrong doc ids"
+
+        self.acj.comp(acj_pair, outcome, reviewer=judge_name, time=duration)
+        del self.served_not_returned[pair_id]
+        if len(self.roundList) == 0 and len(self.served_not_returned) == 0:
+            self.acj.nextIDPair()
+            self.roundList = self.acj.roundList[:]
         self.pickle_acj()
         self.fossilIncrementCounter += 1
         if self.fossilIncrementCounter == self.fossilIncrement:
             self.fossilize_self()
             self.fossilIncrementCounter = 0
+        return True
 
     def get_sorted(self, allDocs, allJudgments):
         # if isinstance(self.acj, type(None)):
@@ -149,7 +170,8 @@ class ACJProxy:
             shutil.rmtree(self.logPath)
 
     def get_round_list(self):
-        return self.acj.unservedRoundList
+        return self.roundList
+        # return self.acj.unservedRoundList
 
     def finished(self):
         return self.no_more_pairs

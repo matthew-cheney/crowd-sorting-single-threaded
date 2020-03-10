@@ -574,7 +574,7 @@ def sorter(admin_docpair=None):
                            selection_prompt=selection_prompt,
                            preferred_prompt=preferred_prompt,
                            unpreferred_prompt=unpreferred_prompt,
-                           pair_id=docPair.id,
+                           pair_id=docPair.pair_id,
                            project_name=request.cookies.get('project'),
                            admin=admin
                            )
@@ -795,11 +795,12 @@ def submitanswer():
     else:
         not_preferred = request.form.get("file_one_name")
     judge = session['user']
+    pair_id = request.form.get('pair_id')
     print(f'judge: {judge.email}')
-    if dbhandler.check_user_has_pair([preferred, not_preferred], judge, request.cookies.get('project')):
-        time_started = int(request.form.get("time_started"))
-        dbhandler.create_judgment(preferred, not_preferred, request.cookies.get('project'),
-                                  judge, floor(time.time()) - time_started)
+    # if dbhandler.check_user_has_pair([preferred, not_preferred], judge, request.cookies.get('project')):
+    time_started = int(request.form.get("time_started"))
+    dbhandler.create_judgment(pair_id, preferred, not_preferred, request.cookies.get('project'),
+                              judge, floor(time.time()) - time_started)
     if request.form.get('admin') == 'True':
         return redirect(url_for('tower'))
     if isinstance(request.form.get('another_pair_checkbox'), type(None)):
@@ -814,10 +815,11 @@ def safeexit():
     print("in safe exit")
     doc1 = request.form.get('file_one_name')
     doc2 = request.form.get('file_two_name')
+    pair_id = request.form.get('pair_id')
     admin = request.form.get('admin')
     project = request.cookies.get('project')
-    if dbhandler.check_user_has_pair([doc1, doc2], session['user'], project):
-        dbhandler.return_pair((doc1, doc2), project)
+    # if dbhandler.check_user_has_pair([doc1, doc2], session['user'], project):
+    dbhandler.return_pair(pair_id, (doc1, doc2), project)
     if admin == 'True':
         return redirect(url_for('tower'))
     return redirect(url_for('home'))
@@ -828,15 +830,16 @@ def hardeasy():
     print(f"in hardeasy for {session['user'].email}")
     doc1 = request.form.get('file_one_name')
     doc2 = request.form.get('file_two_name')
+    pair_id = request.form.get('pair_id')
     too_hard = request.form.get('too_hard')
     if too_hard == '1':
         too_hard = True
     else:
         too_hard = False
     project = request.cookies.get('project')
-    if dbhandler.check_user_has_pair([doc1, doc2], session['user'], project):
-        dbhandler.return_pair((doc1, doc2), project, session['user'].email)
-        rejectLogger.log_reject(project, session['user'].email, doc1, doc2, too_hard)
+    # if dbhandler.check_user_has_pair([doc1, doc2], session['user'], project):
+    dbhandler.return_pair(pair_id, (doc1, doc2), project, session['user'].email)
+    rejectLogger.log_reject(project, session['user'].email, doc1, doc2, too_hard)
     return redirect(url_for('sorter'))
 
 
@@ -1021,7 +1024,8 @@ def force_return():
     doc_two = request.form.get('doc_two')
     project = request.form.get('project_name')
     user_email = request.form.get('user_email')
-    dbhandler.return_pair([doc_one, doc_two], project)
+    pair_id = request.form.get('pair_id')
+    dbhandler.return_pair(pair_id, [doc_one, doc_two], project)
     return redirect(url_for('tower'))
 
 @app.route("/adminsorter", methods=["POST"])
