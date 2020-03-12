@@ -1,4 +1,4 @@
-{% extends "layout.html" %}
+{% extends "layout_sorter.html" %}
 
 {% block content %}
 
@@ -64,6 +64,7 @@
     <div class="col-lg-6">
         <form id="safe_exit_form" method="POST" action="safeexit">
             <input type="hidden" value="{{ pair_id }}" name="pair_id">
+            <input type="hidden" value="{{ pair_submission_key }}" name="pair_submission_key">
             <div class="row">
                 <div class="col-md-12 text-left">
                     <button type="button" class="btn btn-danger btn-lg" onclick="show_safe_exit_modal()">{% if admin %}Return to Tower{% else %}Exit Without Submitting{% endif %}</button>
@@ -80,6 +81,7 @@
     <div class="col-lg-6">
         <form id="hard_easy_form" method="POST" action="hardeasy">
             <input type="hidden" value="{{ pair_id }}" name="pair_id">
+            <input type="hidden" value="{{ pair_submission_key }}" name="pair_submission_key">
             <div class="row">
                 <div class="col-md-12 text-right">
                     <button type="button" class="btn btn-lg btn-warning text-white" onclick="show_hard_easy_modal()">Too Hard</button>
@@ -98,6 +100,8 @@
 <form id="submit_answer_form" method="POST" action="submitAnswer">
     <input type="hidden" value="{{ admin }}" name="admin">
     <input type="hidden" value="{{ pair_id }}" name="pair_id">
+    <input type="hidden" value="{{ pair_submission_key }}" name="pair_submission_key">
+    <input type="hidden" value="{{ judge_email }}" name="judge_email">
     <div class="row">
         <div class="col-md-12 text-center">
             <h3>{{ selection_prompt }}</h3>

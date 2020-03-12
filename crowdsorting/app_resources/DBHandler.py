@@ -19,7 +19,9 @@ class DBHandler:
 
     def __init__(self):
         self.PBP_Path = app.config['PAIRS_BEING_PROCESSED_PATH']
+        self.email_dict_path = app.config['EMAIL_DICT_PATH']
         self.unpickle_pairs_being_processed()
+        self.unpickle_email_dict()
 
     def pickle_pairs_being_processed(self):
         with open(self.PBP_Path, "wb") as f:
@@ -31,6 +33,18 @@ class DBHandler:
                 self.pairsBeingProcessed = pickle.load(f)
         except FileNotFoundError:
             self.pairsBeingProcessed = {}
+
+    def unpickle_email_dict(self):
+        try:
+            with open(self.email_dict_path, "rb") as f:
+                self.email_dict = pickle.load(f)
+        except FileNotFoundError:
+            self.email_dict = {}
+
+    def pickle_email_dict(self):
+        with open(self.email_dict_path, "wb") as f:
+            pickle.dump(self.email_dict, f)
+
 
     def db_file_names(self, project):
         filesInDatabase = db.session.query(Doc).filter_by(
@@ -70,6 +84,7 @@ class DBHandler:
                 print(f"serving stored pair {pair}")
                 pair.checked_out = True
                 pair.user_checked_out_by = user
+                pair.pair_submission_key = uuid.uuid4().hex
                 self.pickle_pairs_being_processed()
                 return pair
         allDocs = db.session.query(Doc).filter_by(project_name=project,
@@ -94,7 +109,8 @@ class DBHandler:
         if doc_one is None or doc_two is None:
             raise Exception('doc not found in database')
 
-        pair = DocPair(doc_one, doc_two, pair_id=pair_id)
+        pair = DocPair(doc_one, doc_two, pair_id=pair_id,
+                       pair_submission_key=uuid.uuid4().hex)
 
         # if not pair:
         #     return pair
@@ -131,7 +147,7 @@ class DBHandler:
         return pair
 
     # Function to create new judgment
-    def create_judgment(self, pair_id, harder, easier, project, judge, duration):
+    def create_judgment(self, pair_id, harder, easier, project, judge_email, duration):
         print(f"The winner is {harder}")
         print(f"The loser is {easier}")
         harder_doc = \
@@ -150,7 +166,7 @@ class DBHandler:
         #              judge_id=judge_id, project_name=project))
         # db.session.commit()
         pairselectors[project].make_judgment(pair_id, easier_doc, harder_doc, duration,
-                                             judge.email)
+                                             judge_email)
         # self.unpickle_pairs_being_processed()
         if project not in self.pairsBeingProcessed:
             self.add_pairs_being_processed(project)
@@ -283,7 +299,28 @@ class DBHandler:
         db.session.add(Judge(firstName=firstName, lastName=lastName,
                              email=email))
         db.session.commit()
+
+        id = uuid.uuid4().hex
+        self.email_dict[id] = email
+        self.email_dict[email] = id
+        self.pickle_email_dict()
+
         return
+
+    def id_to_email(self, id):
+        try:
+            return self.email_dict[id]
+        except KeyError:
+            return None
+
+    def email_to_id(self, email):
+        try:
+            return self.email_dict[email]
+        except KeyError:
+            id = uuid.uuid4().hex
+            self.email_dict[email] = id
+            self.email_dict[id] = email
+            return id
 
     def get_number_of_judgments(self, project):
         return pairselectors[project].get_number_comparisons_made()
@@ -608,3 +645,8 @@ class DBHandler:
             if pair.checked_out:
                 judges.add(pair.user_checked_out_by)
         return judges
+
+    def check_pair_submission_key(self, project, pair_id, key):
+        if key != self.pairsBeingProcessed[project][pair_id].pair_submission_key:
+            return False
+        return True

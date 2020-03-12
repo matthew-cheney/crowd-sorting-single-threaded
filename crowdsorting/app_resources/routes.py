@@ -499,36 +499,44 @@ def home():
 
 # Router to sorting page
 @app.route("/sorter")
-@login_required
+# @login_required
 def sorter(admin_docpair=None):
-    if 'user' not in session:
-        return redirect(url_for('home'))
-    if not check_project(request):
-        return redirect(url_for('dashboard'))
-    if not dbhandler.user_consented(session['user'], request.cookies.get('project')):
-        return render_template('consentform.html', title='Consent Form',
-                               current_user=session['user'],
-                               all_projects=get_all_user_projects(),
-                               public_projects=dbhandler.get_public_projects(),
-                               current_project=get_current_project(),
-                               consent_form_text=dbhandler.get_consent_form(request.cookies.get('project')),
-                               admin=False
-                               )
+    bypass_login = request.args.get('bypass_login')
+    user_email_id = request.args.get('user_email_id')
+    user_email = dbhandler.id_to_email(user_email_id)
+    if not bypass_login == 'True':
+        if 'user' not in session:
+            return redirect(url_for('home'))
+        if not check_project(request):
+            return redirect(url_for('dashboard'))
+        if not dbhandler.user_consented(session['user'], request.cookies.get('project')):
+            return render_template('consentform.html', title='Consent Form',
+                                   current_user=session['user'],
+                                   all_projects=get_all_user_projects(),
+                                   public_projects=dbhandler.get_public_projects(),
+                                   current_project=get_current_project(),
+                                   consent_form_text=dbhandler.get_consent_form(request.cookies.get('project')),
+                                   admin=False
+                                   )
     if isinstance(request.cookies.get('project'), type(None)):
-        return render_template('nopairs.html', title='Check later',
-                               message="No project selected",
-                               current_user=session['user'],
-                               all_projects=get_all_user_projects(),
-                               public_projects=dbhandler.get_public_projects(),
-                               current_project=get_current_project()
-                               )
+        if 'user' in session:
+            return render_template('nopairs.html', title='Check later',
+                                   message="No project selected",
+                                   current_user=session['user'],
+                                   all_projects=get_all_user_projects(),
+                                   public_projects=dbhandler.get_public_projects(),
+                                   current_project=get_current_project()
+                                   )
+        else:
+            return redirect(url_for('home'))
     try:
-        user_email = session['user'].email
+        if user_email is None:
+            user_email = session['user'].email
         if admin_docpair is None:
             docPair = dbhandler.get_pair(request.cookies.get('project'), user_email)
             admin = False
         else:
-            docPair = dbhandler.get_docpair_by_names(admin_docpair[0], admin_docpair[1], request.cookies.get('project'), session['user'].email)
+            docPair = dbhandler.get_docpair_by_names(admin_docpair[0], admin_docpair[1], request.cookies.get('project'), user_email)
             admin = True
     except KeyError:
         flash('Looks like your selected project has been deleted!', 'warning')
@@ -565,7 +573,7 @@ def sorter(admin_docpair=None):
                            file_two=file_two,
                            file_one_name=docPair.get_first(),
                            file_two_name=docPair.get_second(),
-                           current_user=session['user'],
+                           # current_user=session['user'],
                            time_started=floor(time.time()),
                            all_projects=get_all_user_projects(),
                            public_projects=dbhandler.get_public_projects(),
@@ -576,7 +584,9 @@ def sorter(admin_docpair=None):
                            unpreferred_prompt=unpreferred_prompt,
                            pair_id=docPair.pair_id,
                            project_name=request.cookies.get('project'),
-                           admin=admin
+                           admin=admin,
+                           pair_submission_key=docPair.pair_submission_key,
+                           judge_email=dbhandler.email_to_id(user_email)
                            )
 
 @app.route("/moretime", methods=['POST'])
@@ -782,11 +792,17 @@ def detectFiles():  # This route is obselete?
 
 
 @app.route("/submitAnswer", methods=['POST'])
-@login_required
+# @login_required
 def submitanswer():
     print("in submitAnswer route")
+    project_name = request.cookies.get('project')
+    pair_id = request.form.get('pair_id')
+    pair_submission_key = request.form.get('pair_submission_key')
+    if not dbhandler.check_pair_submission_key(project_name, pair_id, pair_submission_key):
+        print('invalid pair_submission_key')
+        return redirect(url_for('sorter'))
     if not check_project(request):
-        redirect(url_for('home'))
+        return redirect(url_for('home'))
     print(request.form.get("preferred"))
     preferred = request.form.get("preferred")
     not_preferred = ""
@@ -794,20 +810,21 @@ def submitanswer():
         not_preferred = request.form.get("file_two_name")
     else:
         not_preferred = request.form.get("file_one_name")
-    judge = session['user']
-    pair_id = request.form.get('pair_id')
-    print(f'judge: {judge.email}')
+    user_email_id = request.form.get('judge_email')
+    user_email = dbhandler.id_to_email(user_email_id)
+    # pair_id = request.form.get('pair_id')
+    print(f'judge: {user_email}')
     # if dbhandler.check_user_has_pair([preferred, not_preferred], judge, request.cookies.get('project')):
     time_started = int(request.form.get("time_started"))
     dbhandler.create_judgment(pair_id, preferred, not_preferred, request.cookies.get('project'),
-                              judge, floor(time.time()) - time_started)
+                              user_email, floor(time.time()) - time_started)
     if request.form.get('admin') == 'True':
         return redirect(url_for('tower'))
     if isinstance(request.form.get('another_pair_checkbox'), type(None)):
         # flash('Judgment submitted', 'success')
         return redirect(url_for('home'))
     else:
-        return redirect(url_for('sorter'))
+        return redirect(url_for('sorter', bypass_login=True, user_email_id=user_email_id))
 
 @app.route("/safeexit", methods=['POST'])
 @login_required

@@ -10,7 +10,8 @@ class DocPair:
     timestamp = ""
     lifeSeconds = 0
 
-    def __init__(self, doc1, doc2, pair_id=None, lifeSeconds=DEFAULT_TIMEOUT):
+    def __init__(self, doc1, doc2, pair_id=None, lifeSeconds=DEFAULT_TIMEOUT,
+                 pair_submission_key=0):
         self.doc1 = doc1
         self.doc2 = doc2
         self.timestamp = datetime.now()
@@ -19,6 +20,7 @@ class DocPair:
         self.users_opted_out = list()
         self.pair_id = pair_id
         self.user_checked_out_by = None
+        self.pair_submission_key = pair_submission_key
 
     def equals(self, other):
         if self.doc1.id == other.doc1.id and self.doc2.id == other.doc2.id:
