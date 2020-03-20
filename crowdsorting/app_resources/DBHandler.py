@@ -126,7 +126,7 @@ class DBHandler:
         doc2_contents = re.split(' |\n', pair.doc2.contents.decode('utf-8'))
         total_length = len(doc1_contents) + len(doc2_contents)
         lifeSeconds = total_length / 2
-        pair.lifeSeconds = (lifeSeconds if lifeSeconds > 90000 else 90000)
+        # pair.lifeSeconds = (lifeSeconds if lifeSeconds > 90 else 90)
         # print(f"lifeSeconds: {lifeSeconds}")
 
         pair.user_checked_out_by = user
