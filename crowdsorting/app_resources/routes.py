@@ -43,12 +43,12 @@ dummyUser = User("", False, False, 0, "", "", "")
 def login_required(fn):
     @wraps(fn)
     def wrapper(*args, **kwargs):
-        print("checking login ..............................................................")
+        # print("checking login ..............................................................")
         try:
             if not dbhandler.check_cid(session['user'].get('email'), session['user'].get('cid')):
                 return "This page is solely accessible to users", 403
             else:
-                print("you're ok")
+                # print("you're ok")
                 return fn(*args, **kwargs)
         except KeyError:
             return "This page is only accessible to users", 403
@@ -599,7 +599,7 @@ def sorter(admin_docpair=None):
         file_two = docPair.get_second_contents()
 
     selection_prompt, preferred_prompt, unpreferred_prompt = dbhandler.get_project_prompts(request.cookies.get('project'))
-
+    print(f'sorter request from {user_email}')
     return render_template('sorter.html', title='Sorter', file_one=file_one,
                            file_two=file_two,
                            file_one_name=docPair.get_first(),
@@ -873,7 +873,7 @@ def detectFiles():  # This route is obselete?
 @app.route("/submitAnswer", methods=['POST'])
 # @login_required
 def submitanswer():
-    print("in submitAnswer route")
+    print(f'in submitAnswer with {session["user"].get("email")}')
     project_name = request.cookies.get('project')
     pair_id = request.form.get('pair_id')
     pair_submission_key = request.form.get('pair_submission_key')

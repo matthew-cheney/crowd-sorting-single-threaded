@@ -42,10 +42,15 @@
     document.getElementById('hard_easy_form').submit();
   }
 
+  var submitting = false;
+
   function submit_pair() {
     freeze_all_buttons();
     stop_user = 0;
-    document.getElementById('submit_answer_form').submit();
+    if (!submitting) {
+        submitting = true;
+        document.getElementById('submit_answer_form').submit();
+    }
   }
 
   function submit_pair_then_home() {

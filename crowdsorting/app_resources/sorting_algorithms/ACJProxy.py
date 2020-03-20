@@ -120,6 +120,7 @@ class ACJProxy:
         self.acj.comp(acj_pair, outcome, reviewer=judge_name, time=duration)
         del self.served_not_returned[pair_id]
         if len(self.roundList) == 0 and len(self.served_not_returned) == 0:
+            self.acj.step = len(self.acj.roundList) + 1
             self.acj.nextIDPair()
             self.roundList = self.acj.roundList[:]
         self.pickle_acj()

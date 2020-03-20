@@ -126,8 +126,8 @@ class DBHandler:
         doc2_contents = re.split(' |\n', pair.doc2.contents.decode('utf-8'))
         total_length = len(doc1_contents) + len(doc2_contents)
         lifeSeconds = total_length / 2
-        # pair.lifeSeconds = (lifeSeconds if lifeSeconds > 90 else 90)
-        print(f"lifeSeconds: {lifeSeconds}")
+        pair.lifeSeconds = (lifeSeconds if lifeSeconds > 90000 else 90000)
+        # print(f"lifeSeconds: {lifeSeconds}")
 
         pair.user_checked_out_by = user
         self.pairsBeingProcessed[project][pair.pair_id] = pair
@@ -148,8 +148,8 @@ class DBHandler:
 
     # Function to create new judgment
     def create_judgment(self, pair_id, harder, easier, project, judge_email, duration):
-        print(f"The winner is {harder}")
-        print(f"The loser is {easier}")
+        # print(f"The winner is {harder}")
+        # print(f"The loser is {easier}")
         harder_doc = \
             db.session.query(Doc).filter_by(name=harder,
                                             project_name=project).first()
@@ -258,7 +258,7 @@ class DBHandler:
         user = db.session.query(Judge).filter_by(
             email=email).first()
         if user is not None:
-            print('no email user:', user)
+            print('email taken:', email)
             return False
 
         # Email not taken, create user and return true
@@ -358,8 +358,8 @@ class DBHandler:
             projects.append(
                 models.Project(p.name, p.sorting_algorithm, p.date_created,
                                p.judges, p.docs, p.judgments, p.public))
-        print("in get_all_projects")
-        print(projects)
+        # print("in get_all_projects")
+        # print(projects)
         if projects is None:
             return []
         return projects
@@ -371,8 +371,8 @@ class DBHandler:
                 projects.append(
                     models.Project(p.name, p.sorting_algorithm, p.date_created,
                                    p.judges, p.docs, p.judgments, p.public))
-        print("in get_all_group_projects")
-        print(projects)
+        # print("in get_all_group_projects")
+        # print(projects)
         if projects is None:
             return []
         return projects
@@ -522,8 +522,8 @@ class DBHandler:
             return False
 
     def check_cid(self, email, cid):
-        print(f'email: {email}\n'
-              f'cid: {cid}')
+        # print(f'email: {email}\n'
+        #       f'cid: {cid}')
         user = db.session.query(Judge).filter_by(email=email, cid=cid).first()
         if user is None:
             return False
