@@ -1,3 +1,6 @@
+tmp
+.gitignore
+passenger_wsgi.py
 ACJ_Logs
 ACJ_Logs.zip
 **__pycache__
