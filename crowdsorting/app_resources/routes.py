@@ -443,7 +443,7 @@ def temp_two():
     return 'Hello, World!'
 
 
-def check_project(current_request):
+def check_project(current_request, user_email):
     if isinstance(current_request.cookies.get('project'), type(None)):
         flash("Please select a project", "warning")
         print("User has not selected project")
@@ -455,7 +455,7 @@ def check_project(current_request):
         if isAdmin():
             all_projects = dbhandler.get_all_projects()
         else:
-            all_projects = dbhandler.get_user_projects(session['user'].email)
+            all_projects = dbhandler.get_user_projects(user_email)
         if project not in [x.name for x in all_projects]:
             print("User not given access to project")
             return False
@@ -475,7 +475,7 @@ def check_select_project(user_email, project_name):
 def home():
     #     if 'user' in Session:
     if 'user' in session:
-        if not check_project(request):
+        if not check_project(request, session['user'].email):
             return redirect(url_for('dashboard'))
         current_project = get_current_project()
         return render_template('home.html', title='Home',
@@ -507,7 +507,7 @@ def sorter(admin_docpair=None):
     if not bypass_login == 'True':
         if 'user' not in session:
             return redirect(url_for('home'))
-        if not check_project(request):
+        if not check_project(request, session['user'].email):
             return redirect(url_for('dashboard'))
         if not dbhandler.user_consented(session['user'], request.cookies.get('project')):
             return render_template('consentform.html', title='Consent Form',
@@ -649,7 +649,7 @@ def join_code():
 @app.route("/about", methods=['GET'])
 def about():
     if 'user' in session:
-        if not check_project(request):
+        if not check_project(request, session['user'].email):
             return redirect(url_for('dashboard'))
         return render_template('about.html', current_user=session['user'],
                                all_projects=get_all_user_projects(),
@@ -684,7 +684,7 @@ def myadmin():
 @login_required
 @admin_required
 def sorted():
-    if not check_project(request):
+    if not check_project(request, session['user'].email):
         return redirect(url_for('dashboard'))
     if 'user' not in session:
         return redirect(url_for('home'))
@@ -738,7 +738,7 @@ def sorted():
 @login_required
 @admin_required
 def tower():
-    if not check_project(request):
+    if not check_project(request, session['user'].email):
         return redirect(url_for('dashboard'))
     if not dbhandler.user_consented(session['user'], request.cookies.get('project')):
         return render_template('consentform.html', title='Consent Form',
@@ -801,7 +801,7 @@ def submitanswer():
     if not dbhandler.check_pair_submission_key(project_name, pair_id, pair_submission_key):
         print('invalid pair_submission_key')
         return redirect(url_for('sorter'))
-    if not check_project(request):
+    if not check_project(request, session['user'].email):
         return redirect(url_for('home'))
     print(request.form.get("preferred"))
     preferred = request.form.get("preferred")
