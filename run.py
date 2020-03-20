@@ -14,7 +14,7 @@ if __name__ == '__main__':
     # )
 
     # run_simple('0.0.0.0', 5000, application, use_reloader=True, ssl_context='adhoc')
-    app.run(debug=False, use_reloader=False, threaded=True, ssl_context='adhoc')
+    # app.run(debug=False, use_reloader=False, threaded=True, ssl_context='adhoc')
 
-    # from waitress import serve
-    # serve(app, listen="0.0.0.0:5000", threads=1)
+    from waitress import serve
+    serve(app, listen="0.0.0.0:5000", threads=1)
