@@ -647,6 +647,9 @@ class DBHandler:
         return judges
 
     def check_pair_submission_key(self, project, pair_id, key):
-        if key != self.pairsBeingProcessed[project][pair_id].pair_submission_key:
+        try:
+            if key != self.pairsBeingProcessed[project][pair_id].pair_submission_key:
+                return False
+            return True
+        except KeyError:
             return False
-        return True
