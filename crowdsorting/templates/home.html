@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 {% block content %}
-{% if session['user'].get_is_authenticated() %}
+{% if 'user' in session and is_authenticated %}
 {% if landing_page != False %}
     {{ landing_page|safe }}
     <div class="row">
@@ -11,10 +11,10 @@
         </div>
     </div>
 {% else %}
-<h1 class="text-center">Welcome {{ session['user'].get_first_name() }}!</h1>
+<h1 class="text-center">Welcome {{ first_name }}!</h1>
 
-  is_authenticated: {{ session['user'].get_is_authenticated() }}</br>
-  is_admin: {{ session['user'].get_is_admin() }}</br>
+  is_authenticated: {{ is_authenticated }}</br>
+  is_admin: {{ is_admin }}</br>
   current_project: {{ current_project }}
 {% endif %}
 {% else %}

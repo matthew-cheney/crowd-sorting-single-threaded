@@ -79,9 +79,11 @@ class Judge(db.Model):
     projects = db.relationship('Project', secondary='judges', lazy='subquery', backref=db.backref('myusers', lazy=True))
     cprojects = db.relationship('Project', secondary='cjudges', lazy='subquery', backref=db.backref('mycusers', lazy=True))
     votes = db.relationship('Vote', secondary='votejudges', lazy='subquery', backref=db.backref('myjudges', lazy=True))
+    cid = db.Column(db.String(64), nullable=False)
+    is_admin = db.Column(db.Boolean, default=False)
 
     def __repr__(self):
-        return f"\nJudge('{self.firstName} {self.lastName}', '{self.email}', '{self.email}')"
+        return f"\nJudge('{self.firstName} {self.lastName}', '{self.email}', '{self.email}', '{self.cid}')"
 
 
 class Judgment(db.Model):

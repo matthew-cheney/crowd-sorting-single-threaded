@@ -45,7 +45,7 @@ def login_required(fn):
     def wrapper(*args, **kwargs):
         print("checking login ..............................................................")
         try:
-            if not session['user'].is_authenticated:
+            if not dbhandler.check_cid(session['user'].get('email'), session['user'].get('cid')):
                 return "This page is solely accessible to users", 403
             else:
                 print("you're ok")
@@ -69,9 +69,9 @@ def load_user(email):
     print("userID", user_id)
     if type(user_id) == type(""):
         print("new user detected")
-        session['user'] = User(False, False,
-                               False, "", "",
-                               "", email)
+        session['user'] = dict()
+        session['user']['email'] = email
+        session['user']['cid'] = ""
         return redirect(url_for('newuser'))
     else:
         return returninguser(email, user_id)
@@ -85,9 +85,9 @@ def load_cas_user(username):
     print("userID", user_id)
     if type(user_id) == type(""):
         print("new user detected")
-        session['user'] = User(False, False,
-                               False, "", "",
-                               "", "")
+        session['user'] = dict()
+        session['user']['email'] = ""
+        session['user']['cid'] = ""
         return redirect(url_for('newcasuser'))  # newcasuser()  # Login with CAS - work on this next
     else:
         email = dbhandler.get_cas_email(username)
@@ -96,7 +96,7 @@ def load_cas_user(username):
 
 @app.route('/newuser', methods=['GET', 'POST'])
 def newuser():
-    if 'user' in session and session['user'].get_is_authenticated():
+    if 'user' in session and dbhandler.check_cid(session['user'].get('email'), session['user'].get('cid')):
         return redirect(url_for('dashboard'))
     if request.method == 'POST':
         if 'user' not in session:
@@ -110,23 +110,21 @@ def newuser():
         if ' ' in last_name:
             flash(StringList.space_in_last_name_error, 'danger')
             return redirect(url_for('newuser'))
-        current_user = session['user']  # Need to add user to session before this
-        dbhandler.create_user(request.form.get('firstName'), request.form.get('lastName'),
-                              current_user.email, None)
-        session['user'] = User(True, isInAdminFile(current_user.email),
-                               isInPMFile(current_user.email), dbhandler.get_user(current_user.email), request.form.get('firstName'),
-                               request.form.get('lastName'), current_user.email)
-        print("admin:", session["user"].email, session['user'].is_admin)
+        user_email = session['user'].get('email')  # Need to add user to session before this
+        cid = dbhandler.create_user(request.form.get('firstName'), request.form.get('lastName'),
+                              user_email, None)
+        session['user'] = {'email': user_email, 'cid': cid}
+        isInAdminFile(user_email)
         return postLoadUser()
     if request.method == 'POST':
         flash('Failed to register user', 'danger')
     return render_template('newuser.html', current_user=dummyUser, title='New User',
-                               subroot=SUB_ROOT)
+                               subroot=SUB_ROOT, is_admin=dbhandler.check_admin(session['user'].get('email'), session['user'].get('cid')), is_authenticated=dbhandler.check_cid(session['user'].get('email'), session['user'].get('cid')))
 
 
 @app.route('/newcasuser', methods=['GET', 'POST'])
 def newcasuser():
-    if 'user' in session and session['user'].get_is_authenticated():
+    if 'user' in session and dbhandler.check_cid(session['user'].get('email'), session['user'].get('cid')):
         return redirect(url_for('dashboard'))
     if request.method == 'POST':
         if 'user' not in session:
@@ -140,29 +138,30 @@ def newcasuser():
         if ' ' in last_name:
             flash(StringList.space_in_last_name_error, 'danger')
             return redirect(url_for('newcasuser'))
-        current_user = session['user']  # Need to add user to session before this
+        user_email = cas.username + '@byu.edu'
         print("creating cas user for", cas.username)
-        if not dbhandler.create_cas_user(request.form.get('firstName'), request.form.get('lastName'),
-                              cas.username + '@byu.edu', cas.username):
+        cid = dbhandler.create_cas_user(request.form.get('firstName'), request.form.get('lastName'),
+                              cas.username + '@byu.edu', cas.username)
+        if cid == False:
             flash('Email already taken', 'danger')
             return render_template('newcasuser.html', current_user=dummyUser, title='New User')
-        session['user'] = User(True, isInAdminFile(cas.username + '@byu.edu'),
-                               isInPMFile(current_user.email), dbhandler.get_user(cas.username + '@byu.edu'), request.form.get('firstName'),
-                               request.form.get('lastName'), cas.username + '@byu.edu')
-        print("admin:", session["user"].email, session['user'].is_admin)
+        session['user'] = {'email': user_email, 'cid': cid}
+        isInAdminFile(user_email)
         return postLoadUser()
-    return render_template('newcasuser.html', current_user=dummyUser, title='New User')
+    return render_template('newcasuser.html', current_user=dummyUser, title='New User', is_admin=dbhandler.check_admin(session['user'].get('email'), session['user'].get('cid')), is_authenticated=dbhandler.check_cid(session['user'].get('email'), session['user'].get('cid')))
 
 
 
 def returninguser(email, user_id):
-    admins = []
-    db_user_id = dbhandler.get_user(email)
-    firstName, lastName = dbhandler.get_user_full_name(db_user_id)
-    email = dbhandler.get_email(db_user_id)
-    session['user'] = User(True, isInAdminFile(email),
-                           isInPMFile(email), user_id, firstName,
-                           lastName, email)
+    # admins = []
+    # db_user_id = dbhandler.get_user(email)
+    # email = dbhandler.get_email(db_user_id)
+    isInAdminFile(email)
+    # isInPMFile(email)
+    cid = dbhandler.get_user_cid(email)
+    session['user'] = dict()
+    session['user']['email'] = email
+    session['user']['cid'] = cid
     return postLoadUser()
 
 def postLoadUser():
@@ -247,8 +246,8 @@ def logout_master():
     print("in logout()")
     email = ""
     if 'user' in session:
-        email = session['user'].email
-        session.pop('user', None)
+        email = session['user'].get('email')
+        session['user'] = dict()
     if email.endswith("@gmail.com"):  # Google user
         logout_user()
     elif email.endswith("@byu.edu"): # CAS user
@@ -296,6 +295,7 @@ def isInAdminFile(email):
     for admin in admins:
         if admin == email:
             adminBool = True
+            dbhandler.set_admin_in_db(email)
             break
     if adminBool:
         userID = dbhandler.get_user_id(email)
@@ -317,9 +317,7 @@ def isInPMFile(email):
 def isAdmin():
     if not 'user' in session:
         return False
-    if not isinstance(session['user'], User):
-        return False
-    return session['user'].is_admin
+    return dbhandler.check_admin(session['user'].get('email'), session['user'].get('cid'))
 
 
 @app.route('/old_logout')
@@ -330,11 +328,11 @@ def _logout_old():
 
 
 @app.route("/dashboard")
+@login_required
 def dashboard():
-    if 'user' in session and session[
-            'user'].get_is_admin():  # This is bad - fix it
+    if 'user' in session and dbhandler.check_admin(session['user'].get('email'), session['user'].get('cid')):  # This is bad - fix it
         print("returning admindashboard")
-        userID = dbhandler.get_user_id(session['user'].email)
+        userID = dbhandler.get_user_id(session['user'].get('email'))
         for project in dbhandler.get_all_projects():
             dbhandler.add_user_to_project(userID,
                                           project.name)
@@ -346,15 +344,13 @@ def dashboard():
                                all_projects=get_all_projects(),
                                public_projects=dbhandler.get_public_projects(),
                                current_project=get_current_project(),
-                               subroot=SUB_ROOT
-                               )
-    elif 'user' in session and session['user'].is_pm:
-        return render_template('userdashboard.html', title='Dashboard',
-
-                               all_projects=get_all_user_projects(),
-                               public_projects=dbhandler.get_public_projects(),
-                               current_project=get_current_project(),
-                               StringList=StringList
+                               subroot=SUB_ROOT,
+                               is_admin=dbhandler.check_admin(
+                                   session['user'].get('email'),
+                                   session['user'].get('cid')),
+                               is_authenticated=dbhandler.check_cid(
+                                   session['user'].get('email'),
+                                   session['user'].get('cid'))
                                )
     elif 'user' in session:
         all_projects = get_all_user_projects()
@@ -365,7 +361,13 @@ def dashboard():
                                all_projects=get_all_user_projects(),
                                current_project=get_current_project(),
                                filtered_public_projects=filtered_public_projects,
-                               StringList=StringList
+                               StringList=StringList,
+                               is_admin=dbhandler.check_admin(
+                                   session['user'].get('email'),
+                                   session['user'].get('cid')),
+                               is_authenticated=dbhandler.check_cid(
+                                   session['user'].get('email'),
+                                   session['user'].get('cid'))
                                )
     else:
         return redirect(url_for('home'))
@@ -381,7 +383,7 @@ def check_current_project(project):
     if 'user' not in session:
         return False
     # all_projects = get_all_group_projects()
-    all_projects = dbhandler.get_user_projects(session['user'].email)
+    all_projects = dbhandler.get_user_projects(session['user'].get('email'))
     if project not in [x.name for x in all_projects]:
         return False
     return True
@@ -400,7 +402,7 @@ def get_all_projects():
 def get_all_user_projects():
     if 'user' not in session:
         return []
-    return dbhandler.get_user_projects(session['user'].email)
+    return dbhandler.get_user_projects(session['user'].get('email'))
 
 @app.route("/selectproject/<project_name>", methods=["POST"])
 @login_required
@@ -408,7 +410,7 @@ def selectproject(project_name):
     print("in selectproject with", project_name)
     if project_name == 'None':
         return redirect(url_for('dashboard'))
-    if check_select_project(session['user'].email, project_name):
+    if check_select_project(session['user'].get('email'), project_name):
     # response = make_response(redirect(url_for('home')))
         response = make_response()
         response.set_cookie('project', project_name)
@@ -474,22 +476,33 @@ def check_select_project(user_email, project_name):
 @app.route("/home")
 def home():
     #     if 'user' in Session:
-    if 'user' in session:
-        if not check_project(request, session['user'].email):
+    if 'user' in session and dbhandler.check_cid(session['user'].get('email'), session['user'].get('cid')):
+        if not check_project(request, session['user'].get('email')):
             return redirect(url_for('dashboard'))
         current_project = get_current_project()
+        user = dbhandler.get_user_by_cid(session['user'].get('cid'))
         return render_template('home.html', title='Home',
-
                                all_projects=get_all_user_projects(),
                                public_projects=dbhandler.get_public_projects(),
                                current_project=current_project,
-                               landing_page=dbhandler.get_landing_page(current_project))
+                               landing_page=dbhandler.get_landing_page(current_project),
+                               is_admin=dbhandler.check_admin(
+                                   session['user'].get('email'),
+                                   session['user'].get('cid')),
+                               is_authenticated=dbhandler.check_cid(
+                                   session['user'].get('email'),
+                                   session['user'].get('cid')),
+                               first_name=user.firstName,
+                               last_name=user.lastName
+                               )
                                # landing_page=DEFAULT_LANDING_PAGE)
     else:
         return render_template('home.html', title='Home',
                                current_user=dummyUser,
                                current_project='',
                                all_projects='',
+                               is_admin=False,
+                               is_authenticated=False
                                )
 
 
@@ -507,16 +520,22 @@ def sorter(admin_docpair=None):
     if not bypass_login == 'True':
         if 'user' not in session:
             return redirect(url_for('home'))
-        if not check_project(request, session['user'].email):
+        if not check_project(request, session['user'].get('email')):
             return redirect(url_for('dashboard'))
-        if not dbhandler.user_consented(session['user'], request.cookies.get('project')):
+        if not dbhandler.user_consented(session['user'].get('email'), request.cookies.get('project')):
             return render_template('consentform.html', title='Consent Form',
 
                                    all_projects=get_all_user_projects(),
                                    public_projects=dbhandler.get_public_projects(),
                                    current_project=get_current_project(),
                                    consent_form_text=dbhandler.get_consent_form(request.cookies.get('project')),
-                                   admin=False
+                                   admin=False,
+                                   is_admin=dbhandler.check_admin(
+                                       session['user'].get('email'),
+                                       session['user'].get('cid')),
+                                   is_authenticated=dbhandler.check_cid(
+                                       session['user'].get('email'),
+                                       session['user'].get('cid'))
                                    )
     if isinstance(request.cookies.get('project'), type(None)):
         if 'user' in session:
@@ -525,13 +544,19 @@ def sorter(admin_docpair=None):
 
                                    all_projects=get_all_user_projects(),
                                    public_projects=dbhandler.get_public_projects(),
-                                   current_project=get_current_project()
+                                   current_project=get_current_project(),
+                                   is_admin=dbhandler.check_admin(
+                                       session['user'].get('email'),
+                                       session['user'].get('cid')),
+                                   is_authenticated=dbhandler.check_cid(
+                                       session['user'].get('email'),
+                                       session['user'].get('cid'))
                                    )
         else:
             return redirect(url_for('home'))
     try:
         if user_email is None:
-            user_email = session['user'].email
+            user_email = session['user'].get('email')
         if admin_docpair is None:
             docPair = dbhandler.get_pair(request.cookies.get('project'), user_email)
             admin = False
@@ -556,7 +581,13 @@ def sorter(admin_docpair=None):
                                all_projects=get_all_user_projects(),
                                public_projects=dbhandler.get_public_projects(),
                                current_project=get_current_project(),
-                               refresh=refresh
+                               refresh=refresh,
+                               is_admin=dbhandler.check_admin(
+                                   session['user'].get('email'),
+                                   session['user'].get('cid')),
+                               is_authenticated=dbhandler.check_cid(
+                                   session['user'].get('email'),
+                                   session['user'].get('cid'))
                                )
     try:
         file_one = docPair.get_first_contents().decode("utf-8")
@@ -585,7 +616,13 @@ def sorter(admin_docpair=None):
                            project_name=request.cookies.get('project'),
                            admin=admin,
                            pair_submission_key=docPair.pair_submission_key,
-                           judge_email=dbhandler.email_to_id(user_email)
+                           judge_email=dbhandler.email_to_id(user_email),
+                           is_admin=dbhandler.check_admin(
+                               session['user'].get('email'),
+                               session['user'].get('cid')),
+                           is_authenticated=dbhandler.check_cid(
+                               session['user'].get('email'),
+                               session['user'].get('cid'))
                            )
 
 @app.route("/moretime", methods=['POST'])
@@ -635,7 +672,7 @@ def join_code():
     project_name = request.form.get("project_name")
     join_code = request.form.get("join_code")
     if dbhandler.check_join_code(project_name, join_code):
-        user_id = dbhandler.get_user_id(session['user'].email)
+        user_id = dbhandler.get_user_id(session['user'].get('email'))
         dbhandler.add_user_to_project(user_id, project_name)
         # flash(f'{project_name} added to My Projects', category='success')
     else:
@@ -647,21 +684,29 @@ def join_code():
 # Router to about page
 @app.route("/about", methods=['GET'])
 def about():
-    if 'user' in session:
-        if not check_project(request, session['user'].email):
+    if 'user' in session and dbhandler.check_cid(session['user'].get('email'), session['user'].get('cid')):
+        if not check_project(request, session['user'].get('email')):
             return redirect(url_for('dashboard'))
         return render_template('about.html',
                                all_projects=get_all_user_projects(),
                                public_projects=dbhandler.get_public_projects(),
                                current_project=get_current_project(),
-                               title='About'
+                               title='About',
+                               is_admin=dbhandler.check_admin(
+                                   session['user'].get('email'),
+                                   session['user'].get('cid')),
+                               is_authenticated=dbhandler.check_cid(
+                                   session['user'].get('email'),
+                                   session['user'].get('cid'))
                                )
     else:
         return render_template('about.html', current_user=dummyUser,
                                all_projects=get_all_user_projects(),
                                public_projects=dbhandler.get_public_projects(),
                                current_project=get_current_project(),
-                               title='About'
+                               title='About',
+                               is_admin=False,
+                               is_authenticated=False
                                )
 
 
@@ -683,25 +728,35 @@ def myadmin():
 @login_required
 @admin_required
 def sorted():
-    if not check_project(request, session['user'].email):
+    if not check_project(request, session['user'].get('email')):
         return redirect(url_for('dashboard'))
     if 'user' not in session:
         return redirect(url_for('home'))
     if isinstance(request.cookies.get('project'), type(None)):
         return render_template('nopairs.html', title='Check later',
                                message='No project selected',
-
                                all_projects=get_all_user_projects(),
                                public_projects=dbhandler.get_public_projects(),
-                               current_project=get_current_project()
+                               current_project=get_current_project(),
+                               is_admin=dbhandler.check_admin(
+                                   session['user'].get('email'),
+                                   session['user'].get('cid')),
+                               is_authenticated=dbhandler.check_cid(
+                                   session['user'].get('email'),
+                                   session['user'].get('cid'))
                                )
     if dbhandler.get_number_of_docs(request.cookies.get('project')) == 0:
         return render_template('nopairs.html', title='Check later',
                                message='No docs in this project',
-
                                all_projects=get_all_user_projects(),
                                public_projects=dbhandler.get_public_projects(),
-                               current_project=get_current_project()
+                               current_project=get_current_project(),
+                               is_admin=dbhandler.check_admin(
+                                   session['user'].get('email'),
+                                   session['user'].get('cid')),
+                               is_authenticated=dbhandler.check_cid(
+                                   session['user'].get('email'),
+                                   session['user'].get('cid'))
                                )
     sortedFiles, confidence, *args = dbhandler.get_sorted(
         request.cookies.get('project'))
@@ -720,7 +775,6 @@ def sorted():
     selection_prompt, preferred_prompt, unpreferred_prompt = dbhandler.get_project_prompts(request.cookies.get('project'))
     return render_template('sorted.html', title='Sorted',
                            sortedFiles=sortedFiles,
-
                            confidence=confidence,
                            number_of_judgments=number_of_judgments,
                            number_of_docs=number_of_docs,
@@ -730,23 +784,34 @@ def sorted():
                            public_projects=dbhandler.get_public_projects(),
                            current_project=get_current_project(),
                            preferred_prompt=preferred_prompt,
-                           unpreferred_prompt=unpreferred_prompt
+                           unpreferred_prompt=unpreferred_prompt,
+                           is_admin=dbhandler.check_admin(
+                               session['user'].get('email'),
+                               session['user'].get('cid')),
+                           is_authenticated=dbhandler.check_cid(
+                               session['user'].get('email'),
+                               session['user'].get('cid'))
                            )
 
 @app.route("/tower")
 @login_required
 @admin_required
 def tower():
-    if not check_project(request, session['user'].email):
+    if not check_project(request, session['user'].get('email')):
         return redirect(url_for('dashboard'))
-    if not dbhandler.user_consented(session['user'], request.cookies.get('project')):
+    if not dbhandler.user_consented(session['user'].get('email'), request.cookies.get('project')):
         return render_template('consentform.html', title='Consent Form',
-
                                all_projects=get_all_user_projects(),
                                public_projects=dbhandler.get_public_projects(),
                                current_project=get_current_project(),
                                consent_form_text=dbhandler.get_consent_form(request.cookies.get('project')),
-                               admin=True
+                               admin=True,
+                               is_admin=dbhandler.check_admin(
+                                   session['user'].get('email'),
+                                   session['user'].get('cid')),
+                               is_authenticated=dbhandler.check_cid(
+                                   session['user'].get('email'),
+                                   session['user'].get('cid'))
                                )
     return render_template('tower.html',
                            all_projects=get_all_user_projects(),
@@ -756,16 +821,31 @@ def tower():
                            pairsCheckedOut=dbhandler.get_pairs_currently_checked_out(request.cookies.get('project')),
                            pairsReadyForRecheckout=dbhandler.get_pairs_waiting_for_recheckout(request.cookies.get('project')),
                            project_proxy=dbhandler.get_proxy(request.cookies.get('project')),
-                           active_judges=dbhandler.get_active_judges(request.cookies.get('project'))
+                           active_judges=dbhandler.get_active_judges(request.cookies.get('project')),
+                           is_admin=dbhandler.check_admin(
+                               session['user'].get('email'),
+                               session['user'].get('cid')),
+                           is_authenticated=dbhandler.check_cid(
+                               session['user'].get('email'),
+                               session['user'].get('cid'))
                            )
 
 @app.route("/accountinfo", methods=['GET'])
 @login_required
 def accountinfo():
+    user = dbhandler.get_user_by_cid(session['user'].get('cid'))
     return render_template('accountinfo.html',
                            all_projects=get_all_user_projects(),
                            public_projects=dbhandler.get_public_projects(),
-                           current_project=get_current_project()
+                           current_project=get_current_project(),
+                           is_admin=dbhandler.check_admin(
+                               session['user'].get('email'),
+                               session['user'].get('cid')),
+                           is_authenticated=dbhandler.check_cid(
+                               session['user'].get('email'),
+                               session['user'].get('cid')),
+                           first_name=user.firstName,
+                           last_name=user.lastName
                            )
 
 
@@ -800,7 +880,7 @@ def submitanswer():
     if not dbhandler.check_pair_submission_key(project_name, pair_id, pair_submission_key):
         print('invalid pair_submission_key')
         return redirect(url_for('sorter'))
-    if not check_project(request, session['user'].email):
+    if not check_project(request, session['user'].get('email')):
         return redirect(url_for('home'))
     print(request.form.get("preferred"))
     preferred = request.form.get("preferred")
@@ -843,7 +923,7 @@ def safeexit():
 @app.route("/hardeasy", methods=['POST'])
 @login_required
 def hardeasy():
-    print(f"in hardeasy for {session['user'].email}")
+    print(f"in hardeasy for {session['user'].get('email')}")
     doc1 = request.form.get('file_one_name')
     doc2 = request.form.get('file_two_name')
     pair_id = request.form.get('pair_id')
@@ -854,8 +934,8 @@ def hardeasy():
         too_hard = False
     project = request.cookies.get('project')
     # if dbhandler.check_user_has_pair([doc1, doc2], session['user'], project):
-    dbhandler.return_pair(pair_id, (doc1, doc2), project, session['user'].email)
-    rejectLogger.log_reject(project, session['user'].email, doc1, doc2, too_hard)
+    dbhandler.return_pair(pair_id, (doc1, doc2), project, session['user'].get('email'))
+    rejectLogger.log_reject(project, session['user'].get('email'), doc1, doc2, too_hard)
     return redirect(url_for('sorter'))
 
 
@@ -947,7 +1027,7 @@ def update_user_info():
         flash("Last Name cannot be empty", "warning")
         return redirect(url_for('accountinfo'))
 
-    email = session['user'].email
+    email = session['user'].get('email')
 
     dbhandler.update_user_info(newFirstName, newLastName, email)
     return load_user(email)
@@ -968,7 +1048,13 @@ def edit_project():
                            preferred_prompt=preferred_prompt,
                            unpreferred_prompt=unpreferred_prompt,
                            consent_form=consent_form,
-                           instruction_page=instruction_page
+                           instruction_page=instruction_page,
+                           is_admin=dbhandler.check_admin(
+                               session['user'].get('email'),
+                               session['user'].get('cid')),
+                           is_authenticated=dbhandler.check_cid(
+                               session['user'].get('email'),
+                               session['user'].get('cid'))
                            )
 
 @app.route("/updateprojectinfo", methods=['POST'])

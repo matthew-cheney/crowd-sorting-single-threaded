@@ -160,7 +160,7 @@ class DBHandler:
         # easier_doc.checked_out = False
         # harder_doc.num_compares += 1
         # easier_doc.num_compares += 1
-        judge_id = session['user'].get_judge_id()
+        judge_id = self.get_user_id(judge_email)
         # db.session.add(
         #     Judgment(doc_harder_id=harder_doc.id, doc_easier_id=easier_doc.id,
         #              judge_id=judge_id, project_name=project))
@@ -247,10 +247,11 @@ class DBHandler:
         return "User not found"
 
     def create_user(self, firstName, lastName, email, username):
+        cid = uuid.uuid4().hex
         db.session.add(Judge(firstName=firstName, lastName=lastName,
-                             email=email, username=username))
+                             email=email, username=username, cid=cid))
         db.session.commit()
-        return
+        return cid
 
     def create_cas_user(self, firstName, lastName, email, username):
         # Check if email is already taken
@@ -261,10 +262,11 @@ class DBHandler:
             return False
 
         # Email not taken, create user and return true
+        cid = uuid.uuid4().hex
         db.session.add(Judge(firstName=firstName, lastName=lastName,
-                             email=email, username=username))
+                             email=email, username=username, cid=cid))
         db.session.commit()
-        return True
+        return cid
 
     def delete_user(self, email):
         user_to_delete = db.session.query(Judge).filter_by(email=email).first()
@@ -451,11 +453,11 @@ class DBHandler:
             return False
         return project.landing_page
 
-    def user_consented(self, user, project):
+    def user_consented(self, user_email, project):
         project_result = db.session.query(Project).filter_by(name=project).first()
         if project_result is None:
             return False
-        if user.email not in [x.email for x in project_result.cjudges]:
+        if user_email not in [x.email for x in project_result.cjudges]:
             return False
         return True
 
@@ -490,6 +492,43 @@ class DBHandler:
         if user is None:
             return False
         return user.id
+
+    def get_user_cid(self, email):
+        user = db.session.query(Judge).filter_by(email=email).first()
+        if user is None:
+            return False
+        return user.cid
+
+    def get_user_by_cid(self, cid):
+        user = db.session.query(Judge).filter_by(cid=cid).first()
+        if user is None:
+            return False
+        return user
+
+    def set_admin_in_db(self, user_email):
+        try:
+            user = db.session.query(Judge).filter_by(email=user_email).first()
+            user.is_admin = True
+            db.session.commit()
+        except (TypeError, AttributeError):
+            return False
+        return True
+
+    def check_admin(self, email, cid):
+        try:
+            user = db.session.query(Judge).filter_by(email=email, cid=cid).first()
+            return user.is_admin
+        except AttributeError:
+            return False
+
+    def check_cid(self, email, cid):
+        print(f'email: {email}\n'
+              f'cid: {cid}')
+        user = db.session.query(Judge).filter_by(email=email, cid=cid).first()
+        if user is None:
+            return False
+        return True
+
 
     def add_user_to_project(self, userId, projectName):
         project = db.session.query(Project).filter_by(name=projectName).first()

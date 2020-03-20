@@ -3,7 +3,7 @@ from glob import glob
 
 from flask import Flask, session
 from flask_login import LoginManager
-from flask_session import Session
+#from flask_session import Session
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_admin import Admin
@@ -39,8 +39,8 @@ def load_user(user_id):
     print("in __init__ load_user", user_id)
     return User.username"""
 
-app.secret_key = '398247b108570892173509827389057'
-Session(app)
+# app.secret_key = '398247b108570892173509827389057'
+# Session(app)
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)

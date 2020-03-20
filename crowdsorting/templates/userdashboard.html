@@ -140,7 +140,7 @@
       function set_current_project_user_public(project_name) {
 
           json_dict = {
-                    user_email: '{{ session['user'].email }}',
+                    user_email: '{{ session['user'].get('email') }}',
                     project_name: project_name
                     };
 
@@ -166,7 +166,7 @@
       function remove_self_from_project() {
         project_name = document.getElementById('leave_model_project_name').value
         json_dict = {
-                    user_email: '{{ session['user'].email }}',
+                    user_email: '{{ session['user'].get('email') }}',
                     project_name: project_name
                     };
 

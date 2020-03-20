@@ -10,7 +10,7 @@
 <div class="row">
     <div class="col-lg-12 text-center">
         <form id="consent_form" method="POST" action="signconsent">
-            <input name="user_email" value="{{ session['user'].email }}" hidden>
+            <input name="user_email" value="{{ session['user'].get('email') }}" hidden>
             <input name="current_project" value="{{ current_project }}" hidden>
             <input type="hidden" name="admin" value="{{ admin }}">
             <button type="submit" id="consent_agree_button" class="btn btn-lg btn-primary left-button">Agree</button>
