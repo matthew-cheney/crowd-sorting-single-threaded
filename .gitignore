@@ -1,3 +1,5 @@
+selenium_test.pkl
+number_files/
 tmp
 .gitignore
 passenger_wsgi.py
