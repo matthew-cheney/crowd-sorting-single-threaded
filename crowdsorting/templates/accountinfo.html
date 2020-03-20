@@ -11,7 +11,7 @@
                         First Name:
                     </td>
                     <td>
-                        <input type="text" name="firstName" class="info_input" value="{{ current_user.get_first_name() }}" onkeyup="editText()">
+                        <input type="text" name="firstName" class="info_input" value="{{ session['user'].get_first_name() }}" onkeyup="editText()">
                     </td>
                 </tr>
                 <tr>
@@ -19,7 +19,7 @@
                         Last Name:
                     </td>
                     <td>
-                        <input type="text" name="lastName" class="info_input" value="{{ current_user.get_last_name() }}" onkeyup="editText()">
+                        <input type="text" name="lastName" class="info_input" value="{{ session['user'].get_last_name() }}" onkeyup="editText()">
                     </td>
                 </tr>
                 <tr>
@@ -27,7 +27,7 @@
                         Email:
                     </td>
                     <td>
-                        <div>{{ current_user.get_email() }}</div>
+                        <div>{{ session['user'].get_email() }}</div>
                     </td>
                 </tr>
             </table>

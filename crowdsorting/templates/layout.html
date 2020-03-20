@@ -44,17 +44,17 @@
             <div class="navbar-nav mr-auto">
               <a class="nav-item nav-link" href="{{ url_for('home') }}">Home</a>
               <a class="nav-item nav-link" href="{{ url_for('about') }}">About</a>
-              {% if current_user.get_is_authenticated() and current_user.get_is_authenticated() %}
+              {% if session['user'].get_is_authenticated() and session['user'].get_is_authenticated() %}
               <a class="nav-item nav-link" id="layout_sorter_link" href="{{ url_for('sorter') }}">Sorter</a>
               {% endif %}
-              {% if current_user.get_is_admin() %}
+              {% if session['user'].get_is_admin() %}
               <a class="nav-item nav-link" href="{{ url_for('tower') }}">Control Tower</a>
               {% endif %}
             </div>
             <!-- Navbar Center -->
             <!-- Navbar Right Side -->
             <div class="navbar-nav">
-            {% if current_user.get_is_authenticated() %}
+            {% if session['user'].get_is_authenticated() %}
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown_project" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   <span id="displayed_project">{{ current_project }}</span>
@@ -70,13 +70,13 @@
                 </div>
               </li>
               {% endif %}
-              {% if current_user.get_is_authenticated() and current_user.get_is_admin() %}
+              {% if session['user'].get_is_authenticated() and session['user'].get_is_admin() %}
               <a class="nav-item nav-link" href="{{ url_for('sorted') }}">Results</a>
               {% endif %}
-              {% if current_user.get_is_authenticated() %}
+              {% if session['user'].get_is_authenticated() %}
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" name="account_dropdown_link" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  {{ current_user.get_email() }}
+                  {{ session['user'].email }}
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                   <a class="dropdown-item" id="layout_dashboard_link" href="{{ url_for('dashboard') }}">Dashboard</a>
@@ -133,7 +133,7 @@
         function set_current_project_public(project_name) {
 
           json_dict = {
-                    user_email: '{{ current_user.email }}',
+                    user_email: '{{ session['user'].email }}',
                     project_name: project_name
                     };
 
