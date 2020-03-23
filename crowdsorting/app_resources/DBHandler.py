@@ -717,4 +717,5 @@ class DBHandler:
                 return False
             return True
         except KeyError:
+            print("pair_id not in pbp")
             return False
