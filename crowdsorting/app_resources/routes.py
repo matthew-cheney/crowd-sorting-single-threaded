@@ -51,6 +51,7 @@ def login_required(fn):
                 # print("you're ok")
                 return fn(*args, **kwargs)
         except KeyError:
+            print(session)
             return "This page is only accessible to users", 403
     return wrapper
 
