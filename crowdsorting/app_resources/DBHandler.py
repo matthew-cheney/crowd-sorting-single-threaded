@@ -22,6 +22,28 @@ class DBHandler:
         self.email_dict_path = app.config['EMAIL_DICT_PATH']
         self.unpickle_pairs_being_processed()
         self.unpickle_email_dict()
+        self.pairs_by_user = dict()
+
+    def add_pair_to_user(self, pair_id, user_email):
+        if user_email not in self.pairs_by_user:
+            self.pairs_by_user[user_email] = list()
+        self.pairs_by_user[user_email].append(pair_id)
+
+    def remove_pair_from_user(self, pair_id, user_email):
+        if user_email not in self.pairs_by_user:
+            return
+        self.pairs_by_user[user_email].remove(pair_id)
+
+    def return_all_user_pairs(self, user_email, project):
+        if user_email not in self.pairs_by_user:
+            return
+        put_back = []
+        for pair_id in self.pairs_by_user[user_email]:
+            try:
+                self.return_pair(pair_id, None, project)
+            except KeyError:
+                put_back.append(pair_id)
+        self.pairs_by_user[user_email] = put_back
 
     def pickle_pairs_being_processed(self):
         with open(self.PBP_Path, "wb") as f:
@@ -85,6 +107,7 @@ class DBHandler:
                 pair.checked_out = True
                 pair.user_checked_out_by = user
                 pair.pair_submission_key = uuid.uuid4().hex
+                self.add_pair_to_user(pair.pair_id, user)
                 self.pickle_pairs_being_processed()
                 return pair
         allDocs = db.session.query(Doc).filter_by(project_name=project,
@@ -126,10 +149,11 @@ class DBHandler:
         doc2_contents = re.split(' |\n', pair.doc2.contents.decode('utf-8'))
         total_length = len(doc1_contents) + len(doc2_contents)
         lifeSeconds = total_length / 2
-        # pair.lifeSeconds = (lifeSeconds if lifeSeconds > 90 else 90)
+        pair.lifeSeconds = (lifeSeconds if lifeSeconds > 90 else 90)
         # print(f"lifeSeconds: {lifeSeconds}")
 
         pair.user_checked_out_by = user
+        self.add_pair_to_user(pair.pair_id, user)
         self.pairsBeingProcessed[project][pair.pair_id] = pair
         self.pickle_pairs_being_processed()
 
@@ -174,6 +198,7 @@ class DBHandler:
         print(f'removing {harder}, {easier} from pbp')
         removed = False
         del self.pairsBeingProcessed[project][pair_id]
+        self.return_all_user_pairs(judge_email, project)
         removed = True
         """for pair in self.pairsBeingProcessed[project]:
             if (pair.doc1.name == harder and pair.doc2.name == easier) or (
@@ -184,6 +209,7 @@ class DBHandler:
         if not removed:
             print('TRIED TO REMOVE NONEXISTENT PAIR FROM pairsBeingProcessed',self.pairsBeingProcessed, harder, easier)
             # exit(1)
+
         self.pickle_pairs_being_processed()
 
     def reset_timestamp(self, project_name, pair_id):
