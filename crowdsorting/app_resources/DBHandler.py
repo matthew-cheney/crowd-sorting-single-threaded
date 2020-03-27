@@ -34,11 +34,13 @@ class DBHandler:
             return
         self.pairs_by_user[user_email].remove(pair_id)
 
-    def return_all_user_pairs(self, user_email, project):
+    def return_all_user_pairs(self, user_email, project, skip_id):
         if user_email not in self.pairs_by_user:
             return
         put_back = []
         for pair_id in self.pairs_by_user[user_email]:
+            if pair_id == skip_id:
+                continue
             try:
                 self.return_pair(pair_id, None, project)
             except KeyError:
@@ -198,7 +200,7 @@ class DBHandler:
         print(f'removing {harder}, {easier} from pbp')
         removed = False
         del self.pairsBeingProcessed[project][pair_id]
-        self.return_all_user_pairs(judge_email, project)
+        self.return_all_user_pairs(judge_email, project, pair_id)
         removed = True
         """for pair in self.pairsBeingProcessed[project]:
             if (pair.doc1.name == harder and pair.doc2.name == easier) or (
