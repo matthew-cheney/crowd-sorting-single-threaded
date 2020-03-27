@@ -490,6 +490,7 @@ class DBHandler:
         return True
 
     def add_consent_judge(self, user_email, projectName):
+        print(f'adding {user_email} to {projectName}')
         project = db.session.query(Project).filter_by(name=projectName).first()
         user = db.session.query(Judge).filter_by(email=user_email).first()
         project.cjudges.append(user)
