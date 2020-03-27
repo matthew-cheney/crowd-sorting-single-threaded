@@ -53,7 +53,7 @@ from crowdsorting.app_resources.sorting_algorithms.MonteCarloProxy import MonteC
 
 pairselector_options = list()
 pairselector_options.append(ACJProxy)
-pairselector_options.append(MonteCarloProxy)
+# pairselector_options.append(MonteCarloProxy)
 
 
 pairselectors = dict()

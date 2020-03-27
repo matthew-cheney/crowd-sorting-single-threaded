@@ -10,9 +10,9 @@ PM_PATH = os.path.join(app.config['APP_ROOT'], 'projectManagers.txt')
 DEFAULT_TIMEOUT = 30
 
 DEFAULT_DESCRIPTION = ""
-DEFAULT_SELECTION_PROMPT = "Select the better text"
-DEFAULT_PREFERRED_PROMPT = "Better"
-DEFAULT_UNPREFERRED_PROMPT = "Worse"
+DEFAULT_SELECTION_PROMPT = "Select the easier text"
+DEFAULT_PREFERRED_PROMPT = "Easier"
+DEFAULT_UNPREFERRED_PROMPT = "Harder"
 DEFAULT_LANDING_PAGE = """<div class="text-center"><h1>Crowd Sorting</h1><h2>with the BYU Department of Digital Humanities</h2><p><br></p><h2>Please read the following instructions carefully.</h2><p>The
  purpose of this project is to sort Russian texts by 
 difficulty. This is typically done by a language professional or 
