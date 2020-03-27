@@ -1,5 +1,9 @@
+<<<<<<< HEAD
 run_crowdsorting.py
 crowd-sorting.log
+=======
+All_Alpha_Logs/
+>>>>>>> e286c8ae3e0d55dee537f12bf195d133769a5354
 index.html
 run_notes.txt
 selenium_test.pkl

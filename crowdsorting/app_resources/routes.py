@@ -917,6 +917,7 @@ def safeexit():
     project = request.cookies.get('project')
     # if dbhandler.check_user_has_pair([doc1, doc2], session['user'], project):
     dbhandler.return_pair(pair_id, (doc1, doc2), project)
+    dbhandler.return_all_user_pairs(session['user'].get('email'), project, pair_id)
     if admin == 'True':
         return redirect(url_for('tower'))
     return redirect(url_for('home'))
@@ -936,6 +937,7 @@ def hardeasy():
     project = request.cookies.get('project')
     # if dbhandler.check_user_has_pair([doc1, doc2], session['user'], project):
     dbhandler.return_pair(pair_id, (doc1, doc2), project, session['user'].get('email'))
+    dbhandler.return_all_user_pairs(session['user'].get('email'), project, pair_id)
     rejectLogger.log_reject(project, session['user'].get('email'), doc1, doc2, too_hard)
     return redirect(url_for('sorter'))
 
@@ -1129,6 +1131,7 @@ def force_return():
     user_email = request.form.get('user_email')
     pair_id = request.form.get('pair_id')
     dbhandler.return_pair(pair_id, [doc_one, doc_two], project)
+    # dbhandler.return_all_user_pairs(session['user'].get('email'), project, pair_id)
     return redirect(url_for('tower'))
 
 @app.route("/adminsorter", methods=["POST"])
