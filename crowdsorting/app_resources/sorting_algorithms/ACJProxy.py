@@ -73,6 +73,10 @@ class ACJProxy:
         except FileNotFoundError:
             return False
 
+        if len(self.roundList) == 0 and len(self.served_not_returned) == 0:
+            self.no_more_pairs = True
+            return "project is over"
+
         if len(self.roundList) == 0:
             return "waiting for round to turn over"
 
