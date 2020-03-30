@@ -8,6 +8,7 @@ ADMIN_PATH = os.path.join(app.config['APP_ROOT'], 'admins.txt')
 PM_PATH = os.path.join(app.config['APP_ROOT'], 'projectManagers.txt')
 
 DEFAULT_TIMEOUT = 30
+EMAIL_BREAK_SECONDS = 60
 
 DEFAULT_DESCRIPTION = ""
 DEFAULT_SELECTION_PROMPT = "Select the easier text"

@@ -514,7 +514,7 @@ def home():
 # Router to sorting page
 @app.route("/sorter")
 # @login_required
-def sorter(admin_docpair=None):
+def sorter(admin_docpair=None, check_stuck_round=False):
     bypass_login = request.args.get('bypass_login')
     user_email_id = request.args.get('user_email_id')
     user_email = dbhandler.id_to_email(user_email_id)
@@ -559,7 +559,7 @@ def sorter(admin_docpair=None):
         if user_email is None:
             user_email = session['user'].get('email')
         if admin_docpair is None:
-            docPair = dbhandler.get_pair(request.cookies.get('project'), user_email)
+            docPair = dbhandler.get_pair(request.cookies.get('project'), user_email, check_stuck_round=check_stuck_round)
             admin = False
         else:
             docPair = dbhandler.get_docpair_by_names(admin_docpair[0], admin_docpair[1], request.cookies.get('project'), user_email)
