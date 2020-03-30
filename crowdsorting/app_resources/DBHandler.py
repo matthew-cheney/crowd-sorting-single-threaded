@@ -189,7 +189,7 @@ class DBHandler:
             print('too early')
             return
         print('emailing admin')
-        sender_email = "cheneycreations@gmail.com"
+        sender_email = "matthew@cheneycreations.com"
         receiver_email = "cheneycreations@gmail.com"
         with open("crowdsorting/app_resources/email_password.txt", 'r') as f:
             password = f.read()
