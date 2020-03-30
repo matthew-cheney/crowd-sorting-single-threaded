@@ -87,7 +87,7 @@
               </li>
 
               {% else %}
-              <li class="nav-item dropdown">
+              <!--<li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   <span id="login_dropdown">Login</span>
                 </a>
@@ -95,7 +95,8 @@
                   <a class="dropdown-item" id="login_google" href="{{ url_for('login') }}">Login with Google</a>
                   <a class="dropdown-item" id="login_cas" href="{{ url_for('cas.login') }}">Login with CAS</a>
                 </div>
-              </li>
+              </li>-->
+              <a class="navbar-brand mr-4" href="{{ url_for('cas.login') }}">Login</a>
               {% endif %}
             </div>
           </div>
