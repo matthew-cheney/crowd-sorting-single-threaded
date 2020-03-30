@@ -100,18 +100,18 @@ class DBHandler:
         # self.unpickle_pairs_being_processed()
         if project not in self.pairsBeingProcessed:
             self.add_pairs_being_processed(project)
-        for pair in self.pairsBeingProcessed[project].values():
-            if ((pair.get_timestamp() < (datetime.now() - timedelta(seconds=pair.lifeSeconds))) or \
-                    (pair.checked_out == False)) and (user not in pair.users_opted_out):
-                pair.update_time_stamp()
-                print(f"pair timestamp set to {pair.get_timestamp()}")
-                print(f"serving stored pair {pair}")
-                pair.checked_out = True
-                pair.user_checked_out_by = user
-                pair.pair_submission_key = uuid.uuid4().hex
-                self.add_pair_to_user(pair.pair_id, user)
+        for pair_each in self.pairsBeingProcessed[project].values():
+            if ((pair_each.get_timestamp() < (datetime.now() - timedelta(seconds=pair_each.lifeSeconds))) or \
+                    (pair_each.checked_out == False)) and (user not in pair_each.users_opted_out):
+                pair_each.update_time_stamp()
+                print(f"pair timestamp set to {pair_each.get_timestamp()}")
+                print(f"serving stored pair {pair_each}")
+                pair_each.checked_out = True
+                pair_each.user_checked_out_by = user
+                pair_each.pair_submission_key = uuid.uuid4().hex
+                self.add_pair_to_user(pair_each.pair_id, user)
                 self.pickle_pairs_being_processed()
-                return pair
+                return pair_each
         allDocs = db.session.query(Doc).filter_by(project_name=project,
                                                   checked_out=False).all()
         # allJudgments = db.session.query(Judgment).filter_by(
