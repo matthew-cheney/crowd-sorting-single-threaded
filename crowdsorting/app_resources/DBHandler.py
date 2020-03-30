@@ -152,6 +152,8 @@ class DBHandler:
         total_length = len(doc1_contents) + len(doc2_contents)
         lifeSeconds = total_length / 2
         pair.lifeSeconds = (lifeSeconds if lifeSeconds > 90 else 90)
+        if pair.lifeSeconds > 300:
+            pair.lifeSeconds = 300
         # print(f"lifeSeconds: {lifeSeconds}")
 
         pair.user_checked_out_by = user
