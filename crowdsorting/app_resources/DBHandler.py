@@ -1,5 +1,7 @@
 import re
 import uuid
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 from crowdsorting import session, pairselectors
 from crowdsorting import db
@@ -12,9 +14,7 @@ from datetime import timedelta
 import pickle
 from crowdsorting.app_resources.settings import *
 
-import smtplib, ssl
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+import smtplib
 
 
 from crowdsorting.app_resources.sorting_algorithms.ACJProxy import ACJProxy
@@ -189,49 +189,46 @@ class DBHandler:
             print('too early')
             return
         print('emailing admin')
-        sender_email = "matthew@cheneycreations.com"
-        receiver_email = "cheneycreations@gmail.com"
         with open("crowdsorting/app_resources/email_password.txt", 'r') as f:
             password = f.read()
         with open("crowdsorting/app_resources/server_url.txt", 'r') as f:
             server_url = f.read()
 
-        message = MIMEMultipart("alternative")
-        message["Subject"] = "multipart test"
-        message["From"] = sender_email
-        message["To"] = receiver_email
+        sender_email = "matthew@cheneycreations.com"
+        receiver_email = "m.cheney95@outlook.com"
 
-        # Create the plain-text and HTML version of your message
-        text = f"""\
-        project {project} requires admin intervention at {server_url}
-        """
+        msg = MIMEMultipart('alternative')
+        msg['Subject'] = f"{server_url} Requires Admin Help"
+        msg['From'] = sender_email
+        msg['To'] = receiver_email
+
+        text = f"Crowd Sorting Admin - {datetime.now()}"
         html = f"""\
         <html>
+          <head></head>
           <body>
-            <p>Project {project} requires admin intervention.<br>
-               <a href="{server_url}">Go to {server_url}</a> 
+            <p>Crowd Sorting Admin Email<br>
+                Admin intervention may be required:<br>
+                Project: {project}<br>
+                <a href="{server_url}">Go to {server_url}</a>
             </p>
           </body>
         </html>
         """
 
-        # Turn these into plain/html MIMEText objects
-        part1 = MIMEText(text, "plain")
-        part2 = MIMEText(html, "html")
+        part1 = MIMEText(text, 'plain')
+        part2 = MIMEText(html, 'html')
 
-        # Add HTML/plain-text parts to MIMEMultipart message
-        # The email client will try to render the last part first
-        message.attach(part1)
-        message.attach(part2)
+        msg.attach(part1)
+        msg.attach(part2)
 
-        # Create secure connection with server and send email
-        context = ssl.create_default_context()
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465,
-                              context=context) as server:
-            server.login(sender_email, password)
-            server.sendmail(
-                sender_email, receiver_email, message.as_string()
-            )
+        s = smtplib.SMTP('cheneycreations.com')
+        s.ehlo()
+        s.login(sender_email, password)
+        s.sendmail(sender_email, receiver_email, msg.as_string())
+
+        s.quit()
+
         self.last_email_sent = datetime.now()
 
     # Function to create new judgment
