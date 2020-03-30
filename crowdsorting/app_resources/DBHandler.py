@@ -195,7 +195,7 @@ class DBHandler:
             server_url = f.read()
 
         sender_email = "matthew@cheneycreations.com"
-        receiver_email = "m.cheney95@outlook.com"
+        receiver_email = "cheneycreations@gmail.com"
 
         msg = MIMEMultipart('alternative')
         msg['Subject'] = f"{server_url} Requires Admin Help"
