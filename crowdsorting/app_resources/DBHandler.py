@@ -2,6 +2,7 @@ import re
 import uuid
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+import smtplib
 
 from crowdsorting import session, pairselectors
 from crowdsorting import db
@@ -14,7 +15,6 @@ from datetime import timedelta
 import pickle
 from crowdsorting.app_resources.settings import *
 
-import smtplib
 
 
 from crowdsorting.app_resources.sorting_algorithms.ACJProxy import ACJProxy
@@ -190,7 +190,7 @@ class DBHandler:
             return
         print('emailing admin')
         with open("crowdsorting/app_resources/email_password.txt", 'r') as f:
-            password = f.read()
+            password = f.read().split('\n')[0]
         with open("crowdsorting/app_resources/server_url.txt", 'r') as f:
             server_url = f.read()
 
@@ -198,7 +198,7 @@ class DBHandler:
         receiver_email = "cheneycreations@gmail.com"
 
         msg = MIMEMultipart('alternative')
-        msg['Subject'] = f"{server_url} Requires Admin Help"
+        msg['Subject'] = f"{server_url} Requires Admin Help - {datetime.now()}"
         msg['From'] = sender_email
         msg['To'] = receiver_email
 
