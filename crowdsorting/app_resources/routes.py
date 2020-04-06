@@ -814,6 +814,10 @@ def tower():
                                    session['user'].get('email'),
                                    session['user'].get('cid'))
                                )
+    sortedFiles, confidence, *args = dbhandler.get_sorted(
+        request.cookies.get('project'))
+    confidence = confidence * 100
+    confidence = round(confidence, 2)
     return render_template('tower.html',
                            all_projects=get_all_user_projects(),
                            public_projects=dbhandler.get_public_projects(),
@@ -828,7 +832,8 @@ def tower():
                                session['user'].get('cid')),
                            is_authenticated=dbhandler.check_cid(
                                session['user'].get('email'),
-                               session['user'].get('cid'))
+                               session['user'].get('cid')),
+                           confidence=confidence
                            )
 
 @app.route("/accountinfo", methods=['GET'])

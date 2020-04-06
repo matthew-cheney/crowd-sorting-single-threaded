@@ -12,14 +12,17 @@
 </div>
 <hr/>
 <div class="row text-center">
-    <div class="col-lg-4">
-        <h4>Comparisons made: {{ project_proxy.get_number_comparisons_made() }}</h4>
+    <div class="col-lg-3">
+        <h4>Comparisons made:<br>{{ project_proxy.get_number_comparisons_made() }}</h4>
     </div>
-    <div class="col-lg-4">
-        <h4>Comparisons left: {{ project_proxy.get_total_comparisons_left() }}</h4>
+    <div class="col-lg-3">
+        <h4>Comparisons left:<br>{{ project_proxy.get_total_comparisons_left() }}</h4>
     </div>
-    <div class="col-lg-4">
-        <h4>Active judges: {{ active_judges|length }}</h4>
+    <div class="col-lg-3">
+        <h4>Active judges:<br>{{ active_judges|length }}</h4>
+    </div>
+    <div class="col-lg-3">
+        <h4>Confidence:<br>{{ confidence }} %</h4>
     </div>
 </div>
 <hr/>
