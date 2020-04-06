@@ -129,7 +129,8 @@ class DBHandler:
             print(values)
             # check if all pairs in pbp are waiting for recheckout
             if len(self.get_pairs_currently_checked_out(project)) == 0:
-                self.email_admin(project)
+                # self.email_admin(project)
+                pass
             return values
         doc_one_name = values[0]
         doc_two_name = values[1]

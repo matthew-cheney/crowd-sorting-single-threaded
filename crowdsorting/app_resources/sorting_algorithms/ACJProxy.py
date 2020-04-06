@@ -24,6 +24,7 @@ class ACJProxy:
         self.served_not_returned = dict()
         self.finished = False
         self.total_comparisons = 0
+        self.total_pairs_served = 0
 
     @staticmethod
     def get_algorithm_name():
@@ -45,7 +46,7 @@ class ACJProxy:
         self.fossilIncrement = fossilIncrement
         self.fossilIncrementCounter = 0
         self.number_of_docs = len(data)
-        self.total_comparisons = int(0.5*(self.number_of_docs**2) - 5*(self.number_of_docs / 10))
+        # self.total_comparisons = int(0.5*(self.number_of_docs**2) - 5*(self.number_of_docs / 10))
         self.rounds = rounds
         dat = np.asarray(data)
         np.random.shuffle(dat)
@@ -56,6 +57,8 @@ class ACJProxy:
         with open(f"crowdsorting/app_resources/sorter_instances/{self.project_name}.pkl", "wb") as output_file:  # noqa: E501
             pickle.dump(self, output_file)
         self.fossilize_self()
+        self.total_comparisons = int(self.rounds*(self.number_of_docs/2))
+        self.pair_cutoff = int(self.rounds*(self.number_of_docs/2))
 
     def pickle_acj(self):
         # print("pickling acj")
@@ -72,6 +75,10 @@ class ACJProxy:
                 return "no acj created yet"
         except FileNotFoundError:
             return False
+        #int(rounds*(length/2))
+        if self.total_pairs_served >= self.pair_cutoff:
+            self.no_more_pairs = True
+            return "project is over"
 
         if len(self.roundList) == 0 and len(self.served_not_returned) == 0:
             self.no_more_pairs = True
@@ -102,6 +109,7 @@ class ACJProxy:
         # if not doc_one or not doc_two:
         #     return "no pair available"
         self.served_not_returned[pair_id] = acj_pair
+        self.total_pairs_served += 1
         return (acj_pair[0], acj_pair[1], pair_id)
 
     def make_judgment(self, pair_id, easier_doc_name, harder_doc_name, duration,
