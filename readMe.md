@@ -1,6 +1,8 @@
-## Crowd Sorting
+## Crowd Sorting - Single Threaded
 
 Crowd Sorting is a web application built by Matthew Cheney for the Department of Digital Humanities at Brigham Young University.
+
+This version of Crowd Sorting must be run by a single thread. Multi-threading will likely corrupt the pair tracking and lock the system.
 
 ## Installing Crowd Sorting
 
